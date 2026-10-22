@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Luan · dev sob medida</title>
+<meta name="description" content="Automação, BI com IA, chatbot e apps sob medida para tirar o trabalho manual da sua empresa.">
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0e0f12;--panel:#15171c;--ink:#f3f3f5;--ink2:#9a9ca6;--line:#262932;--acc:#5b8cff;--acc2:#8fd3a4;--soft:#182238}
+:root[data-theme="light"]{--bg:#f7f6f2;--panel:#fff;--ink:#17171a;--ink2:#5c5e66;--line:#e4e2db;--acc:#0f5bd7;--acc2:#1f8a4c;--soft:#e8eefc}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#f7f6f2;--panel:#fff;--ink:#17171a;--ink2:#5c5e66;--line:#e4e2db;--acc:#0f5bd7;--acc2:#1f8a4c;--soft:#e8eefc}}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:var(--acc);text-decoration:none}
+.wrap{max-width:1040px;margin:0 auto;padding:0 20px}
+h1,h2,h3{font-family:"Inter Tight",Inter,sans-serif;letter-spacing:-.02em;margin:0;line-height:1.1}
+nav{position:sticky;top:0;z-index:9;background:color-mix(in srgb,var(--bg) 85%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+nav .wrap{display:flex;align-items:center;justify-content:space-between;height:60px}
+nav .logo{font-family:"Inter Tight";font-weight:800;font-size:18px;color:var(--ink)}
+nav .links{display:flex;gap:4px}
+nav .links a{color:var(--ink2);font-size:14px;font-weight:600;padding:8px 12px;border-radius:999px}
+nav .links a:hover{background:var(--soft);color:var(--acc)}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 20px;border-radius:12px;font-weight:600;font-size:15px;border:1px solid var(--line);color:var(--ink);background:var(--panel);transition:.15s}
+.btn:hover{border-color:var(--acc)}
+.btn.primary{background:var(--acc);color:#fff;border-color:transparent}
+.btn.primary:hover{filter:brightness(1.08)}
+header{padding:96px 0 72px}
+.eyebrow{font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--acc2)}
+header h1{font-size:clamp(40px,7vw,76px);font-weight:800;margin:14px 0 20px;max-width:14ch}
+header .lede{font-size:clamp(18px,2.3vw,22px);color:var(--ink2);max-width:52ch;margin:0 0 32px}
+.cta{display:flex;flex-wrap:wrap;gap:12px}
+section{padding:72px 0;border-top:1px solid var(--line)}
+section h2{font-size:clamp(28px,4vw,40px);font-weight:700;margin-bottom:10px}
+.sub{color:var(--ink2);max-width:60ch;margin:0 0 36px;font-size:17px}
+.grid{display:grid;gap:16px}
+.g3{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.g2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:24px}
+.card h3{font-size:19px;font-weight:700;margin-bottom:8px}
+.card p{margin:0;color:var(--ink2);font-size:15px}
+.ico{width:40px;height:40px;border-radius:10px;background:var(--soft);display:grid;place-items:center;margin-bottom:14px;color:var(--acc);font-weight:800;font-family:"Inter Tight"}
+.tag{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:4px 9px;border-radius:6px;background:var(--soft);color:var(--acc)}
+.tag.soon{background:color-mix(in srgb,var(--ink2) 15%,transparent);color:var(--ink2)}
+.ex{display:grid;grid-template-rows:auto 1fr;overflow:hidden;padding:0}
+.ex .media{aspect-ratio:16/9;background:linear-gradient(135deg,var(--soft),var(--panel));display:grid;place-items:center;color:var(--ink2);font-size:14px;border-bottom:1px solid var(--line);position:relative}
+.ex .media .big{font-family:"Inter Tight";font-size:clamp(28px,4vw,44px);font-weight:800;color:var(--ink);line-height:1}
+.ex .media .big small{display:block;font:600 13px Inter;color:var(--ink2);margin-top:6px;letter-spacing:.06em;text-transform:uppercase}
+.ex .body{padding:20px 24px 24px}
+.ex .body .tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.steps{counter-reset:s;display:grid;gap:12px}
+.step{counter-increment:s;display:grid;grid-template-columns:48px 1fr;gap:14px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px 20px}
+.step::before{content:counter(s,decimal-leading-zero);font-family:"Inter Tight";font-weight:800;font-size:22px;color:var(--acc)}
+.step b{display:block;margin-bottom:4px;font-size:16px}
+.step p{margin:0;color:var(--ink2);font-size:15px}
+.contact{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.contact a{display:flex;flex-direction:column;gap:4px;padding:20px;border-radius:14px;background:var(--panel);border:1px solid var(--line);color:var(--ink)}
+.contact a:hover{border-color:var(--acc)}
+.contact small{color:var(--ink2);font-size:13px}
+.contact b{font-size:17px}
+footer{padding:40px 0 60px;color:var(--ink2);font-size:14px;border-top:1px solid var(--line)}
+footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+@media (max-width:640px){nav .links{display:none}header{padding:64px 0 48px}section{padding:56px 0}}
+</style>
+</head>
+<body>
+
+<nav><div class="wrap">
+  <a class="logo" href="#">Luan<span style="color:var(--acc)">.</span>dev</a>
+  <div class="links"><a href="#servicos">Serviços</a><a href="#exemplos">Exemplos</a><a href="#como">Como trabalho</a><a href="#contato">Contato</a></div>
+  <a class="btn primary" href="#contato">Falar comigo</a>
+</div></nav>
+
+<header class="wrap">
+  <div class="eyebrow">Desenvolvedor · sistemas sob medida</div>
+  <h1>Menos cliques, menos planilha, menos retrabalho.</h1>
+  <p class="lede">Eu faço o seu sistema fazer o que ele não faz. Automação, painéis com IA, chatbot e apps construídos em cima da operação que você já tem — e medidos em minutos ganhos por dia.</p>
+  <div class="cta">
+    <a class="btn primary" href="#contato">Falar comigo</a>
+    <a class="btn" href="#exemplos">Ver exemplos</a>
+    <a class="btn" href="https://github.com/ilicito95" target="_blank" rel="noopener">GitHub ↗</a>
+  </div>
+</header>
+
+<section id="servicos"><div class="wrap">
+  <h2>O que eu faço</h2>
+  <p class="sub">Cinco frentes. Todas começam olhando onde o tempo da sua equipe vai embora.</p>
+  <div class="grid g3">
+    <div class="card"><div class="ico">⚡</div><h3>Automação de serviço repetitivo</h3><p>Cadastro, lançamento, conferência: o que sua equipe faz 30 vezes por dia em 6 abas vira um clique ligado ao seu sistema por API.</p></div>
+    <div class="card"><div class="ico">◔</div><h3>BI com IA que aponta caminho</h3><p>Painel com os números que importam e uma caixa onde você pergunta em português: "por que a inadimplência subiu?" — e recebe onde olhar.</p></div>
+    <div class="card"><div class="ico">✉</div><h3>Chatbot com IA</h3><p>WhatsApp que responde boleto, status e horário consultando o seu sistema, 24 h, e chama um humano quando não sabe.</p></div>
+    <div class="card"><div class="ico">⌁</div><h3>Acompanhamento de equipe</h3><p>App no celular do funcionário: foto da nota, abastecimento, visita — caindo direto na planilha ou no sistema, sem grupo de WhatsApp.</p></div>
+    <div class="card"><div class="ico">⇄</div><h3>Integrações e automações</h3><p>Dois sistemas que não conversam passam a conversar. Planilha que vira banco. Relatório que chega sozinho.</p></div>
+    <div class="card" style="background:var(--soft);border-color:transparent"><div class="ico" style="background:var(--panel)">?</div><h3>Não está na lista?</h3><p>Se é tarefa manual que se repete e tem dado por trás, provavelmente dá para tirar do caminho. Me conta.</p></div>
+  </div>
+</div></section>
+
+<section id="exemplos"><div class="wrap">
+  <h2>Exemplos</h2>
+  <p class="sub">Reconstruções com dados fictícios de problemas reais que já resolvi. Cada um vira vídeo de 45 segundos no <a href="https://www.instagram.com/oluan.dev/" target="_blank" rel="noopener">@oluan.dev</a>.</p>
+  <div class="grid g2">
+
+    <div class="card ex"><div class="media"><div class="big">15 min → 2 min<small>cadastro de cliente</small></div></div><div class="body">
+      <div class="tags"><span class="tag">Automação</span><span class="tag">API</span><span class="tag soon">Em construção</span></div>
+      <h3>Cadastro que levava 15 minutos</h3><p>6 abas, 40 campos, 30 que ninguém usava. Um formulário único ligado ao sistema por API: 2 minutos. 13 min × 30 cadastros/dia = 6,5 h por dia de volta.</p></div></div>
+
+    <div class="card ex"><div class="media"><div class="big">"Por quê?"<small>painel que responde</small></div></div><div class="body">
+      <div class="tags"><span class="tag">BI</span><span class="tag">IA</span><span class="tag soon">Em construção</span></div>
+      <h3>Painel que aponta o caminho</h3><p>Faturamento, inadimplência, clientes, chamados — e uma pergunta em português que devolve onde está o problema e o que fazer.</p></div></div>
+
+    <div class="card ex"><div class="media"><div class="big">23h<small>cliente pergunta o boleto</small></div></div><div class="body">
+      <div class="tags"><span class="tag">Chatbot</span><span class="tag">WhatsApp</span><span class="tag soon">Em construção</span></div>
+      <h3>WhatsApp que consulta o sistema</h3><p>Boleto, status do chamado, horário. Responde de madrugada, não inventa resposta, e chama gente quando precisa.</p></div></div>
+
+    <div class="card ex"><div class="media"><div class="big">📷 → 📊<small>celular para planilha</small></div></div><div class="body">
+      <div class="tags"><span class="tag">App</span><span class="tag">Google Sheets</span><span class="tag soon">Em construção</span></div>
+      <h3>Fim do bloquinho</h3><p>Funcionário tira foto da nota, preenche 3 campos, e a linha aparece na planilha. Sem foto perdida no grupo.</p></div></div>
+
+  </div>
+</div></section>
+
+<section id="como"><div class="wrap">
+  <h2>Como eu trabalho</h2>
+  <p class="sub">Quem constrói é quem conversa. Sem gerente no meio, sem escopo que cresce sem aviso.</p>
+  <div class="steps">
+    <div class="step"><div><b>Conversa de 30 minutos</b><p>Você me mostra como é o dia a dia. Eu só ouço e anoto onde o tempo vaza. Sem custo, sem compromisso.</p></div></div>
+    <div class="step"><div><b>Diagnóstico e número fechado</b><p>Em 2 dias você recebe: o que eu faria, quanto tempo sua equipe ganha, e o preço — fechado por projeto, não por hora.</p></div></div>
+    <div class="step"><div><b>Construção com você olhando</b><p>Entregas pequenas, toda semana, rodando com os seus dados. Você aprova cada etapa.</p></div></div>
+    <div class="step"><div><b>Implantação e medição</b><p>Entra em uso, a equipe aprende em uma tarde, e a gente mede o antes e o depois. O número vai no relatório final.</p></div></div>
+    <div class="step"><div><b>Suporte</b><p>30 dias inclusos. Depois, manutenção mensal se fizer sentido — para chatbot e painel, costuma fazer.</p></div></div>
+  </div>
+</div></section>
+
+<section id="contato"><div class="wrap">
+  <h2>Falar comigo</h2>
+  <p class="sub">Me conta a tarefa que mais toma tempo da sua equipe. Eu respondo em até 1 dia útil.</p>
+  <div class="contact">
+    <a href="https://www.instagram.com/oluan.dev/" target="_blank" rel="noopener"><small>Instagram</small><b>@oluan.dev</b></a>
+    <a href="https://github.com/ilicito95" target="_blank" rel="noopener"><small>GitHub</small><b>github.com/ilicito95</b></a>
+    <a href="https://wa.me/55SEUNUMERO?text=Oi%20Luan%2C%20vi%20seu%20portf%C3%B3lio" target="_blank" rel="noopener"><small>WhatsApp</small><b>Chamar no WhatsApp</b></a>
+  </div>
+</div></section>
+
+<footer><div class="wrap"><span>Luan · desenvolvedor sob medida</span><span>Exemplos usam dados fictícios. Nenhum dado de cliente real aparece aqui.</span></div></footer>
+
+</body>
+</html>
