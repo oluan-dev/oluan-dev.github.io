@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Fala comigo · oLuan</title>
+<meta name="description" content="Fale direto com o Luan pelo WhatsApp, ou descubra em 4 perguntas que tipo de bagunça a sua empresa tem e qual a primeira automação que ele faria.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#070708;--bg2:#0d0d10;--ink:#f2f1ee;--ink2:#a4a39e;--ink3:#5e5d59;
+  --line:rgba(255,255,255,.08);--acc:#c8ff2e;--acc-ink:#0a0a0a;
+  --display:"Space Grotesk",Inter,sans-serif;--mono:"JetBrains Mono",monospace;
+  --ease:cubic-bezier(.16,1,.3,1);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.55 Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:clip}
+a{color:inherit;text-decoration:none}
+::selection{background:var(--acc);color:var(--acc-ink)}
+:focus-visible{outline:2px solid var(--acc);outline-offset:4px}
+.wrap{max-width:1200px;margin:0 auto;padding:0 clamp(20px,4vw,48px)}
+h1,h2,h3{font-family:var(--display);font-weight:700;letter-spacing:-.035em;line-height:.95;margin:0}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--acc);margin:0}
+.sub{color:var(--ink2);font-size:clamp(17px,1.6vw,20px);max-width:56ch;margin:0}
+
+nav{position:fixed;inset:0 0 auto;z-index:50;mix-blend-mode:difference}
+nav .wrap{display:flex;align-items:center;justify-content:space-between;height:72px}
+nav .logo{font-family:var(--display);font-weight:700;font-size:20px;letter-spacing:-.02em}
+nav .links{display:flex;gap:28px;font-size:14px;font-weight:500;color:#ddd}
+nav .links a:hover,nav .links a[aria-current]{color:#fff}
+nav .links a[aria-current]{text-decoration:underline;text-underline-offset:6px}
+@media(max-width:760px){nav .links{display:none}}
+
+.btn{display:inline-flex;align-items:center;gap:10px;min-height:48px;padding:12px 22px;border-radius:999px;font-weight:600;font-size:15px;border:1px solid var(--line);color:var(--ink);background:transparent;cursor:pointer;transition:border-color .35s var(--ease),background .35s var(--ease)}
+.btn:hover{border-color:rgba(255,255,255,.35)}
+.btn.acc{background:var(--acc);color:var(--acc-ink);border-color:transparent}
+.btn.acc:hover{background:#dbff6a}
+.btn .dot{width:8px;height:8px;border-radius:50%;background:currentColor;opacity:.7}
+nav .btn{min-height:44px;padding:10px 18px;font-size:13px;background:#fff;color:#000;border-color:transparent}
+
+/* topo */
+.top{padding:clamp(140px,18vw,200px) 0 clamp(56px,8vw,96px)}
+.top h1{font-size:clamp(48px,9vw,140px);max-width:12ch;margin:18px 0 24px;text-wrap:balance}
+.top h1 em{font-style:normal;color:var(--acc)}
+.top .row{display:flex;flex-wrap:wrap;gap:24px;align-items:end;justify-content:space-between}
+.cta{display:flex;flex-wrap:wrap;gap:12px}
+
+/* canais */
+.canais{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));border-top:1px solid var(--line);border-left:1px solid var(--line);margin-bottom:clamp(80px,10vw,140px)}
+.canal{padding:28px 24px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);display:grid;gap:10px;transition:background .4s var(--ease)}
+.canal:hover{background:var(--bg2)}
+.canal small{font:500 11px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--ink3)}
+.canal b{font-family:var(--display);font-size:24px;letter-spacing:-.02em}
+.canal span{color:var(--ink2);font-size:15px}
+.canal.wa b{color:var(--acc)}
+
+/* quiz */
+.quiz{background:var(--acc);color:var(--acc-ink);padding:clamp(80px,12vw,160px) 0}
+.quiz .eyebrow{color:#2a3300}
+.quiz h2{color:#0a0a0a;font-size:clamp(36px,5.6vw,84px);max-width:14ch;text-wrap:balance}
+.quiz .sub{color:#2a3300}
+.quiz .head{display:grid;gap:18px;margin-bottom:clamp(40px,6vw,72px)}
+.qbox{background:#0a0a0a;color:var(--ink);border-radius:24px;padding:clamp(24px,4vw,48px);max-width:860px}
+.qbox .prog{display:flex;gap:6px;margin-bottom:28px}
+.qbox .prog i{flex:1;height:3px;background:#2a2a2e;border-radius:2px;transition:background .3s}
+.qbox .prog i.on{background:var(--acc)}
+.qbox .q{font-family:var(--display);font-size:clamp(24px,3vw,38px);letter-spacing:-.03em;line-height:1.05;margin:0 0 24px}
+.opts{display:grid;gap:10px}
+.opt{text-align:left;background:transparent;border:1px solid var(--line);color:var(--ink);min-height:56px;padding:16px 18px;-webkit-tap-highlight-color:transparent;border-radius:14px;font:500 16px Inter,sans-serif;cursor:pointer;display:grid;grid-template-columns:28px 1fr;gap:12px;align-items:center;transition:border-color .3s,background .3s}
+.opt:hover{border-color:rgba(255,255,255,.4);background:#121214}
+.opt i{font:500 12px var(--mono);color:var(--ink3);border:1px solid var(--line);border-radius:6px;width:28px;height:28px;display:grid;place-items:center;font-style:normal}
+.opt:hover i{color:var(--acc);border-color:var(--acc)}
+.res{display:none}
+.res.on{display:block;animation:up .6s var(--ease)}
+.res .eyebrow{margin-bottom:12px}
+.res h3{font-size:clamp(32px,5vw,64px);letter-spacing:-.04em;margin-bottom:14px}
+.res h3 em{font-style:normal;color:var(--acc)}
+.res p{color:var(--ink2);margin:0 0 20px;max-width:58ch}
+.res .first{border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin-bottom:24px;display:grid;gap:4px}
+.res .first small{font:500 11px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--acc)}
+.res .first b{font-family:var(--display);font-size:20px;letter-spacing:-.02em}
+.res .row{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.res .redo{background:none;border:0;color:var(--ink3);font:500 14px Inter;cursor:pointer;min-height:44px;padding:12px 4px;text-decoration:underline;text-underline-offset:4px}
+
+footer{padding:28px 0 40px;color:var(--ink3);font-size:13px;border-top:1px solid var(--line)}
+footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+footer a:hover{color:var(--ink)}
+
+.in{animation:up .9s var(--ease) both}
+.in:nth-child(2){animation-delay:.08s}.in:nth-child(3){animation-delay:.16s}
+@keyframes up{from{opacity:0;transform:translateY(24px)}}
+@media(max-width:760px){.top .cta .btn{width:100%;justify-content:center}}
+@media(prefers-reduced-motion:reduce){.in,.res.on{animation:none}}
+</style>
+</head>
+<body>
+
+<nav><div class="wrap">
+  <a class="logo" href="index.html">oLuan<span style="color:var(--acc)">.</span></a>
+  <div class="links"><a href="index.html#demo">Demo</a><a href="index.html#agentes">Agentes</a><a href="index.html#cases">Resultados</a><a href="index.html#capitulos">Método</a><a href="fala-comigo.html" aria-current="page">Fala comigo</a><a href="quem-e-luan.html">Quem é Luan?</a></div>
+  <a class="btn" href="https://wa.me/5521970568810?text=Oi%20Luan%2C%20vi%20seu%20site%20e%20quero%20conversar%20sobre%20automa%C3%A7%C3%A3o" target="_blank" rel="noopener">WhatsApp</a>
+</div></nav>
+
+<header class="top"><div class="wrap">
+  <p class="eyebrow in">Fala comigo</p>
+  <h1 class="in">Me conta a tarefa que mais <em>rouba tempo.</em></h1>
+  <div class="row in">
+    <p class="sub">Uma mensagem basta. Eu respondo em até 1 dia útil com a próxima pergunta, ou com a data da conversa de 30 minutos. Sem custo, sem compromisso.</p>
+    <div class="cta">
+      <a class="btn acc" href="https://wa.me/5521970568810?text=Oi%20Luan%2C%20a%20tarefa%20que%20mais%20rouba%20tempo%20aqui%20%C3%A9%3A%20" target="_blank" rel="noopener"><span class="dot"></span>Chamar no WhatsApp</a>
+      <a class="btn" href="#quiz">Não sei por onde começar ↓</a>
+    </div>
+  </div>
+</div></header>
+
+<div class="wrap">
+  <div class="canais">
+    <a class="canal wa" href="https://wa.me/5521970568810?text=Oi%20Luan%2C%20vi%20seu%20site%20e%20quero%20conversar" target="_blank" rel="noopener"><small>WhatsApp</small><b>Chamar agora ↗</b><span>O jeito mais rápido. Respondo em até 1 dia útil.</span></a>
+    <a class="canal" href="https://www.instagram.com/oluan.dev/" target="_blank" rel="noopener"><small>Instagram</small><b>@oluan.dev ↗</b><span>Cada exemplo vira um vídeo de 45 segundos.</span></a>
+    <a class="canal" href="https://github.com/oluan-dev" target="_blank" rel="noopener"><small>GitHub</small><b>oluan-dev ↗</b><span>Prefere ver o código antes de conversar? Está aberto.</span></a>
+  </div>
+</div>
+
+<section class="quiz" id="quiz"><div class="wrap">
+  <div class="head">
+    <p class="eyebrow">Não sabe por onde começar? · 4 perguntas</p>
+    <h2>Que tipo de bagunça é a sua empresa?</h2>
+    <p class="sub">Quatro perguntas, um perfil, e a primeira automação que eu faria. Sem e-mail, sem cadastro.</p>
+  </div>
+  <div class="qbox">
+    <div class="prog" id="prog"><i class="on"></i><i></i><i></i><i></i></div>
+    <div id="qstep">
+      <p class="q" id="qtext"></p>
+      <div class="opts" id="opts"></div>
+    </div>
+    <div class="res" id="res">
+      <p class="eyebrow">Seu perfil</p>
+      <h3 id="rname"></h3>
+      <p id="rdesc"></p>
+      <div class="first"><small>Primeira automação que eu faria</small><b id="rfirst"></b></div>
+      <div class="row">
+        <a class="btn acc" id="rwa" href="#" target="_blank" rel="noopener"><span class="dot"></span>Mandar meu perfil no WhatsApp</a>
+        <button class="redo" id="redo" type="button">Refazer o quiz</button>
+      </div>
+    </div>
+  </div>
+</div></section>
+
+<footer><div class="wrap"><span>oLuan · desenvolvedor sob medida</span><span><a href="index.html">Início</a> · <a href="quem-e-luan.html">Quem é Luan?</a></span></div></footer>
+
+<script>
+// Quiz — 4 perguntas, 4 perfis
+(function(){
+  var P = {
+    cad:{name:'Bagunça de <em>Cadastro</em>', desc:'Sua equipe digita a mesma coisa em vários lugares. O trabalho existe, só que metade dele é copiar e colar entre abas. É a bagunça mais fácil de medir e a que paga mais rápido.', first:'Formulário único ligado ao seu sistema por API — o cadastro de 15 minutos vira 2.'},
+    grp:{name:'Bagunça de <em>Grupo</em>', desc:'A operação de campo vive em grupo de WhatsApp: foto de nota, abastecimento, visita. Informação chega, mas ninguém consolida e o que importa se perde na rolagem.', first:'App no celular da equipe: foto + 3 campos, caindo direto no painel.'},
+    num:{name:'Bagunça de <em>Número</em>', desc:'Dado existe, mas a resposta para "por que caiu?" leva uma reunião. Você decide por intuição porque olhar o número custa mais do que decidir sem ele.', first:'Painel com IA ligado ao seu sistema, com a caixa de "por quê?" em português.'},
+    mad:{name:'Bagunça de <em>Madrugada</em>', desc:'Cliente pergunta boleto, status e horário fora do expediente, e a resposta vem no dia seguinte — ou não vem. Quem responde é sempre a mesma pessoa cansada.', first:'Chatbot de WhatsApp que consulta o seu sistema e chama um humano quando não sabe.'}
+  };
+  var Q = [
+    {q:'Onde o tempo da sua equipe mais some hoje?', o:[['Digitando a mesma informação em mais de um sistema','cad'],['Procurando foto, nota ou comprovante em grupo de WhatsApp','grp'],['Montando relatório para saber como está o mês','num'],['Respondendo cliente no WhatsApp a qualquer hora','mad']]},
+    {q:'Como você descobre que algo deu errado?', o:[['Quando um cadastro sai duplicado ou faltando campo','cad'],['Quando alguém do campo lembra de avisar','grp'],['No fechamento do mês, tarde demais','num'],['Quando o cliente reclama que ninguém respondeu','mad']]},
+    {q:'Qual frase soa mais familiar?', o:[['"Abre a outra aba e copia daqui"','cad'],['"Manda no grupo que depois eu anoto"','grp'],['"Acho que caiu, mas não sei por quê"','num'],['"Amanhã eu respondo esse"','mad']]},
+    {q:'Se eu devolvesse uma hora por dia para a equipe, ela viria de onde?', o:[['Cadastro e lançamento','cad'],['Conferência do que o campo mandou','grp'],['Reunião para entender os números','num'],['Atendimento repetitivo no WhatsApp','mad']]}
+  ];
+  var i = 0, score = {cad:0,grp:0,num:0,mad:0};
+  var qtext = document.getElementById('qtext'), opts = document.getElementById('opts'), prog = document.getElementById('prog').children,
+      step = document.getElementById('qstep'), res = document.getElementById('res');
+  function render(){
+    var q = Q[i]; qtext.textContent = q.q; opts.innerHTML = '';
+    q.o.forEach(function(o, k){
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'opt';
+      b.innerHTML = '<i>' + String.fromCharCode(65 + k) + '</i><span></span>'; b.lastChild.textContent = o[0];
+      b.addEventListener('click', function(){ pick(o[1]); });
+      opts.appendChild(b);
+    });
+    for (var k = 0; k < prog.length; k++) prog[k].classList.toggle('on', k <= i);
+  }
+  function pick(p){
+    score[p]++; i++;
+    if (i < Q.length) return render();
+    var best = Object.keys(score).sort(function(a, b){ return score[b] - score[a]; })[0], r = P[best];
+    document.getElementById('rname').innerHTML = r.name;
+    document.getElementById('rdesc').textContent = r.desc;
+    document.getElementById('rfirst').textContent = r.first;
+    var plain = r.name.replace(/<[^>]+>/g, '');
+    document.getElementById('rwa').href = 'https://wa.me/5521970568810?text=' + encodeURIComponent('Oi Luan, fiz o quiz no seu site e deu "' + plain + '". A primeira automação sugerida foi: ' + r.first + ' Quero conversar.');
+    step.style.display = 'none'; res.classList.add('on');
+  }
+  document.getElementById('redo').addEventListener('click', function(){
+    i = 0; score = {cad:0,grp:0,num:0,mad:0}; res.classList.remove('on'); step.style.display = ''; render();
+  });
+  render();
+})();
+</script>
+</body>
+</html>
