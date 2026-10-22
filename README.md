@@ -1,6 +1,6 @@
 # Luan · dev sob medida
 
-Portfólio: **https://ilicito95.github.io**
+Portfólio: **https://oluan-dev.github.io**
 
 Automação de serviço repetitivo, BI com IA, chatbot, apps de campo e integrações — sob medida, em cima do sistema que a empresa já tem.
 

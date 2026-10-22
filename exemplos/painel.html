@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Horizonte · Painel</title>
+<meta name="description" content="Mockup de painel de BI com IA — dados fictícios da Serviços Horizonte Ltda.">
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{--bg:#0b0c10;--panel:#13151b;--panel2:#191c24;--ink:#f2f3f6;--ink2:#8d919d;--line:#242833;--acc:#5b8cff;--good:#4ad48b;--bad:#ff6b6b;--warn:#ffb648;--soft:#172038}
+:root[data-theme="light"]{--bg:#f4f5f8;--panel:#fff;--panel2:#f8f9fc;--ink:#15171c;--ink2:#636774;--line:#e3e6ee;--acc:#1f5fe0;--good:#1f8a4c;--bad:#d64545;--warn:#b7791f;--soft:#e8eefc}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#f4f5f8;--panel:#fff;--panel2:#f8f9fc;--ink:#15171c;--ink2:#636774;--line:#e3e6ee;--acc:#1f5fe0;--good:#1f8a4c;--bad:#d64545;--warn:#b7791f;--soft:#e8eefc}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:"Inter Tight",Inter,sans-serif;letter-spacing:-.02em;margin:0}
+.app{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
+aside{background:var(--panel);border-right:1px solid var(--line);padding:20px 16px;display:flex;flex-direction:column;gap:6px}
+.brand{display:flex;align-items:center;gap:10px;padding:6px 8px 18px;font-family:"Inter Tight";font-weight:800;font-size:17px}
+.brand i{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,var(--acc),#9bd3ff);display:inline-block}
+aside a{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:9px;color:var(--ink2);text-decoration:none;font-weight:500}
+aside a.on{background:var(--soft);color:var(--acc);font-weight:600}
+aside a span{width:18px;text-align:center;opacity:.8}
+aside .foot{margin-top:auto;font-size:12px;color:var(--ink2);padding:10px 8px;border-top:1px solid var(--line)}
+main{padding:22px 26px 40px;max-width:1240px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:20px}
+.top h1{font-size:24px;font-weight:700}
+.top p{margin:2px 0 0;color:var(--ink2)}
+.seg{display:flex;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:3px}
+.seg button{border:0;background:none;color:var(--ink2);font:600 13px Inter;padding:7px 12px;border-radius:8px;cursor:pointer}
+.seg button.on{background:var(--soft);color:var(--acc)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:14px}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 18px;position:relative;overflow:hidden}
+.kpi .l{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2)}
+.kpi .v{font-family:"Inter Tight";font-size:32px;font-weight:800;margin:6px 0 2px;line-height:1}
+.kpi .d{font-size:12px;font-weight:600}
+.kpi .d.up{color:var(--good)}.kpi .d.down{color:var(--bad)}.kpi .d.warn{color:var(--warn)}
+.kpi canvas{position:absolute;right:12px;bottom:10px;width:90px!important;height:34px!important;opacity:.9}
+.row{display:grid;grid-template-columns:1.5fr 1fr;gap:14px;margin-bottom:14px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px}
+.panel h2{font-size:15px;font-weight:700;margin-bottom:2px}
+.panel .s{color:var(--ink2);font-size:12px;margin-bottom:12px}
+.chart{position:relative;height:240px}
+.ai{background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:14px}
+.ai h2{display:flex;align-items:center;gap:8px;font-size:15px}
+.ai h2 i{width:8px;height:8px;border-radius:50%;background:var(--acc);box-shadow:0 0 0 4px var(--soft)}
+.ai .s{color:var(--ink2);font-size:12px;margin:2px 0 12px}
+.ask{display:flex;gap:8px}
+.ask input{flex:1;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:12px 14px;color:var(--ink);font:15px Inter;outline:0}
+.ask input:focus{border-color:var(--acc)}
+.ask button{background:var(--acc);color:#fff;border:0;border-radius:10px;padding:0 18px;font:600 14px Inter;cursor:pointer}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.chips button{background:none;border:1px solid var(--line);color:var(--ink2);border-radius:999px;padding:5px 11px;font:500 12px Inter;cursor:pointer}
+.chips button:hover{border-color:var(--acc);color:var(--acc)}
+.answer{margin-top:14px;padding:14px 16px;border-radius:12px;background:var(--bg);border-left:3px solid var(--acc);display:none;white-space:pre-line;line-height:1.6}
+.answer.show{display:block;animation:in .25s ease}
+.answer b{color:var(--acc)}
+@keyframes in{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2);text-align:left;padding:8px 10px;border-bottom:1px solid var(--line)}
+td{padding:9px 10px;border-bottom:1px solid var(--line)}
+tr:last-child td{border-bottom:0}
+.pill{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:700}
+.pill.bad{background:color-mix(in srgb,var(--bad) 18%,transparent);color:var(--bad)}
+.pill.warn{background:color-mix(in srgb,var(--warn) 18%,transparent);color:var(--warn)}
+.pill.good{background:color-mix(in srgb,var(--good) 18%,transparent);color:var(--good)}
+.bar{height:6px;border-radius:3px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--acc)}
+.banner{position:fixed;left:0;right:0;bottom:0;background:var(--acc);color:#fff;text-align:center;font-size:12px;padding:6px;font-weight:600;z-index:9}
+@media (max-width:900px){.app{grid-template-columns:1fr}aside{display:none}.row{grid-template-columns:1fr}main{padding:16px 16px 60px}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside>
+  <div class="brand"><i></i>Horizonte</div>
+  <a class="on"><span>◫</span>Visão geral</a>
+  <a><span>◔</span>Financeiro</a>
+  <a><span>☷</span>Atendimento</a>
+  <a><span>⌁</span>Equipe de rua</a>
+  <a><span>◎</span>Clientes</a>
+  <div class="foot">Serviços Horizonte Ltda<br>dados fictícios · outubro</div>
+</aside>
+<main>
+  <div class="top">
+    <div><h1>Visão geral</h1><p>Atualizado há 4 min · sincronizado com o sistema de gestão</p></div>
+    <div class="seg"><button>7 dias</button><button class="on">30 dias</button><button>12 meses</button></div>
+  </div>
+
+  <div class="kpis">
+    <div class="kpi"><div class="l">Faturamento do mês</div><div class="v">R$ 184,2 mil</div><div class="d up">▲ 6,1% vs. set</div><canvas id="s1"></canvas></div>
+    <div class="kpi"><div class="l">Inadimplência</div><div class="v">12,4%</div><div class="d down">▲ 4,2 pts vs. set</div><canvas id="s2"></canvas></div>
+    <div class="kpi"><div class="l">Clientes ativos</div><div class="v">1.218</div><div class="d up">▲ 31 novos</div><canvas id="s3"></canvas></div>
+    <div class="kpi"><div class="l">Chamados abertos</div><div class="v">47</div><div class="d warn">● 9 acima de 48 h</div><canvas id="s4"></canvas></div>
+  </div>
+
+  <div class="ai">
+    <h2><i></i>Pergunte aos seus dados</h2>
+    <div class="s">Em português. A resposta diz onde olhar e o que fazer — não só o número.</div>
+    <div class="ask"><input id="q" placeholder="Ex.: por que a inadimplência subiu?"><button id="go">Perguntar</button></div>
+    <div class="chips">
+      <button data-q="por que a inadimplência subiu?">por que a inadimplência subiu?</button>
+      <button data-q="qual bairro mais atrasa?">qual bairro mais atrasa?</button>
+      <button data-q="quem da equipe está sobrecarregado?">quem da equipe está sobrecarregado?</button>
+      <button data-q="onde cortar custo esse mês?">onde cortar custo esse mês?</button>
+    </div>
+    <div class="answer" id="a"></div>
+  </div>
+
+  <div class="row">
+    <div class="panel"><h2>Faturamento × inadimplência</h2><div class="s">Últimos 12 meses</div><div class="chart"><canvas id="c1"></canvas></div></div>
+    <div class="panel"><h2>Atrasos por bairro</h2><div class="s">Contratos vencidos há mais de 10 dias</div><div class="chart"><canvas id="c2"></canvas></div></div>
+  </div>
+
+  <div class="row">
+    <div class="panel"><h2>Onde agir primeiro</h2><div class="s">Ordenado por valor em risco</div>
+      <table><tr><th>Grupo</th><th>Contratos</th><th>Em risco</th><th>Situação</th></tr>
+      <tr><td>Centro · vencimento dia 10</td><td>86</td><td>R$ 21,4 mil</td><td><span class="pill bad">Crítico</span></td></tr>
+      <tr><td>Jardim Sul · plano básico</td><td>54</td><td>R$ 9,8 mil</td><td><span class="pill warn">Atenção</span></td></tr>
+      <tr><td>Nova Era · vencimento dia 25</td><td>39</td><td>R$ 6,1 mil</td><td><span class="pill warn">Atenção</span></td></tr>
+      <tr><td>Industrial · empresas</td><td>22</td><td>R$ 2,0 mil</td><td><span class="pill good">Normal</span></td></tr>
+      </table></div>
+    <div class="panel"><h2>Equipe de rua · hoje</h2><div class="s">Visitas concluídas / agendadas</div>
+      <table>
+      <tr><td>Carlos</td><td style="width:45%"><div class="bar"><i style="width:92%"></i></div></td><td>11 / 12</td></tr>
+      <tr><td>Ana</td><td><div class="bar"><i style="width:70%"></i></div></td><td>7 / 10</td></tr>
+      <tr><td>Rafael</td><td><div class="bar"><i style="width:38%;background:var(--warn)"></i></div></td><td>5 / 13</td></tr>
+      <tr><td>Bia</td><td><div class="bar"><i style="width:100%;background:var(--good)"></i></div></td><td>9 / 9</td></tr>
+      </table></div>
+  </div>
+</main>
+</div>
+<div class="banner">MOCKUP · Serviços Horizonte Ltda é fictícia · todos os dados são inventados · oluan-dev.github.io</div>
+
+<script>
+const css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const meses=['nov','dez','jan','fev','mar','abr','mai','jun','jul','ago','set','out'];
+const fat=[151,158,149,162,165,171,168,174,176,179,173,184];
+const inad=[7.1,7.4,8.0,7.6,7.9,8.2,8.4,8.1,8.6,8.3,8.2,12.4];
+Chart.defaults.color=css('--ink2');Chart.defaults.font.family='Inter';Chart.defaults.borderColor=css('--line');
+const spark=(id,data,color)=>new Chart(document.getElementById(id),{type:'line',data:{labels:data,datasets:[{data,borderColor:color,borderWidth:2,pointRadius:0,tension:.4}]},options:{plugins:{legend:{display:false},tooltip:{enabled:false}},scales:{x:{display:false},y:{display:false}},responsive:false}});
+spark('s1',fat.slice(-7),css('--good'));spark('s2',inad.slice(-7),css('--bad'));spark('s3',[1140,1152,1160,1171,1187,1190,1218],css('--acc'));spark('s4',[31,28,35,40,38,44,47],css('--warn'));
+new Chart(document.getElementById('c1'),{data:{labels:meses,datasets:[
+ {type:'bar',label:'Faturamento (R$ mil)',data:fat,backgroundColor:css('--acc'),borderRadius:6,yAxisID:'y'},
+ {type:'line',label:'Inadimplência (%)',data:inad,borderColor:css('--bad'),backgroundColor:css('--bad'),tension:.35,pointRadius:3,yAxisID:'y2'}]},
+ options:{maintainAspectRatio:false,plugins:{legend:{position:'bottom'}},scales:{y:{beginAtZero:false,grid:{color:css('--line')}},y2:{position:'right',grid:{display:false},ticks:{callback:v=>v+'%'}},x:{grid:{display:false}}}}});
+new Chart(document.getElementById('c2'),{type:'bar',data:{labels:['Centro','Jardim Sul','Nova Era','Industrial','Outros'],datasets:[{data:[86,54,39,22,17],backgroundColor:[css('--bad'),css('--warn'),css('--warn'),css('--acc'),css('--line')],borderRadius:6}]},
+ options:{indexAxis:'y',maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:css('--line')}},y:{grid:{display:false}}}}});
+const R={
+ 'por que a inadimplência subiu?':'<b>Subiu de 8,2% para 12,4% em outubro.</b>\n70% do aumento vem de um grupo só: <b>Centro, vencimento dia 10</b> — 86 contratos, R$ 21,4 mil em atraso. O dia 10 caiu num sábado e o lembrete automático não saiu.\n\n<b>O que fazer:</b> disparar lembrete por WhatsApp hoje para esses 86 e mover o lembrete para 2 dias úteis antes do vencimento. Resolve ~R$ 15 mil nas próximas 2 semanas, pelo histórico.',
+ 'qual bairro mais atrasa?':'<b>Centro</b>, com 86 contratos vencidos há mais de 10 dias (R$ 21,4 mil). Depois Jardim Sul (54) e Nova Era (39).\n\nCentro concentra os contratos com vencimento dia 10 — não é o bairro, é a data. <b>Sugestão:</b> oferecer troca de vencimento para dia 15 nesse grupo.',
+ 'quem da equipe está sobrecarregado?':'<b>Rafael</b>: 13 visitas agendadas hoje, 5 concluídas às 15h. Média da equipe é 10. Ele está com a rota mais longa (Nova Era + Industrial).\n\n<b>O que fazer:</b> passar 3 visitas do Industrial para a Bia, que já fechou a rota dela.',
+ 'onde cortar custo esse mês?':'Dois pontos somam <b>R$ 4,3 mil/mês</b>:\n1. 9 chamados abertos há mais de 48 h geram revisita — cada revisita custa ~R$ 180. Fechar no primeiro contato economiza R$ 1,6 mil.\n2. 22 contratos do plano básico no Industrial estão abaixo do custo de atendimento. Migrar para o plano empresa recupera R$ 2,7 mil.'
+};
+const a=document.getElementById('a'),q=document.getElementById('q');
+function ask(t){t=(t||q.value).trim().toLowerCase();if(!t)return;const k=Object.keys(R).find(k=>t.includes(k.split(' ')[2]||k))||Object.keys(R)[0];a.innerHTML=R[k]||R[Object.keys(R)[0]];a.classList.remove('show');void a.offsetWidth;a.classList.add('show');q.value=k}
+document.getElementById('go').onclick=()=>ask();q.addEventListener('keydown',e=>{if(e.key==='Enter')ask()});
+document.querySelectorAll('.chips button').forEach(b=>b.onclick=()=>ask(b.dataset.q));
+</script>
+</body>
+</html>
