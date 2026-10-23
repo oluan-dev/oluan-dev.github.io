@@ -6,8 +6,20 @@
 <link rel="icon" type="image/png" href="favicon.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <script src="rastreio.js" defer></script>
-<title>Demo · oLuan</title>
-<meta name="description" content="Das 18h às 8h, enquanto a equipe dorme, chatbot, integração e painel com IA trabalham sozinhos. A bagunça da sua operação vira painel. Luan, desenvolvedor sob medida para PMEs.">
+<title>Chatbot com IA e Dashboard de BI · oLuan</title>
+<meta name="description" content="Chatbot com IA que faz todo o atendimento no WhatsApp e dashboard de Business Intelligence com IA: projeções financeiras, KPIs, controle de estoque e a pauta da semana de cada setor. Desenvolvedor sob medida para pequenas e médias empresas.">
+<link rel="canonical" href="https://oluan.com.br/">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:url" content="https://oluan.com.br/">
+<meta property="og:title" content="Chatbot com IA e Dashboard de BI para empresas · oLuan">
+<meta property="og:description" content="Atendimento completo no WhatsApp com IA e um painel que lê o histórico da sua empresa e diz onde cada setor tem que agir.">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@graph":[
+{"@type":"ProfessionalService","name":"oLuan","url":"https://oluan.com.br/","email":"luan@oluan.com.br","telephone":"+55-21-97056-8810","areaServed":"BR","sameAs":["https://instagram.com/oluan.dev","https://github.com/oluan-dev"],"founder":{"@type":"Person","name":"Luan"},
+ "description":"Chatbot com IA para WhatsApp, dashboard de Business Intelligence com IA, projeções financeiras e contábeis, KPIs, controle de estoque e automação de processos para pequenas e médias empresas."},
+{"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Preciso trocar o sistema que eu já uso?", "acceptedAnswer": {"@type": "Answer", "text": "Não. Eu conecto no que a empresa já tem: sistema de gestão, ERP, banco de dados ou até a planilha antiga. Tem API, uso a API. Não tem, leio do banco ou dos arquivos que o sistema exporta."}}, {"@type": "Question", "name": "O chatbot com IA pode inventar resposta?", "acceptedAnswer": {"@type": "Answer", "text": "Não, e por dois motivos. Ele responde consultando um banco de dados vetorizado com o histórico da sua empresa, que aprende com cada atendimento do dia a dia. E um supervisor digital revisa as conversas 24 horas por dia e corrige o que sair do trilho. O que ele não sabe vai para uma pessoa da equipe, com a conversa inteira junto."}}, {"@type": "Question", "name": "A IA do dashboard entende os números da minha empresa?", "acceptedAnswer": {"@type": "Answer", "text": "Entende e mostra de onde tirou. Ela lê o histórico de vendas, financeiro, estoque e atendimento, responde em português e aponta o dado que usou. Você confere antes de decidir."}}, {"@type": "Question", "name": "Quanto custa um chatbot com IA ou um dashboard de BI?", "acceptedAnswer": {"@type": "Answer", "text": "Preço fechado por projeto. Sai no diagnóstico, 2 dias depois de uma conversa de 30 minutos. Sem cobrança por hora e sem escopo que cresce sem aviso."}}, {"@type": "Question", "name": "Quanto tempo até funcionar?", "acceptedAnswer": {"@type": "Answer", "text": "Tem entrega toda semana. Você usa cada parte funcionando com os seus dados antes de eu começar a próxima. Nada de sumir três meses e voltar com surpresa."}}, {"@type": "Question", "name": "E depois de entregue?", "acceptedAnswer": {"@type": "Answer", "text": "30 dias de suporte inclusos. A equipe aprende a usar em uma tarde. Depois, manutenção mensal se fizer sentido para a sua empresa."}}]}]}
+</script>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Fraunces:ital,opsz,wght@0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
 <style>
@@ -83,11 +95,6 @@ section{padding:clamp(80px,12vw,160px) 0}
 .head{display:grid;gap:18px;margin-bottom:clamp(40px,6vw,72px)}
 section h2{font-size:clamp(36px,5.6vw,84px);max-width:14ch;text-wrap:balance}
 
-/* relógio da noite (site 04, visual do 05) */
-#clock{position:fixed;left:clamp(20px,4vw,48px);bottom:22px;z-index:40;pointer-events:none;mix-blend-mode:difference;font-family:var(--mono);line-height:1}
-#clock b{display:block;font-weight:500;font-size:22px;letter-spacing:-.02em;color:var(--acc);font-variant-numeric:tabular-nums}
-#clock span{display:block;margin-top:6px;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:#bbb}
-@media(max-width:760px){#clock{bottom:14px;left:16px}#clock b{font-size:18px}}
 
 /* lápide (site 01) */
 .lapide{padding:clamp(60px,10vw,120px) 0;text-align:center}
@@ -159,8 +166,8 @@ section h2{font-size:clamp(36px,5.6vw,84px);max-width:14ch;text-wrap:balance}
 .agent.live .m2 i:first-child{background:rgba(200,255,46,.12);border-color:rgba(200,255,46,.4)}
 .m2 .t{position:absolute;right:12px;bottom:10px;font:700 22px var(--display);color:var(--ink3);transition:.5s}
 .agent.live .m2 .t{color:var(--acc)}
-.m2 .t::after{content:"15 min"}
-.agent.live .m2 .t::after{content:"2 min"}
+.m2 .t::after{content:"6 telas"}
+.agent.live .m2 .t::after{content:"1 clique"}
 .m3 .q{font-size:12px;color:var(--ink2);border:1px solid var(--line);border-radius:8px;padding:6px 10px;margin-bottom:8px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
 .m3 .q::before{content:"?";color:var(--acc);margin-right:6px;font-weight:700}
 .m3 .a{font-size:11.5px;color:var(--ink2);opacity:0;transform:translateY(6px);transition:.5s var(--ease) .2s;line-height:1.4}
@@ -183,6 +190,56 @@ section h2{font-size:clamp(36px,5.6vw,84px);max-width:14ch;text-wrap:balance}
 @keyframes pop{0%{transform:scaleX(0);transform-origin:left}}
 .ask-line{margin-top:28px;font-size:15px;color:var(--ink2)}
 .ask-line a{color:var(--acc);text-decoration:underline;text-underline-offset:4px}
+
+.agents{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media(max-width:1000px){.agents{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:620px){.agents{grid-template-columns:1fr}}
+.agent.live .m6 .row{animation:none;opacity:1}
+.agent.live .m6 .row:nth-child(-n+2) i{background:#ff6b4a}
+.agent.live .m6 .row:nth-child(3) i{background:#f5c542}
+.agent.live .m6 .row:nth-child(4) i{background:var(--acc)}
+.m5{display:flex;align-items:flex-end;gap:5px}
+.m5 i{flex:1;background:rgba(255,255,255,.14);border-radius:3px 3px 0 0;transition:.6s var(--ease)}
+.m5 i.p{background:transparent;border:1px dashed rgba(255,255,255,.25);border-bottom:0}
+.agent.live .m5 i{background:rgba(200,255,46,.5)}
+.agent.live .m5 i.p{background:transparent;border-color:var(--acc)}
+.agent.live .m5 i.p:nth-last-of-type(-n+2){border-color:#ff6b4a}
+.m5 span{position:absolute;right:12px;top:10px;font:11px var(--mono);color:var(--ink3)}
+.m7{display:grid;gap:7px;align-content:center}
+.m7 div{display:flex;justify-content:space-between;font:11.5px var(--mono);color:var(--ink2)}
+.m7 b{font-weight:500;color:var(--ink);transition:.4s}
+.agent.live .m7 b{color:var(--acc)}
+.agent.live .m7 b.bad{color:#ff6b4a}
+
+/* perguntas (FAQ para SEO) */
+.faqgrid{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:clamp(32px,6vw,96px);align-items:start}
+.faqside{position:sticky;top:110px;display:grid;gap:20px;justify-items:start}
+.faqside h2{font-size:clamp(36px,4.6vw,68px)}
+.faq{display:grid;gap:10px}
+.qa{border:1px solid var(--line);border-radius:18px;background:var(--bg2);transition:border-color .3s,background .3s}
+.qa:hover{border-color:rgba(255,255,255,.18)}
+.qa[open]{border-color:rgba(200,255,46,.35);background:linear-gradient(180deg,rgba(200,255,46,.05),transparent 70%),var(--bg2)}
+.qa summary{cursor:pointer;list-style:none;display:grid;grid-template-columns:1fr auto;gap:6px 20px;align-items:center;padding:22px 24px;border-radius:18px}
+.qa summary::-webkit-details-marker{display:none}
+.qa summary:focus-visible{outline-offset:-2px}
+.qn{grid-column:1;font:500 11px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--ink3);transition:color .3s}
+.qa[open] .qn{color:var(--acc)}
+.qq{grid-column:1;font:700 clamp(18px,1.9vw,23px)/1.2 var(--display);letter-spacing:-.02em}
+.qx{grid-column:2;grid-row:1/3;width:38px;height:38px;border-radius:50%;border:1px solid var(--line);position:relative;transition:transform .4s var(--ease),background .3s,border-color .3s}
+.qx::before,.qx::after{content:"";position:absolute;left:50%;top:50%;width:12px;height:1.5px;background:var(--ink);transform:translate(-50%,-50%)}
+.qx::after{transform:translate(-50%,-50%) rotate(90deg)}
+.qa[open] .qx{transform:rotate(45deg);background:var(--acc);border-color:var(--acc)}
+.qa[open] .qx::before,.qa[open] .qx::after{background:var(--acc-ink)}
+.qa-body{padding:0 24px 24px;display:grid;gap:16px}
+.qa-body p{margin:0;color:var(--ink2);max-width:58ch;font-size:16.5px}
+.qa-body p b{color:var(--ink);font-weight:600}
+.qchips{display:flex;flex-wrap:wrap;gap:8px}
+.qchips span{font:500 11px var(--mono);letter-spacing:.06em;padding:6px 10px;border-radius:999px;border:1px solid var(--line);color:var(--ink2)}
+.qa::details-content{transition:height .45s var(--ease),content-visibility .45s allow-discrete;height:0;overflow:clip}
+.qa[open]::details-content{height:auto}
+:root{interpolate-size:allow-keywords}
+@media(max-width:860px){.faqgrid{grid-template-columns:1fr}.faqside{position:static}.qa summary{padding:18px}.qa-body{padding:0 18px 20px}}
+@media(prefers-reduced-motion:reduce){.qa::details-content{transition:none}}
 
 /* como a planilha morre · 4 capítulos fixados (site 01) */
 .chapters{position:relative;height:400vh;background:var(--bg2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
@@ -293,11 +350,10 @@ html.motion [data-reveal]{opacity:0;transform:translateY(28px)}
 <body>
 
 <div class="cur" aria-hidden="true"></div><div class="cur2" aria-hidden="true"></div>
-<div id="clock" aria-hidden="true"><b id="clockT">18:00</b><span id="clockL">a equipe foi embora</span></div>
 
 <nav><div class="wrap">
   <a class="logo" href="#top">oLuan<span style="color:var(--acc)">.</span></a>
-  <div class="links"><a href="#demo">Demo</a><a href="#agentes">Agentes</a><a href="#cases">Resultados</a><a href="#capitulos">Método</a><a href="fala-comigo.html">Fala comigo</a><a href="quem-e-luan.html">Quem é Luan?</a></div>
+  <div class="links"><a href="#demo">Demo</a><a href="#solucoes">Soluções</a><a href="#capitulos">Método</a><a href="#perguntas">Perguntas</a><a href="quem-e-luan.html">Quem é Luan?</a></div>
   <a class="btn" href="https://wa.me/5521970568810?text=Oi%20Luan%2C%20vi%20seu%20site%20e%20quero%20conversar%20sobre%20automa%C3%A7%C3%A3o" target="_blank" rel="noopener">WhatsApp</a>
 </div></nav>
 
@@ -307,10 +363,10 @@ html.motion [data-reveal]{opacity:0;transform:translateY(28px)}
     <canvas id="gl" aria-hidden="true"></canvas>
     <div class="state" aria-hidden="true"><span class="on" data-s="0">Bagunça</span><b></b><span data-s="1">Painel</span></div>
     <div class="hero-copy"><div class="wrap">
-      <p class="eyebrow">18h · a equipe vai embora. O trabalho fica.</p>
-      <h1>A bagunça da sua operação <em>vira painel.</em></h1>
+      <p class="eyebrow">Chatbot com IA · BI com IA · sob medida</p>
+      <h1>A bagunça da sua empresa <em>vira painel inteligente.</em></h1>
       <div class="row">
-        <p class="sub">Durante a noite. Chatbot de WhatsApp, integração, painel com IA e app de campo — construídos em cima do sistema que você já tem e medidos em horas ganhas por dia.</p>
+        <p class="sub">Chatbot com IA que faz todo o atendimento no WhatsApp. Dashboard de Business Intelligence que lê o histórico da sua empresa, projeta o caixa e diz onde cada setor tem que agir esta semana. Tudo ligado ao sistema que você já usa.</p>
         <div class="cta">
           <a class="btn acc" href="https://wa.me/5521970568810?text=Oi%20Luan%2C%20vi%20seu%20site%20e%20quero%20conversar%20sobre%20automa%C3%A7%C3%A3o" target="_blank" rel="noopener"><span class="dot"></span>Falar no WhatsApp</a>
           <a class="btn" href="fala-comigo.html">Que bagunça é a sua? →</a>
@@ -330,120 +386,112 @@ html.motion [data-reveal]{opacity:0;transform:translateY(28px)}
 </div></section>
 
 <div class="strip" aria-hidden="true"><div class="track">
-  <span><s>A planilha morreu.</s> <em>Dashboard é o presente.</em></span><span>Menos cliques. Menos retrabalho. Mais horas no dia.</span><span><s>A planilha morreu.</s> <em>Dashboard é o presente.</em></span><span>Menos cliques. Menos retrabalho. Mais horas no dia.</span>
+  <span><s>A planilha morreu.</s> <em>Dashboard é o presente.</em></span><span>Atendimento, caixa, estoque e metas num lugar só.</span><span><s>A planilha morreu.</s> <em>Dashboard é o presente.</em></span><span>Atendimento, caixa, estoque e metas num lugar só.</span>
 </div></div>
 
 <section class="demo-sec" id="demo"><div class="wrap">
   <div class="head">
-    <p class="eyebrow" data-reveal>23h · um cliente pergunta o boleto</p>
-    <h2 data-words>Ninguém está na empresa. Ele recebe em segundos.</h2>
-    <p class="sub" data-reveal>Uma operação de verdade acontecendo em loop: o cliente pede o boleto, o bot consulta o seu sistema, responde, e o painel atualiza. Eu construo isso em cima do que a sua empresa já usa.</p>
+    <p class="eyebrow" data-reveal>Demo · atendimento com IA</p>
+    <h2 data-words>O chatbot resolve o atendimento inteiro.</h2>
+    <p class="sub" data-reveal>O cliente escreve do jeito dele, a IA entende o pedido, consulta o seu sistema, responde, registra tudo e o painel atualiza. Gente da equipe só entra quando precisa.</p>
   </div>
   <div class="demo" id="demobox">
     <div class="selo"><i></i>Simulação · dados fictícios</div>
     <div class="demo-top">
       <div class="panel">
-        <div class="ph"><span>WhatsApp · atendimento</span><span>23:04</span></div>
+        <div class="ph"><span>WhatsApp · atendimento</span><span>21:47</span></div>
         <div class="chat">
-          <div class="bub in" id="b1">oi, me manda o boleto desse mês?<time>23:04</time></div>
+          <div class="bub in" id="b1">oi, não vou conseguir amanhã. dá pra passar minha visita pra sexta de manhã?<time>21:47</time></div>
           <div class="typing" id="typ"><i></i><i></i><i></i></div>
-          <div class="bub out" id="b2">Oi, Marcos! Aqui está o boleto de outubro, vence dia 30.<div class="doc"><i></i>boleto-out-2026.pdf</div><time>23:04 · bot</time></div>
+          <div class="bub out" id="b2">Claro, Marcos! Sua visita saiu de amanhã, 10h, e foi para sexta às 9h, com o mesmo técnico. Te lembro na quinta à noite.<div class="doc"><i></i>visita · sex 09:00 · confirmada</div><time>21:47 · bot</time></div>
         </div>
       </div>
       <div class="panel">
         <div class="ph"><span>agente · log</span><span class="dots"><i></i><i></i><i></i></span></div>
         <div class="term">
-          <div class="l"><span class="m">23:04:11</span> msg recebida <span class="k">5511…9044</span></div>
-          <div class="l"><span class="m">23:04:11</span> intenção: <span class="k">boleto_mes_atual</span></div>
-          <div class="l"><span class="m">23:04:12</span> GET /clientes?tel=…9044 <span class="ok">200</span></div>
-          <div class="l"><span class="m">23:04:12</span> GET /boletos?cliente=1842&amp;mes=10 <span class="ok">200</span></div>
-          <div class="l"><span class="m">23:04:13</span> enviando pdf… <span class="ok">✓ entregue</span></div>
-          <div class="l"><span class="m">23:04:13</span> humano necessário? <span class="ok">não</span></div>
+          <div class="l"><span class="m">21:47:02</span> msg recebida <span class="k">Marcos · cliente</span></div>
+          <div class="l"><span class="m">21:47:02</span> intenção: <span class="k">remarcar visita</span></div>
+          <div class="l"><span class="m">21:47:03</span> agenda sexta manhã <span class="ok">09:00 livre</span></div>
+          <div class="l"><span class="m">21:47:03</span> visita remarcada no sistema <span class="ok">✓</span></div>
+          <div class="l"><span class="m">21:47:04</span> lembrete qui 19:00 <span class="ok">agendado</span></div>
+          <div class="l"><span class="m">21:47:04</span> humano necessário? <span class="ok">não</span></div>
         </div>
       </div>
     </div>
     <div class="dash">
       <div class="kpi" id="k1"><small>Atendidos hoje</small><b data-n="46">46</b><div class="delta">+1 agora</div></div>
-      <div class="kpi" id="k2"><small>Fora do horário</small><b data-n="17">17</b><div class="delta">+1 agora</div></div>
-      <div class="kpi" id="k3"><small>Min. devolvidos</small><b data-n="598">598</b><div class="delta">+13 min</div></div>
+      <div class="kpi" id="k2"><small>Resolvidos sem humano</small><b data-n="39">39</b><div class="delta">+1 agora</div></div>
+      <div class="kpi" id="k3"><small>Agenda ajustada</small><b data-n="12">12</b><div class="delta">+1 agora</div></div>
       <div class="bars"><i style="height:30%"></i><i style="height:45%"></i><i style="height:38%"></i><i style="height:62%"></i><i style="height:55%"></i><i style="height:70%"></i><i style="height:48%"></i><i style="height:80%"></i><i style="height:66%"></i><i style="height:90%"></i><i style="height:74%"></i><i style="height:40%" id="lastbar"></i></div>
     </div>
-    <div class="toast" id="toast"><span class="chk">✓</span><span><b>+13 min</b> devolvidos à equipe</span></div>
+    <div class="toast" id="toast"><span class="chk">✓</span><span><b>Resolvido</b> sem ninguém da equipe</span></div>
   </div>
 </div></section>
 
-<section id="agentes"><div class="wrap">
+<section id="solucoes"><div class="wrap">
   <div class="head">
-    <p class="eyebrow" data-reveal>02h · os agentes trabalham</p>
-    <h2 data-words>Quatro agentes prontos para entrar na sua operação.</h2>
-    <p class="sub" data-reveal>Cada um nasce de um problema que já resolvi. Passe o mouse (ou role até ele) para ver o que faz. Você escolhe por onde começar; eu adapto ao seu sistema.</p>
+    <p class="eyebrow" data-reveal>Soluções</p>
+    <h2 data-words>Do atendimento à decisão, no automático.</h2>
+    <p class="sub" data-reveal>Cada solução funciona sozinha. Juntas, o chatbot alimenta o painel e o painel diz quem cobrar, quem chamar e o que comprar. Passe o mouse (ou role até ela) para ver funcionando.</p>
   </div>
   <div class="agents">
     <div class="agent" data-agent data-reveal>
-      <div class="id"><span>AG-01</span><span>WhatsApp · IA</span></div>
-      <div><h3>Agente do Boleto</h3><p>Responde boleto, status do chamado e horário consultando o sistema. 24 h, de madrugada inclusive. Não inventa; chama um humano quando não sabe.</p></div>
+      <div class="id"><span>01</span><span>WhatsApp · IA</span></div>
+      <div><h3>Chatbot com IA para todo o atendimento</h3><p>Tira dúvida, faz orçamento, agenda, remarca, cobra e abre chamado consultando o seu sistema. Passa para a equipe só o que precisa de gente, com o histórico junto.</p></div>
       <div class="mini m1">
-        <div class="row"><i></i>mensagem recebida</div>
-        <div class="row"><i></i>cliente localizado no sistema</div>
-        <div class="row"><i></i>boleto do mês encontrado</div>
-        <div class="row"><i></i>pdf enviado · humano: não</div>
+        <div class="row"><i></i>dúvida respondida</div>
+        <div class="row"><i></i>orçamento enviado</div>
+        <div class="row"><i></i>visita agendada</div>
+        <div class="row"><i></i>pedido registrado · humano: não</div>
       </div>
-      <div class="foot"><span>responde às</span><b>23h</b></div>
+      <div class="foot"><span>atende</span><b>24 h por dia</b></div>
     </div>
     <div class="agent" data-agent data-reveal>
-      <div class="id"><span>AG-02</span><span>Automação · API</span></div>
-      <div><h3>Agente de Cadastro</h3><p>Seis abas e 40 campos viram um formulário só, ligado ao sistema por API. Os 30 campos que ninguém usava somem.</p></div>
-      <div class="mini m2"><i></i><i></i><i></i><i></i><i></i><i></i><span class="t"></span></div>
-      <div class="foot"><span>por cadastro</span><b>15 → 2 min</b></div>
-    </div>
-    <div class="agent" data-agent data-reveal>
-      <div class="id"><span>AG-03</span><span>BI · IA</span></div>
-      <div><h3>Painel do Porquê</h3><p>Faturamento, inadimplência, chamados. E uma caixa onde você pergunta em português e recebe onde olhar.</p></div>
+      <div class="id"><span>02</span><span>BI · IA</span></div>
+      <div><h3>Dashboard de BI com IA</h3><p>Lê todo o histórico de vendas, financeiro, estoque e atendimento. Você pergunta em português e recebe o motivo e o próximo passo.</p></div>
       <div class="mini m3">
-        <div class="q">por que a inadimplência subiu?</div>
-        <div class="a">Subiu no <b>bairro Centro</b>, semanas 6 e 7, depois da troca de vencimento. <b>Sugestão:</b> reenviar boleto 3 dias antes. <i style="color:var(--ink3)">(exemplo ilustrativo)</i></div>
-        <div class="spark"><i style="height:30%"></i><i style="height:34%"></i><i style="height:28%"></i><i style="height:36%"></i><i style="height:40%"></i><i style="height:82%"></i><i style="height:95%"></i><i style="height:60%"></i></div>
+        <div class="q">por que a margem caiu em outubro?</div>
+        <div class="a">Peças subiram <b>11%</b> e <b>3 contratos</b> fecharam com desconto acima de 15%. <b>Sugestão:</b> revisar a tabela de descontos. <i style="color:var(--ink3)">(exemplo ilustrativo)</i></div>
+        <div class="spark"><i style="height:70%"></i><i style="height:74%"></i><i style="height:68%"></i><i style="height:76%"></i><i style="height:72%"></i><i style="height:40%"></i><i style="height:34%"></i><i style="height:60%"></i></div>
       </div>
-      <div class="foot"><span>resposta</span><b>em português</b></div>
+      <div class="foot"><span>pergunta</span><b>em português</b></div>
     </div>
     <div class="agent" data-agent data-reveal>
-      <div class="id"><span>AG-04</span><span>App · campo</span></div>
-      <div><h3>Agente de Campo</h3><p>Funcionário tira foto da nota, preenche 3 campos no celular, e o registro cai direto no painel. Sem grupo de WhatsApp, sem foto perdida.</p></div>
-      <div class="mini m4">
-        <div class="fone"></div>
-        <div class="arrow">→<i></i></div>
-        <div class="tbl"><i></i><i></i><i></i><i></i><i></i></div>
+      <div class="id"><span>03</span><span>Gestão · IA</span></div>
+      <div><h3>Pauta da semana por setor</h3><p>Toda segunda, cada setor recebe onde atacar: quem cobrar, quem ligar, o que comprar, o que está fora da meta. Direto no painel e no WhatsApp do gestor.</p></div>
+      <div class="mini m1 m6">
+        <div class="row"><i></i>financeiro · cobrar 14 vencidos</div>
+        <div class="row"><i></i>estoque · F-220 acaba em 9 dias</div>
+        <div class="row"><i></i>comercial · ligar para 6 clientes</div>
+        <div class="row"><i></i>operação · prazo na meta</div>
       </div>
-      <div class="foot"><span>do celular</span><b>direto no painel</b></div>
+      <div class="foot"><span>chega</span><b>toda segunda</b></div>
+    </div>
+    <div class="agent" data-agent data-reveal>
+      <div class="id"><span>04</span><span>Finanças · contábil</span></div>
+      <div><h3>Projeções financeiras, contábeis e operacionais</h3><p>Fluxo de caixa, DRE e demanda projetados em cenários. Você vê o mês difícil antes de ele chegar e decide com tempo.</p></div>
+      <div class="mini m5"><i style="height:44%"></i><i style="height:52%"></i><i style="height:48%"></i><i style="height:60%"></i><i style="height:66%"></i><i style="height:58%"></i><i class="p" style="height:70%"></i><i class="p" style="height:62%"></i><i class="p" style="height:46%"></i><i class="p" style="height:34%"></i><span>projetado</span></div>
+      <div class="foot"><span>cenários</span><b>3 por mês</b></div>
+    </div>
+    <div class="agent" data-agent data-reveal>
+      <div class="id"><span>05</span><span>KPIs · estoque</span></div>
+      <div><h3>KPIs, metas e estoque inteligente</h3><p>Os números de cada área com meta e alerta. Estoque com previsão de ruptura pelo ritmo de saída e sugestão de compra.</p></div>
+      <div class="mini m7">
+        <div><span>margem</span><b class="bad">17,2% ▼</b></div>
+        <div><span>ticket médio</span><b>R$ 640 ▲</b></div>
+        <div><span>estoque F-220</span><b class="bad">9 dias</b></div>
+        <div><span>prazo médio</span><b>2,1 d ✓</b></div>
+      </div>
+      <div class="foot"><span>alerta</span><b>antes do problema</b></div>
+    </div>
+    <div class="agent" data-agent data-reveal>
+      <div class="id"><span>06</span><span>Automação · API</span></div>
+      <div><h3>Processos manuais no automático</h3><p>Cadastros, relatórios e conferências que a equipe repete todo dia viram um formulário ou um clique, ligados ao sistema.</p></div>
+      <div class="mini m2"><i></i><i></i><i></i><i></i><i></i><i></i><span class="t"></span></div>
+      <div class="foot"><span>de várias telas para</span><b>um clique</b></div>
     </div>
   </div>
-  <p class="ask-line" data-reveal>Não está na lista? Se é tarefa manual que se repete e tem dado por trás, provavelmente dá para tirar do caminho. <a href="#contato">Me conta.</a></p>
-</div></section>
-
-<section id="cases"><div class="wrap">
-  <div class="head">
-    <p class="eyebrow" data-reveal>05h · o painel recalcula</p>
-    <h2 data-words>Cada projeto vira uma linha de número.</h2>
-    <p class="sub" data-reveal>Reconstruções com dados fictícios de problemas reais que já resolvi. A tecnologia vem depois; o número vem primeiro.</p>
-  </div>
-  <div class="cases">
-    <div class="case" data-reveal>
-      <div class="big"><span data-count="15">15</span> min → <em><span data-count="2">2</span> min</em><small>cadastro de cliente</small></div>
-      <p><b>Cadastro que levava 15 minutos</b>6 abas, 40 campos, 30 que ninguém usava. Um formulário único ligado ao sistema por API.<span class="tag">Automação · API</span></p>
-    </div>
-    <div class="case" data-reveal>
-      <div class="big"><em><span data-count="6.5">6,5</span> h</em>/dia<small>13 min × 30 cadastros por dia</small></div>
-      <p><b>Horas que voltam para a equipe</b>A conta é simples e vai no relatório final: minutos poupados vezes repetições por dia.<span class="tag">Medição</span></p>
-    </div>
-    <div class="case" data-reveal>
-      <div class="big"><em>23h</em> boleto<small>cliente pergunta de madrugada</small></div>
-      <p><b>WhatsApp que consulta o sistema</b>Boleto, status do chamado, horário. Responde de madrugada, não inventa, e chama gente quando precisa.<span class="tag">Chatbot · WhatsApp</span></p>
-    </div>
-    <div class="case" data-reveal>
-      <div class="big">"<em>Por quê?</em>"<small>painel que responde</small></div>
-      <p><b>Painel que aponta o caminho</b>Faturamento, inadimplência, clientes, chamados — e uma pergunta em português que devolve onde está o problema.<span class="tag">BI · IA</span></p>
-    </div>
-  </div>
+  <p class="ask-line" data-reveal>Os números dos cartões são exemplos ilustrativos. Tem outra tarefa repetitiva com dado por trás? <a href="#contato">Me conta.</a></p>
 </div></section>
 
 <div class="chapters" id="capitulos">
@@ -469,10 +517,45 @@ html.motion [data-reveal]{opacity:0;transform:translateY(28px)}
   </div></div>
 </div>
 
+<section id="perguntas"><div class="wrap faqgrid">
+  <div class="faqside">
+    <p class="eyebrow" data-reveal>Perguntas frequentes</p>
+    <h2 data-words>Antes de chamar no WhatsApp.</h2>
+    <p class="sub" data-reveal>O que todo dono de empresa pergunta na primeira conversa. Não achou a sua? Manda direto.</p>
+    <a class="btn acc" data-reveal href="https://wa.me/5521970568810?text=Oi%20Luan%2C%20tenho%20uma%20pergunta%3A%20" target="_blank" rel="noopener"><span class="dot"></span>Perguntar no WhatsApp</a>
+  </div>
+  <div class="faq" data-reveal>
+    <details class="qa" name="faq" open>
+      <summary><span class="qn">01 · sistema</span><span class="qq">Preciso trocar o sistema que eu já uso?</span><span class="qx" aria-hidden="true"></span></summary>
+      <div class="qa-body"><p><b>Não.</b> Eu conecto no que a empresa já tem: sistema de gestão, ERP, banco de dados ou até a planilha antiga. Tem API, uso a API. Não tem, leio do banco ou dos arquivos que o sistema exporta.</p><div class="qchips"><span>API</span><span>banco de dados</span><span>exportação</span></div></div>
+    </details>
+    <details class="qa" name="faq">
+      <summary><span class="qn">02 · ia</span><span class="qq">O chatbot com IA pode inventar resposta?</span><span class="qx" aria-hidden="true"></span></summary>
+      <div class="qa-body"><p><b>Não, e por dois motivos.</b> Ele responde consultando um banco de dados vetorizado com o histórico da sua empresa, que aprende com cada atendimento do dia a dia. E um supervisor digital revisa as conversas 24 horas por dia e corrige o que sair do trilho. O que ele não sabe vai para uma pessoa da equipe, com a conversa inteira junto.</p><div class="qchips"><span>banco de dados vetorizado</span><span>aprende com o dia a dia</span><span>supervisor digital 24 h</span></div></div>
+    </details>
+    <details class="qa" name="faq">
+      <summary><span class="qn">03 · dados</span><span class="qq">A IA do dashboard entende os números da minha empresa?</span><span class="qx" aria-hidden="true"></span></summary>
+      <div class="qa-body"><p><b>Entende e mostra de onde tirou.</b> Ela lê o histórico de vendas, financeiro, estoque e atendimento, responde em português e aponta o dado que usou. Você confere antes de decidir.</p><div class="qchips"><span>histórico completo</span><span>pergunta em português</span></div></div>
+    </details>
+    <details class="qa" name="faq">
+      <summary><span class="qn">04 · preço</span><span class="qq">Quanto custa um chatbot com IA ou um dashboard de BI?</span><span class="qx" aria-hidden="true"></span></summary>
+      <div class="qa-body"><p><b>Preço fechado por projeto.</b> Sai no diagnóstico, 2 dias depois de uma conversa de 30 minutos. Sem cobrança por hora e sem escopo que cresce sem aviso.</p><div class="qchips"><span>conversa: 30 min</span><span>diagnóstico: 2 dias</span></div></div>
+    </details>
+    <details class="qa" name="faq">
+      <summary><span class="qn">05 · prazo</span><span class="qq">Quanto tempo até funcionar?</span><span class="qx" aria-hidden="true"></span></summary>
+      <div class="qa-body"><p><b>Tem entrega toda semana.</b> Você usa cada parte funcionando com os seus dados antes de eu começar a próxima. Nada de sumir três meses e voltar com surpresa.</p><div class="qchips"><span>entrega semanal</span></div></div>
+    </details>
+    <details class="qa" name="faq">
+      <summary><span class="qn">06 · suporte</span><span class="qq">E depois de entregue?</span><span class="qx" aria-hidden="true"></span></summary>
+      <div class="qa-body"><p><b>30 dias de suporte inclusos.</b> A equipe aprende a usar em uma tarde. Depois, manutenção mensal se fizer sentido para a sua empresa.</p><div class="qchips"><span>30 dias inclusos</span><span>manutenção opcional</span></div></div>
+    </details>
+  </div>
+</div></section>
+
 <section class="final" id="contato"><div class="wrap">
-  <p class="eyebrow" data-reveal>08h · a equipe chega · próximo passo</p>
+  <p class="eyebrow" data-reveal>Próximo passo</p>
   <h2 data-words>Me conta a tarefa que mais rouba tempo.</h2>
-  <p class="sub" data-reveal>Uma mensagem basta. Eu respondo em até 1 dia útil com a próxima pergunta — ou com a data da conversa de 30 minutos.</p>
+  <p class="sub" data-reveal>Uma mensagem basta. Eu respondo em até 1 dia útil com a próxima pergunta ou com a data da conversa de 30 minutos.</p>
   <div class="cta" style="justify-content:center" data-reveal>
     <a class="btn acc" href="https://wa.me/5521970568810?text=Oi%20Luan%2C%20a%20tarefa%20que%20mais%20rouba%20tempo%20aqui%20%C3%A9%3A%20" target="_blank" rel="noopener"><span class="dot"></span>Chamar no WhatsApp</a>
     <a class="btn" href="fala-comigo.html">Fazer o quiz da bagunça →</a>
@@ -480,7 +563,7 @@ html.motion [data-reveal]{opacity:0;transform:translateY(28px)}
   </div>
 </div></section>
 
-<footer><div class="wrap"><span>Luan · desenvolvedor sob medida</span><span>A demo e os exemplos usam dados fictícios. Nenhum dado de cliente real aparece aqui.</span></div></footer>
+<footer><div class="wrap"><span>oLuan · chatbot com IA, BI e automação sob medida · luan@oluan.com.br</span><span>A demo e os exemplos usam dados fictícios. Nenhum dado de cliente real aparece aqui.</span></div></footer>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
@@ -525,28 +608,12 @@ html.motion [data-reveal]{opacity:0;transform:translateY(28px)}
   });
   ScrollTrigger.create({start:40, onEnter:function(){html.classList.add('scrolled');}, onLeaveBack:function(){html.classList.remove('scrolled');}});
 
-  // Relógio da noite (site 04): a seção na tela dita a hora; segura na hora e corre para a próxima
-  var clockT = document.getElementById('clockT'), clockL = document.getElementById('clockL');
-  var hours = [['#top',18,'a equipe foi embora'],['#lapide',20,'velório da planilha'],['#demo',23,'o chatbot está acordado'],['#agentes',26,'os agentes trabalham'],['#cases',29,'o painel recalcula'],['#capitulos',30,'como a planilha morre'],['#contato',32,'a equipe chega']], pts = [];
-  function measure(){ pts = hours.map(function(x){ return document.querySelector(x[0]).getBoundingClientRect().top + scrollY; }); }
-  function clockFromScroll(){
-    var y = scrollY + innerHeight*.6, k = 0;
-    for (var i=1;i<pts.length;i++) if (y >= pts[i]) k = i;
-    var h = hours[k][1];
-    if (k < pts.length-1) { var f = (y-pts[k])/(pts[k+1]-pts[k]); f = Math.max(0, (f-.55)/.45); h += (hours[k+1][1]-hours[k][1])*f; }
-    var mins = Math.round(h*60), hh = Math.floor(mins/60)%24, mm = mins%60;
-    clockT.textContent = (hh<10?'0':'')+hh+':'+(mm<10?'0':'')+mm;
-    if (clockL.textContent !== hours[k][2]) clockL.textContent = hours[k][2];
-  }
-  measure(); clockFromScroll();
-  addEventListener('scroll', clockFromScroll, {passive:true});
-  ScrollTrigger.addEventListener('refresh', function(){ measure(); clockFromScroll(); });
   if (document.fonts) document.fonts.ready.then(function(){ ScrollTrigger.refresh(); });
 
   // Demo viva (site 03) — KPIs
   var $ = function(s){ return document.querySelector(s); }, $$ = function(s){ return Array.prototype.slice.call(document.querySelectorAll(s)); };
   var kp = [$('#k1 b'), $('#k2 b'), $('#k3 b')], base = kp.map(function(b){ return +b.dataset.n; });
-  function setKpis(n){ kp[0].textContent = base[0]+n; kp[1].textContent = base[1]+n; kp[2].textContent = base[2]+13*n; }
+  function setKpis(n){ kp[0].textContent = base[0]+n; kp[1].textContent = base[1]+n; kp[2].textContent = base[2]+n; }
 
   if (reduce) {                      // estático: demo no estado final, agentes "vivos", capítulos empilhados
     setKpis(1); $$('#demobox .kpi').forEach(function(x){ x.classList.add('hot'); });
