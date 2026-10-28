@@ -1,0 +1,605 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Luan · da bagunça ao painel</title>
+<meta name="description" content="Automação, painel com IA, chatbot de WhatsApp e app de campo sob medida. A bagunça da sua operação vira painel — e você mede em horas por dia.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#070708;--bg2:#0d0d10;--ink:#f2f1ee;--ink2:#a4a39e;--ink3:#5e5d59;
+  --line:rgba(255,255,255,.08);--acc:#c8ff2e;--acc-ink:#0a0a0a;
+  --display:"Space Grotesk",Inter,sans-serif;--mono:"JetBrains Mono",monospace;
+  --ease:cubic-bezier(.16,1,.3,1);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:auto;-webkit-text-size-adjust:100%}
+html.lenis{height:auto}.lenis.lenis-smooth{scroll-behavior:auto!important}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.55 Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:clip}
+a{color:inherit;text-decoration:none}
+::selection{background:var(--acc);color:var(--acc-ink)}
+:focus-visible{outline:2px solid var(--acc);outline-offset:4px}
+.wrap{max-width:1200px;margin:0 auto;padding:0 clamp(20px,4vw,48px)}
+h1,h2,h3{font-family:var(--display);font-weight:700;letter-spacing:-.035em;line-height:.95;margin:0}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--acc)}
+.sub{color:var(--ink2);font-size:clamp(17px,1.6vw,20px);max-width:56ch;margin:0}
+
+/* nav */
+nav{position:fixed;inset:0 0 auto;z-index:50;mix-blend-mode:difference}
+nav .wrap{display:flex;align-items:center;justify-content:space-between;height:72px}
+nav .logo{font-family:var(--display);font-weight:700;font-size:20px;letter-spacing:-.02em}
+nav .links{display:flex;gap:28px;font-size:14px;font-weight:500;color:#ddd}
+nav .links a:hover{color:#fff}
+@media(max-width:760px){nav .links{display:none}}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;gap:10px;min-height:48px;padding:12px 22px;border-radius:999px;font-weight:600;font-size:15px;border:1px solid var(--line);color:var(--ink);background:transparent;cursor:pointer;transition:border-color .35s var(--ease),background .35s var(--ease),color .35s var(--ease),transform .35s var(--ease)}
+.btn:hover{border-color:rgba(255,255,255,.35)}
+.btn.acc{background:var(--acc);color:var(--acc-ink);border-color:transparent}
+.btn.acc:hover{background:#dbff6a}
+.btn .dot{width:8px;height:8px;border-radius:50%;background:currentColor;opacity:.7}
+nav .btn{min-height:44px;padding:10px 18px;font-size:13px;background:#fff;color:#000;border-color:transparent}
+
+/* hero */
+.hero{position:relative;height:230vh}
+.stage{position:sticky;top:0;height:100vh;overflow:hidden}
+.stage canvas,.poster{position:absolute;inset:0;width:100%;height:100%}
+.stage canvas{display:block}
+.poster{display:flex;align-items:flex-end;justify-content:center;gap:1.2vw;padding-bottom:18vh;opacity:.55}
+.poster i{display:block;width:5vw;max-width:56px;background:#2a2a2e;border-radius:3px}
+.poster i:nth-child(6){background:var(--acc)}
+html.gl .poster{display:none}
+.hero-copy{position:absolute;inset:0;display:grid;align-content:end;padding-bottom:9vh;pointer-events:none;background:linear-gradient(to top,rgba(7,7,8,.85) 0%,rgba(7,7,8,.35) 45%,transparent 70%)}
+.hero-copy .wrap{pointer-events:auto}
+.hero h1{font-size:clamp(46px,9vw,150px);max-width:11ch;text-wrap:balance}
+.hero h1 em{font-style:normal;color:var(--acc)}
+.hero .row{display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:24px;margin-top:28px}
+.hero .sub{max-width:44ch}
+.cta{display:flex;flex-wrap:wrap;gap:12px}
+.state{position:absolute;top:50%;right:clamp(16px,4vw,48px);transform:translateY(-50%);font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink3);display:grid;gap:10px;text-align:right}
+.state span{transition:color .4s}
+.state span.on{color:var(--acc)}
+.state b{display:block;width:1px;height:40px;background:var(--line);margin:0 0 0 auto;position:relative}
+.state b::after{content:"";position:absolute;left:0;top:0;width:1px;height:calc(var(--p,0)*100%);background:var(--acc)}
+.hint{position:absolute;bottom:24px;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink3);opacity:1;transition:opacity .4s}
+html.scrolled .hint{opacity:0}
+@media(max-height:720px){.hint{display:none}}
+@media(max-width:760px){.hero{height:200vh}.state{display:none}.hero-copy{padding-bottom:6vh}.hero h1{font-size:clamp(44px,12.5vw,64px)}.hero .cta .btn{width:100%;justify-content:center}}
+
+/* strip */
+.strip{border-top:1px solid var(--line);border-bottom:1px solid var(--line);overflow:hidden;padding:18px 0;font-family:var(--display);font-size:clamp(18px,2.4vw,28px);letter-spacing:-.02em;white-space:nowrap}
+.strip .track{display:inline-flex;gap:48px;will-change:transform;animation:mq 28s linear infinite}
+.strip s{color:var(--ink3)}
+.strip em{font-style:normal;color:var(--acc)}
+@keyframes mq{to{transform:translateX(-50%)}}
+
+/* sections */
+section{padding:clamp(80px,12vw,160px) 0}
+.head{display:grid;gap:18px;margin-bottom:clamp(40px,6vw,72px)}
+section h2{font-size:clamp(36px,5.6vw,84px);max-width:14ch;text-wrap:balance}
+
+/* serviços */
+.serv{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));border-top:1px solid var(--line);border-left:1px solid var(--line)}
+.serv article{padding:28px 24px 32px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);display:grid;align-content:start;gap:14px;min-height:260px;position:relative;transition:background .4s var(--ease)}
+.serv article:hover{background:var(--bg2)}
+.serv .n{font-family:var(--mono);font-size:12px;color:var(--ink3)}
+.serv h3{font-size:22px;letter-spacing:-.025em;line-height:1.1}
+.serv p{margin:0;color:var(--ink2);font-size:15px}
+.serv article.ask{background:var(--acc);color:var(--acc-ink)}
+.serv article.ask p,.serv article.ask .n{color:#2a3300}
+
+/* método */
+.metodo{background:var(--bg2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.verbs{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-top:1px solid var(--line)}
+.verb{padding:40px 0 48px;border-bottom:1px solid var(--line);display:grid;gap:18px;align-content:start}
+.verb+.verb{padding-left:32px;border-left:1px solid var(--line)}
+.verb h3{font-size:clamp(34px,5vw,72px);letter-spacing:-.04em}
+.verb h3 small{display:block;font:500 12px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--acc);margin-bottom:14px}
+.verb ol{margin:0;padding:0;list-style:none;display:grid;gap:14px}
+.verb li{display:grid;grid-template-columns:30px 1fr;gap:10px;font-size:15px;color:var(--ink2)}
+.verb li b{color:var(--ink);display:block;font-weight:600}
+.verb li i{font:500 12px var(--mono);color:var(--ink3);padding-top:3px}
+.fatos{margin-top:40px;display:flex;flex-wrap:wrap;gap:10px}
+.fatos span{font-family:var(--mono);font-size:12px;letter-spacing:.06em;padding:8px 12px;border:1px solid var(--line);border-radius:999px;color:var(--ink2)}
+@media(max-width:860px){.verbs{grid-template-columns:1fr}.verb+.verb{padding-left:0;border-left:0}}
+
+/* cases */
+.cases{display:grid;border-top:1px solid var(--line)}
+.case{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:24px 40px;align-items:center;padding:36px 0;border-bottom:1px solid var(--line);transition:padding .5s var(--ease)}
+.case .big{font-family:var(--display);font-weight:700;font-size:clamp(40px,7vw,110px);letter-spacing:-.045em;line-height:.9;white-space:nowrap}
+.case .big em{font-style:normal;color:var(--acc)}
+.case .big small{display:block;font:500 12px/1.4 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);margin-top:12px;white-space:normal}
+.case p{margin:0;color:var(--ink2);font-size:16px}
+.case p b{color:var(--ink);display:block;font-family:var(--display);font-size:20px;letter-spacing:-.02em;margin-bottom:6px}
+.case .tag{display:inline-block;font:500 11px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);border:1px solid var(--line);padding:4px 8px;border-radius:4px;margin-top:12px}
+@media(max-width:760px){.case{grid-template-columns:1fr;gap:16px}.case .big{white-space:normal}}
+
+/* quiz */
+.quiz{background:var(--acc);color:var(--acc-ink)}
+.quiz .eyebrow{color:#2a3300}
+.quiz h2{color:#0a0a0a}
+.quiz .sub{color:#2a3300}
+.qbox{background:#0a0a0a;color:var(--ink);border-radius:24px;padding:clamp(24px,4vw,48px);max-width:860px;position:relative;overflow:hidden}
+.qbox .prog{display:flex;gap:6px;margin-bottom:28px}
+.qbox .prog i{flex:1;height:3px;background:#2a2a2e;border-radius:2px;transition:background .3s}
+.qbox .prog i.on{background:var(--acc)}
+.qbox .q{font-family:var(--display);font-size:clamp(24px,3vw,38px);letter-spacing:-.03em;line-height:1.05;margin:0 0 24px}
+.opts{display:grid;gap:10px}
+.opt{text-align:left;background:transparent;border:1px solid var(--line);color:var(--ink);min-height:56px;padding:16px 18px;-webkit-tap-highlight-color:transparent;border-radius:14px;font:500 16px Inter,sans-serif;cursor:pointer;display:grid;grid-template-columns:28px 1fr;gap:12px;align-items:center;transition:border-color .3s,background .3s,transform .3s var(--ease)}
+.opt:hover{border-color:rgba(255,255,255,.4);background:#121214}
+.opt i{font:500 12px var(--mono);color:var(--ink3);border:1px solid var(--line);border-radius:6px;width:28px;height:28px;display:grid;place-items:center}
+.opt:hover i{color:var(--acc);border-color:var(--acc)}
+.res{display:none}
+.res.on{display:block}
+.res .eyebrow{margin-bottom:12px}
+.res h3{font-size:clamp(32px,5vw,64px);letter-spacing:-.04em;margin-bottom:14px}
+.res h3 em{font-style:normal;color:var(--acc)}
+.res p{color:var(--ink2);margin:0 0 20px;max-width:58ch}
+.res .first{border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin-bottom:24px;display:grid;gap:4px}
+.res .first small{font:500 11px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--acc)}
+.res .first b{font-family:var(--display);font-size:20px;letter-spacing:-.02em}
+.res .row{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.res .redo{background:none;border:0;color:var(--ink3);font:500 14px Inter;cursor:pointer;min-height:44px;padding:12px 4px;text-decoration:underline;text-underline-offset:4px}
+
+/* quem */
+.quem .grid{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:clamp(32px,6vw,96px);align-items:center}
+.frame{aspect-ratio:4/5;border:1px dashed rgba(255,255,255,.25);border-radius:20px;display:grid;place-items:center;position:relative;background:
+  linear-gradient(var(--line),var(--line)) center/1px 100% no-repeat,
+  linear-gradient(var(--line),var(--line)) center/100% 1px no-repeat;max-width:460px}
+.frame span{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink3);background:var(--bg);padding:8px 12px;text-align:center;line-height:1.7}
+.frame::before,.frame::after{content:"";position:absolute;width:18px;height:18px;border:2px solid var(--acc)}
+.frame::before{top:-2px;left:-2px;border-right:0;border-bottom:0;border-radius:6px 0 0 0}
+.frame::after{bottom:-2px;right:-2px;border-left:0;border-top:0;border-radius:0 0 6px 0}
+.quem p{color:var(--ink2);margin:0 0 18px;font-size:clamp(17px,1.5vw,19px)}
+.quem .links{display:flex;flex-wrap:wrap;gap:10px;margin-top:28px}
+@media(max-width:760px){.quem .grid{grid-template-columns:1fr}.frame{max-width:320px}}
+
+/* final */
+.final{border-top:1px solid var(--line);text-align:center;padding-bottom:clamp(60px,8vw,120px)}
+.final h2{max-width:none;margin:0 auto 20px;font-size:clamp(40px,8vw,128px)}
+.final .sub{margin:0 auto 32px}
+footer{padding:28px 0 40px;color:var(--ink3);font-size:13px;border-top:1px solid var(--line)}
+footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+
+/* cursor */
+.cur{position:fixed;left:0;top:0;z-index:100;pointer-events:none;width:10px;height:10px;margin:-5px 0 0 -5px;border-radius:50%;background:var(--acc);mix-blend-mode:difference;will-change:transform}
+.cur2{position:fixed;left:0;top:0;z-index:100;pointer-events:none;width:36px;height:36px;margin:-18px 0 0 -18px;border-radius:50%;border:1px solid rgba(255,255,255,.5);mix-blend-mode:difference;will-change:transform;transition:width .3s,height .3s,margin .3s}
+html.link .cur2{width:56px;height:56px;margin:-28px 0 0 -28px}
+@media(pointer:coarse),(prefers-reduced-motion:reduce){.cur,.cur2{display:none}}
+
+/* motion hooks */
+html.motion [data-reveal]{opacity:0;transform:translateY(28px)}
+.w{display:inline-block;overflow:hidden;vertical-align:top}
+.w>span{display:inline-block;will-change:transform}
+@media(prefers-reduced-motion:reduce){
+  .strip .track{animation:none}
+  html.motion [data-reveal]{opacity:1;transform:none}
+}
+</style>
+</head>
+<body>
+
+<div class="cur" aria-hidden="true"></div><div class="cur2" aria-hidden="true"></div>
+
+<nav><div class="wrap">
+  <a class="logo" href="#top">Luan<span style="color:var(--acc)">.</span></a>
+  <div class="links"><a href="#servicos">Serviços</a><a href="#metodo">Método</a><a href="#cases">Resultados</a><a href="#quiz">Quiz</a><a href="#quem">Quem faz</a></div>
+  <a class="btn" href="https://wa.me/55SEUNUMERO?text=Oi%20Luan%2C%20vi%20seu%20site%20e%20quero%20conversar%20sobre%20automa%C3%A7%C3%A3o" target="_blank" rel="noopener">WhatsApp</a>
+</div></nav>
+
+<header class="hero" id="top">
+  <div class="stage">
+    <div class="poster" aria-hidden="true"><i style="height:14vh"></i><i style="height:22vh"></i><i style="height:17vh"></i><i style="height:30vh"></i><i style="height:25vh"></i><i style="height:38vh"></i><i style="height:33vh"></i></div>
+    <canvas id="gl" aria-hidden="true"></canvas>
+    <div class="state" aria-hidden="true"><span class="on" data-s="0">Bagunça</span><b></b><span data-s="1">Painel</span></div>
+    <div class="hero-copy"><div class="wrap">
+      <p class="eyebrow">Desenvolvedor sob medida · PMEs</p>
+      <h1>A bagunça da sua operação <em>vira painel.</em></h1>
+      <div class="row">
+        <p class="sub">Automação, painel com IA, chatbot de WhatsApp e app de campo — construídos em cima do sistema que você já tem e medidos em horas ganhas por dia.</p>
+        <div class="cta">
+          <a class="btn acc" href="https://wa.me/55SEUNUMERO?text=Oi%20Luan%2C%20vi%20seu%20site%20e%20quero%20conversar%20sobre%20automa%C3%A7%C3%A3o" target="_blank" rel="noopener"><span class="dot"></span>Falar no WhatsApp</a>
+          <a class="btn" href="#quiz">Que bagunça é a sua? ↓</a>
+        </div>
+      </div>
+    </div></div>
+    <div class="hint" aria-hidden="true">Role para organizar</div>
+  </div>
+</header>
+
+<div class="strip" aria-hidden="true"><div class="track">
+  <span><s>A planilha morreu.</s> <em>Dashboard é o presente.</em></span><span>Menos cliques. Menos retrabalho. Mais horas no dia.</span><span><s>A planilha morreu.</s> <em>Dashboard é o presente.</em></span><span>Menos cliques. Menos retrabalho. Mais horas no dia.</span>
+</div></div>
+
+<section id="servicos"><div class="wrap">
+  <div class="head">
+    <p class="eyebrow" data-reveal>O que eu faço</p>
+    <h2 data-words>Cinco frentes. Todas começam onde o tempo da equipe vaza.</h2>
+  </div>
+  <div class="serv">
+    <article data-reveal><span class="n">01</span><h3>Automação de serviço repetitivo</h3><p>Cadastro, lançamento, conferência: o que sua equipe faz 30 vezes por dia em 6 abas vira um clique ligado ao seu sistema por API.</p></article>
+    <article data-reveal><span class="n">02</span><h3>Painel com IA que responde "por quê?"</h3><p>Os números que importam e uma caixa onde você pergunta em português: "por que a inadimplência subiu?" — e recebe onde olhar.</p></article>
+    <article data-reveal><span class="n">03</span><h3>Chatbot de WhatsApp</h3><p>Responde boleto, status e horário consultando o seu sistema, 24 h. Não inventa resposta e chama um humano quando não sabe.</p></article>
+    <article data-reveal><span class="n">04</span><h3>App para equipe de campo</h3><p>Foto da nota, abastecimento, visita — no celular do funcionário, caindo direto no painel. Sem grupo de WhatsApp, sem foto perdida.</p></article>
+    <article data-reveal><span class="n">05</span><h3>Integrações</h3><p>Dois sistemas que não conversam passam a conversar. Relatório que chega sozinho, todo dia, sem ninguém montar.</p></article>
+    <article class="ask" data-reveal><span class="n">?</span><h3>Não está na lista?</h3><p>Se é tarefa manual que se repete e tem dado por trás, provavelmente dá para tirar do caminho. Me conta.</p></article>
+  </div>
+</div></section>
+
+<section class="metodo" id="metodo"><div class="wrap">
+  <div class="head">
+    <p class="eyebrow" data-reveal>Como eu trabalho · método de três verbos</p>
+    <h2 data-words>Ouvir. Construir. Medir.</h2>
+    <p class="sub" data-reveal>Quem constrói é quem conversa. Sem gerente no meio, sem escopo que cresce sem aviso. As cinco etapas reais cabem em três verbos.</p>
+  </div>
+  <div class="verbs">
+    <div class="verb" data-reveal>
+      <h3><small>Verbo 1</small>Ouvir</h3>
+      <ol>
+        <li><i>01</i><div><b>Conversa de 30 minutos</b>Você me mostra o dia a dia. Eu só ouço e anoto onde o tempo vaza. Sem custo, sem compromisso.</div></li>
+        <li><i>02</i><div><b>Diagnóstico e número fechado</b>Em 2 dias você recebe o que eu faria, quanto tempo sua equipe ganha e o preço — fechado por projeto, não por hora.</div></li>
+      </ol>
+    </div>
+    <div class="verb" data-reveal>
+      <h3><small>Verbo 2</small>Construir</h3>
+      <ol>
+        <li><i>03</i><div><b>Construção com você olhando</b>Entregas pequenas, toda semana, rodando com os seus dados. Você aprova cada etapa.</div></li>
+      </ol>
+    </div>
+    <div class="verb" data-reveal>
+      <h3><small>Verbo 3</small>Medir</h3>
+      <ol>
+        <li><i>04</i><div><b>Implantação e medição</b>Entra em uso, a equipe aprende em uma tarde, e a gente mede o antes e o depois. O número vai no relatório final.</div></li>
+        <li><i>05</i><div><b>Suporte</b>30 dias inclusos. Depois, manutenção mensal se fizer sentido — para chatbot e painel, costuma fazer.</div></li>
+      </ol>
+    </div>
+  </div>
+  <div class="fatos" data-reveal><span>Diagnóstico em 2 dias</span><span>Preço fechado por projeto</span><span>30 dias de suporte inclusos</span><span>Resposta em 1 dia útil</span></div>
+</div></section>
+
+<section id="cases"><div class="wrap">
+  <div class="head">
+    <p class="eyebrow" data-reveal>Resultados</p>
+    <h2 data-words>Cada projeto vira uma linha de número.</h2>
+    <p class="sub" data-reveal>Reconstruções com dados fictícios de problemas reais que já resolvi. A tecnologia vem depois; o número vem primeiro.</p>
+  </div>
+  <div class="cases">
+    <div class="case" data-reveal>
+      <div class="big"><span data-count="15">15</span> min → <em><span data-count="2">2</span> min</em><small>cadastro de cliente</small></div>
+      <p><b>Cadastro que levava 15 minutos</b>6 abas, 40 campos, 30 que ninguém usava. Um formulário único ligado ao sistema por API.<span class="tag">Automação · API</span></p>
+    </div>
+    <div class="case" data-reveal>
+      <div class="big"><em><span data-count="6.5">6,5</span> h</em>/dia<small>13 min × 30 cadastros por dia</small></div>
+      <p><b>Horas que voltam para a equipe</b>A conta é simples e vai no relatório final: minutos poupados vezes repetições por dia.<span class="tag">Medição</span></p>
+    </div>
+    <div class="case" data-reveal>
+      <div class="big"><em>23h</em> boleto<small>cliente pergunta de madrugada</small></div>
+      <p><b>WhatsApp que consulta o sistema</b>Boleto, status do chamado, horário. Responde de madrugada, não inventa, e chama gente quando precisa.<span class="tag">Chatbot · WhatsApp</span></p>
+    </div>
+    <div class="case" data-reveal>
+      <div class="big">"<em>Por quê?</em>"<small>painel que responde</small></div>
+      <p><b>Painel que aponta o caminho</b>Faturamento, inadimplência, clientes, chamados — e uma pergunta em português que devolve onde está o problema.<span class="tag">BI · IA</span></p>
+    </div>
+  </div>
+</div></section>
+
+<section class="quiz" id="quiz"><div class="wrap">
+  <div class="head">
+    <p class="eyebrow" data-reveal>Isca honesta · 4 perguntas</p>
+    <h2 data-words>Que tipo de bagunça é a sua empresa?</h2>
+    <p class="sub" data-reveal>Quatro perguntas, um perfil, e a primeira automação que eu faria. Sem e-mail, sem cadastro.</p>
+  </div>
+  <div class="qbox" id="qbox">
+    <div class="prog" id="prog"><i class="on"></i><i></i><i></i><i></i></div>
+    <div id="qstep">
+      <p class="q" id="qtext"></p>
+      <div class="opts" id="opts"></div>
+    </div>
+    <div class="res" id="res">
+      <p class="eyebrow">Seu perfil</p>
+      <h3 id="rname"></h3>
+      <p id="rdesc"></p>
+      <div class="first"><small>Primeira automação que eu faria</small><b id="rfirst"></b></div>
+      <div class="row">
+        <a class="btn acc" id="rwa" href="#" target="_blank" rel="noopener"><span class="dot"></span>Mandar meu perfil no WhatsApp</a>
+        <button class="redo" id="redo" type="button">Refazer o quiz</button>
+      </div>
+    </div>
+  </div>
+</div></section>
+
+<section class="quem" id="quem"><div class="wrap">
+  <div class="grid">
+    <div class="frame" data-reveal><span>Sua foto aqui<br>retrato 4:5 · fundo escuro</span></div>
+    <div>
+      <p class="eyebrow" data-reveal>Quem constrói é quem conversa</p>
+      <h2 data-words style="margin:16px 0 24px">Sem gerente de conta. Você fala com quem escreve o código.</h2>
+      <p data-reveal>Sou o Luan, desenvolvedor sob medida. Eu atendo a conversa de 30 minutos, escrevo o diagnóstico, construo, implanto e meço. Se algo quebrar, quem responde sou eu — em até 1 dia útil.</p>
+      <p data-reveal>Cada exemplo vira um vídeo de 45 segundos no Instagram. Se preferir ver o código antes de conversar, o GitHub está aberto.</p>
+      <div class="links" data-reveal>
+        <a class="btn" href="https://www.instagram.com/oluan.dev/" target="_blank" rel="noopener">@oluan.dev ↗</a>
+        <a class="btn" href="https://github.com/oluan-dev" target="_blank" rel="noopener">github.com/oluan-dev ↗</a>
+      </div>
+    </div>
+  </div>
+</div></section>
+
+<section class="final" id="contato"><div class="wrap">
+  <p class="eyebrow" data-reveal>Próximo passo</p>
+  <h2 data-words>Me conta a tarefa que mais rouba tempo.</h2>
+  <p class="sub" data-reveal>Uma mensagem basta. Eu respondo em até 1 dia útil com a próxima pergunta — ou com a data da conversa de 30 minutos.</p>
+  <div class="cta" style="justify-content:center" data-reveal>
+    <a class="btn acc" href="https://wa.me/55SEUNUMERO?text=Oi%20Luan%2C%20a%20tarefa%20que%20mais%20rouba%20tempo%20aqui%20%C3%A9%3A%20" target="_blank" rel="noopener"><span class="dot"></span>Chamar no WhatsApp</a>
+  </div>
+</div></section>
+
+<footer><div class="wrap"><span>Luan · desenvolvedor sob medida</span><span>Exemplos usam dados fictícios. Nenhum dado de cliente real aparece aqui.</span></div></footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
+<script>
+(function(){
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var coarse = matchMedia('(pointer: coarse)').matches;
+  var html = document.documentElement;
+  window.__morph = reduce ? 1 : 0;   // lido pelo módulo Three
+  window.__mouse = {x:0,y:0};
+
+  if (!window.gsap) return;          // CDN falhou: página estática, tudo visível
+  gsap.registerPlugin(ScrollTrigger);
+  gsap.defaults({ease:'power4.out', duration:.9});
+
+  // Lenis (um só engine de scroll), desligado em reduced motion
+  if (!reduce && window.Lenis) {
+    var lenis = new Lenis({lerp:.09, smoothWheel:true, wheelMultiplier:.9});
+    lenis.on('scroll', ScrollTrigger.update);
+    gsap.ticker.add(function(t){ lenis.raf(t*1000); });
+    gsap.ticker.lagSmoothing(0);
+    document.querySelectorAll('a[href^="#"]').forEach(function(a){
+      a.addEventListener('click', function(e){
+        var el = document.querySelector(a.getAttribute('href'));
+        if (!el) return; e.preventDefault(); lenis.scrollTo(el, {offset:-20});
+      });
+    });
+  }
+
+  // Progresso do hero: bagunça (0) -> painel (1)
+  var stateEl = document.querySelector('.state'), sp = document.querySelectorAll('.state span');
+  ScrollTrigger.create({
+    trigger:'.hero', start:'top top', end:'bottom bottom', scrub:reduce?false:.6,
+    onUpdate:function(st){
+      if (reduce) return;
+      window.__morph = st.progress;
+      stateEl.style.setProperty('--p', st.progress);
+      sp[0].classList.toggle('on', st.progress < .5);
+      sp[1].classList.toggle('on', st.progress >= .5);
+    }
+  });
+  ScrollTrigger.create({start:40, onEnter:function(){html.classList.add('scrolled');}, onLeaveBack:function(){html.classList.remove('scrolled');}});
+
+  if (reduce) return;                // sem reveals, sem cursor, sem split
+  html.classList.add('motion');
+
+  // Hero intro
+  gsap.from('.hero-copy .eyebrow, .hero h1, .hero .sub, .hero .cta', {y:40, autoAlpha:0, stagger:.12, duration:1.2, delay:.2});
+
+  // Split por palavra nos h2 (nome acessível preservado via aria-label)
+  document.querySelectorAll('[data-words]').forEach(function(el){
+    var text = el.textContent.trim();
+    el.setAttribute('aria-label', text);
+    el.innerHTML = text.split(/\s+/).map(function(w){ return '<span class="w" aria-hidden="true"><span>'+w+'</span></span>'; }).join(' ');
+    gsap.from(el.querySelectorAll('.w > span'), {yPercent:110, duration:1, stagger:.045, scrollTrigger:{trigger:el, start:'top 85%', once:true}});
+  });
+
+  // Reveals
+  ScrollTrigger.batch('[data-reveal]', {
+    start:'top 88%', once:true,
+    onEnter:function(els){ gsap.to(els, {y:0, autoAlpha:1, stagger:.08, overwrite:true}); }
+  });
+
+  // Contadores
+  document.querySelectorAll('[data-count]').forEach(function(el){
+    var end = parseFloat(el.dataset.count), dec = String(el.dataset.count).indexOf('.')>-1 ? 1 : 0, o = {v:0};
+    gsap.to(o, {v:end, duration:1.6, scrollTrigger:{trigger:el, start:'top 85%', once:true},
+      onUpdate:function(){ el.textContent = o.v.toFixed(dec).replace('.', ','); }});
+  });
+
+  // Touch: o dedo vira "mouse" para o objeto; giroscópio inclina o bicho
+  if (coarse) {
+    var stage = document.querySelector('.stage');
+    stage.addEventListener('touchmove', function(e){
+      var t = e.touches[0]; window.__mouse.x = (t.clientX/innerWidth)*2-1; window.__mouse.y = -(t.clientY/innerHeight)*2+1;
+    }, {passive:true});
+    stage.addEventListener('touchend', function(){ window.__mouse.x = 0; window.__mouse.y = 0; }, {passive:true});
+    addEventListener('deviceorientation', function(e){
+      if (e.gamma == null) return;
+      window.__mouse.x = Math.max(-1, Math.min(1, e.gamma/30)); window.__mouse.y = Math.max(-1, Math.min(1, (45-(e.beta||45))/30));
+    }, {passive:true});
+  }
+
+  // Cursor
+  if (!coarse) {
+    var c1 = document.querySelector('.cur'), c2 = document.querySelector('.cur2');
+    var x1 = gsap.quickTo(c1,'x',{duration:.15}), y1 = gsap.quickTo(c1,'y',{duration:.15});
+    var x2 = gsap.quickTo(c2,'x',{duration:.45,ease:'power3'}), y2 = gsap.quickTo(c2,'y',{duration:.45,ease:'power3'});
+    addEventListener('pointermove', function(e){
+      x1(e.clientX); y1(e.clientY); x2(e.clientX); y2(e.clientY);
+      window.__mouse.x = (e.clientX/innerWidth)*2-1; window.__mouse.y = -(e.clientY/innerHeight)*2+1;
+      html.classList.toggle('link', !!e.target.closest('a,button'));
+    }, {passive:true});
+  }
+})();
+
+// Quiz — 4 perguntas, 4 perfis
+(function(){
+  var P = {
+    cad:{name:'Bagunça de <em>Cadastro</em>', desc:'Sua equipe digita a mesma coisa em vários lugares. O trabalho existe, só que metade dele é copiar e colar entre abas. É a bagunça mais fácil de medir e a que paga mais rápido.', first:'Formulário único ligado ao seu sistema por API — o cadastro de 15 minutos vira 2.'},
+    grp:{name:'Bagunça de <em>Grupo</em>', desc:'A operação de campo vive em grupo de WhatsApp: foto de nota, abastecimento, visita. Informação chega, mas ninguém consolida e o que importa se perde na rolagem.', first:'App no celular da equipe: foto + 3 campos, caindo direto no painel.'},
+    num:{name:'Bagunça de <em>Número</em>', desc:'Dado existe, mas a resposta para "por que caiu?" leva uma reunião. Você decide por intuição porque olhar o número custa mais do que decidir sem ele.', first:'Painel com IA ligado ao seu sistema, com a caixa de "por quê?" em português.'},
+    mad:{name:'Bagunça de <em>Madrugada</em>', desc:'Cliente pergunta boleto, status e horário fora do expediente, e a resposta vem no dia seguinte — ou não vem. Quem responde é sempre a mesma pessoa cansada.', first:'Chatbot de WhatsApp que consulta o seu sistema e chama um humano quando não sabe.'}
+  };
+  var Q = [
+    {q:'Onde o tempo da sua equipe mais some hoje?', o:[['Digitando a mesma informação em mais de um sistema','cad'],['Procurando foto, nota ou comprovante em grupo de WhatsApp','grp'],['Montando relatório para saber como está o mês','num'],['Respondendo cliente no WhatsApp a qualquer hora','mad']]},
+    {q:'Como você descobre que algo deu errado?', o:[['Quando um cadastro sai duplicado ou faltando campo','cad'],['Quando alguém do campo lembra de avisar','grp'],['No fechamento do mês, tarde demais','num'],['Quando o cliente reclama que ninguém respondeu','mad']]},
+    {q:'Qual frase soa mais familiar?', o:[['"Abre a outra aba e copia daqui"','cad'],['"Manda no grupo que depois eu anoto"','grp'],['"Acho que caiu, mas não sei por quê"','num'],['"Amanhã eu respondo esse"','mad']]},
+    {q:'Se eu devolvesse uma hora por dia para a equipe, ela viria de onde?', o:[['Cadastro e lançamento','cad'],['Conferência do que o campo mandou','grp'],['Reunião para entender os números','num'],['Atendimento repetitivo no WhatsApp','mad']]}
+  ];
+  var i = 0, score = {cad:0,grp:0,num:0,mad:0};
+  var qtext = document.getElementById('qtext'), opts = document.getElementById('opts'), prog = document.getElementById('prog').children,
+      step = document.getElementById('qstep'), res = document.getElementById('res');
+  function render(){
+    var q = Q[i]; qtext.textContent = q.q; opts.innerHTML = '';
+    q.o.forEach(function(o, k){
+      var b = document.createElement('button'); b.type='button'; b.className='opt';
+      b.innerHTML = '<i>'+String.fromCharCode(65+k)+'</i><span></span>'; b.lastChild.textContent = o[0];
+      b.addEventListener('click', function(){ pick(o[1]); });
+      opts.appendChild(b);
+    });
+    for (var k=0;k<prog.length;k++) prog[k].classList.toggle('on', k<=i);
+  }
+  function pick(p){
+    score[p]++; i++;
+    if (i < Q.length) return render();
+    var best = Object.keys(score).sort(function(a,b){ return score[b]-score[a]; })[0], r = P[best];
+    document.getElementById('rname').innerHTML = r.name;
+    document.getElementById('rdesc').textContent = r.desc;
+    document.getElementById('rfirst').textContent = r.first;
+    var plain = r.name.replace(/<[^>]+>/g,'');
+    document.getElementById('rwa').href = 'https://wa.me/55SEUNUMERO?text=' + encodeURIComponent('Oi Luan, fiz o quiz no seu site e deu "'+plain+'". A primeira automação sugerida foi: '+r.first+' Quero conversar.');
+    step.style.display = 'none'; res.classList.add('on');
+    if (window.gsap && !matchMedia('(prefers-reduced-motion: reduce)').matches) gsap.from(res.children, {y:20, autoAlpha:0, stagger:.08});
+  }
+  document.getElementById('redo').addEventListener('click', function(){
+    i = 0; score = {cad:0,grp:0,num:0,mad:0}; res.classList.remove('on'); step.style.display = ''; render();
+  });
+  render();
+})();
+</script>
+
+<script type="module">
+// Objeto de marca: núcleo de dados — caos que vira painel conforme o scroll
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+
+const canvas = document.getElementById('gl');
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const mobile = innerWidth < 760;
+let renderer;
+try { renderer = new THREE.WebGLRenderer({canvas, antialias:!mobile, alpha:true, powerPreference:'high-performance'}); }
+catch (e) { throw e; }   // sem WebGL: poster CSS continua visível
+renderer.setPixelRatio(Math.min(devicePixelRatio, mobile ? 1 : 1.5));
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(38, 1, .1, 100);
+camera.position.set(0, .6, 15);
+
+// Alvo: 7 barras + linha, em cubinhos
+const s = mobile ? .18 : .13;                       // passo entre cubos
+const W = mobile ? 4 : 5, D = mobile ? 2 : 3;       // largura/profundidade de cada barra em cubos
+const H = [14,22,17,30,25,38,33].map(h => mobile ? Math.round(h*.75) : h);
+const gap = mobile ? 2 : 3;
+const targets = [], colors = [];
+const acc = new THREE.Color(0xc8ff2e), grey = new THREE.Color(0xd9d8d3), dim = new THREE.Color(0x7a7975);
+const totalW = H.length*W + (H.length-1)*gap;
+H.forEach((h, b) => {
+  const x0 = b*(W+gap) - totalW/2;
+  for (let x=0;x<W;x++) for (let z=0;z<D;z++) for (let y=0;y<h;y++) {
+    targets.push((x0+x+.5)*s, (y+.5)*s - 2.4, (z-(D-1)/2)*s);
+    colors.push(b===5 ? acc : (y%6===0 ? dim : grey));
+  }
+});
+const LINE = mobile ? 60 : 110;
+for (let i=0;i<LINE;i++) {
+  const t = i/(LINE-1), x = (t-.5)*totalW*s*1.02;
+  const y = 1.9 + Math.sin(t*5.2)*.45 + t*.9;
+  targets.push(x, y, 0); colors.push(acc);
+}
+const N = targets.length/3;
+
+// Caos: nuvem esférica + deriva + semente por cubo
+const chaos = new Float32Array(N*3), seed = new Float32Array(N), wave = new Float32Array(N);
+for (let i=0;i<N;i++) {
+  const r = 1.2 + Math.cbrt(Math.random())*2.6, th = Math.random()*Math.PI*2, ph = Math.acos(2*Math.random()-1);
+  chaos[i*3] = r*Math.sin(ph)*Math.cos(th); chaos[i*3+1] = r*Math.sin(ph)*Math.sin(th)*.8; chaos[i*3+2] = r*Math.cos(ph)*.7;
+  seed[i] = Math.random()*6.28; wave[i] = Math.random();
+}
+
+const geo = new THREE.BoxGeometry(s*.72, s*.72, s*.72);
+const mat = new THREE.MeshStandardMaterial({roughness:.45, metalness:.15});
+const mesh = new THREE.InstancedMesh(geo, mat, N);
+mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+for (let i=0;i<N;i++) mesh.setColorAt(i, colors[i]);
+const group = new THREE.Group(); group.add(mesh); scene.add(group);
+
+scene.add(new THREE.HemisphereLight(0xffffff, 0x101014, 1.1));
+const key = new THREE.DirectionalLight(0xffffff, 1.6); key.position.set(4, 6, 8); scene.add(key);
+const glow = new THREE.PointLight(0xc8ff2e, 0, 7); scene.add(glow);   // segue o mouse
+
+const m4 = new THREE.Matrix4(), v = new THREE.Vector3(), q = new THREE.Quaternion(), e = new THREE.Euler(), one = new THREE.Vector3(1,1,1);
+const mouse3 = new THREE.Vector3(), mSmooth = new THREE.Vector3(), ray = new THREE.Vector3();
+let p = reduce ? 1 : 0, rx = 0, ry = 0, baseX = 0, baseY = 0;
+const ss = x => x*x*(3-2*x);
+
+function resize(){
+  const w = canvas.clientWidth, h = canvas.clientHeight;
+  renderer.setSize(w, h, false); camera.aspect = w/h; camera.updateProjectionMatrix();
+  const wide = w/h > 1.2;
+  group.scale.setScalar(wide ? 1 : Math.min(.55, (w/h)/.85));
+  baseX = wide ? 2.6 : 0;                                            // desktop: objeto à direita do título; mobile: acima do título
+  baseY = wide ? .4 : 2.3;
+  group.position.set(baseX, baseY, 0);
+}
+addEventListener('resize', resize); resize();
+
+function frame(t){
+  t *= .001;
+  const target = window.__morph ?? 0;
+  p += (target - p)*.08;
+  // mouse -> ponto no plano z=0 do grupo
+  const mx = window.__mouse.x, my = window.__mouse.y;
+  ray.set(mx, my, .5).unproject(camera).sub(camera.position).normalize();
+  mouse3.copy(camera.position).addScaledVector(ray, -camera.position.z/ray.z);
+  mSmooth.lerp(mouse3, .08);
+  glow.position.copy(mSmooth).setZ(1.2); glow.intensity = (1-p)*6;
+  // o bicho olha para o cursor; em painel, fica quase parado
+  // sem mouse (touch): o objeto gira sozinho e segue o dedo/inclinação do aparelho
+  ry += ((mx*.35)*(1-p*.7) + (1-p)*(mobile ? t*.35 : Math.sin(t*.25)*.35) - ry)*.05;
+  rx += ((-my*.18)*(1-p*.7) - rx)*.05;
+  group.rotation.set(rx, ry, 0);
+  camera.position.z = 15 - p*1.6;
+  group.position.x = baseX*(1 - p*.3);   // painel pronto puxa um pouco para o centro
+  group.position.y = baseY - (baseX ? 0 : p*.3);    // mobile: painel assenta um pouco mais baixo
+
+  for (let i=0;i<N;i++) {
+    const i3 = i*3;
+    let cx = chaos[i3] + Math.sin(t*.7+seed[i])*.22, cy = chaos[i3+1] + Math.cos(t*.6+seed[i]*1.3)*.22, cz = chaos[i3+2] + Math.sin(t*.5+seed[i]*.7)*.18;
+    // curiosidade: cubos perto do cursor vão atrás dele (só no caos)
+    const dx = mSmooth.x-cx, dy = mSmooth.y-cy, d = Math.hypot(dx, dy);
+    if (d < 2.2) { const f = (1-d/2.2)*(1-p)*.55; cx += dx*f; cy += dy*f; cz += (1-d/2.2)*(1-p)*.4; }
+    const k = ss(Math.min(1, Math.max(0, (p - wave[i]*.45)/.55)));
+    v.set(cx + (targets[i3]-cx)*k, cy + (targets[i3+1]-cy)*k, cz + (targets[i3+2]-cz)*k);
+    e.set((1-k)*(t*.4+seed[i]), (1-k)*(t*.3+seed[i]), 0); q.setFromEuler(e);
+    m4.compose(v, q, one); mesh.setMatrixAt(i, m4);
+  }
+  mesh.instanceMatrix.needsUpdate = true;
+  renderer.render(scene, camera);
+  if (!document.documentElement.classList.contains('gl')) document.documentElement.classList.add('gl');
+}
+
+// Desenha só com o hero na tela; checa a posição real a cada quadro (IntersectionObserver
+// trava quando a página carrega num iframe que começa escondido). reduced-motion = um frame parado.
+let raf = 0;
+const stageEl = canvas.parentElement;
+function loop(t){
+  raf = requestAnimationFrame(loop);
+  const r = stageEl.getBoundingClientRect();
+  if (r.bottom > 0 && r.top < innerHeight && !document.hidden) frame(t);
+}
+if (reduce) { frame(0); }
+else raf = requestAnimationFrame(loop);
+canvas.addEventListener('webglcontextlost', ev => { ev.preventDefault(); cancelAnimationFrame(raf); document.documentElement.classList.remove('gl'); });
+</script>
+</body>
+</html>

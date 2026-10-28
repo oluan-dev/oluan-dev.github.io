@@ -1,0 +1,491 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Luan · sua empresa acesa</title>
+<meta name="description" content="Veja uma empresa em miniatura acendendo setor por setor: cadastro, WhatsApp, financeiro e equipe de campo automatizados por Luan, desenvolvedor sob medida.">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f6efe4;--bg2:#efe3d0;--panel:#fffaf2;--ink:#2a2420;--ink2:#6f635a;--line:#e4d6c2;--acc:#e07a4f;--acc2:#2f8f5b;--zap:#25d366;--sun:#ffcf6b;--blue:#4f7fd9;--grey:#b9b1a8}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:var(--acc);text-decoration:none}
+h1,h2,h3{font-family:Fraunces,Georgia,serif;letter-spacing:-.01em;margin:0;line-height:1.08}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:13px 20px;border-radius:999px;font-weight:600;font-size:15px;border:1px solid var(--line);color:var(--ink);background:var(--panel);transition:.15s;white-space:nowrap}
+.btn:hover{border-color:var(--acc);transform:translateY(-1px)}
+.btn.zap{background:var(--zap);color:#07301a;border-color:transparent}
+.btn.zap:hover{filter:brightness(1.05)}
+.btn.zap svg{width:18px;height:18px;fill:currentColor}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--acc)}
+
+/* nav */
+nav{position:fixed;top:0;left:0;right:0;z-index:20;background:color-mix(in srgb,var(--bg) 78%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid color-mix(in srgb,var(--line) 60%,transparent)}
+nav .wrap{display:flex;align-items:center;justify-content:space-between;height:60px}
+nav .logo{font-family:Fraunces,serif;font-weight:700;font-size:20px;color:var(--ink)}
+nav .links{display:flex;gap:4px}
+nav .links a{color:var(--ink2);font-size:14px;font-weight:600;padding:8px 12px;border-radius:999px}
+nav .links a:hover{background:var(--bg2);color:var(--ink)}
+
+/* 3D stage */
+#stage{position:fixed;inset:0;z-index:0;display:block;width:100%;height:100%;transition:opacity .6s}
+body.no3d #stage{display:none}
+body.no3d .story{background:radial-gradient(120% 80% at 70% 20%,#fde7c7 0%,var(--bg) 55%,var(--bg2) 100%)}
+.story{position:relative;z-index:1}
+.badge{position:fixed;left:16px;bottom:14px;z-index:5;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink2);background:color-mix(in srgb,var(--panel) 80%,transparent);border:1px solid var(--line);border-radius:999px;padding:6px 11px;pointer-events:none}
+.hint{position:fixed;right:16px;bottom:14px;z-index:5;font-size:12px;color:var(--ink2);background:color-mix(in srgb,var(--panel) 80%,transparent);border:1px solid var(--line);border-radius:999px;padding:6px 11px;pointer-events:none;transition:opacity .4s}
+body.no3d .badge,body.no3d .hint{display:none}
+.badge-inline{display:none;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink2);margin-top:14px}
+.story.done ~ .badge,.story.done ~ .hint{opacity:0}
+
+/* beats */
+.beat{min-height:100vh;display:flex;align-items:center;pointer-events:none}
+.beat .wrap{width:100%;display:flex;justify-content:flex-end}
+.beat.hero .wrap{justify-content:flex-start}
+.card{pointer-events:auto;width:min(100%,440px);background:color-mix(in srgb,var(--panel) 92%,transparent);backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:22px;padding:26px 28px;box-shadow:0 20px 50px -30px rgba(70,40,10,.35)}
+.hero .card{width:min(100%,600px);background:color-mix(in srgb,var(--bg) 72%,transparent);border:0;box-shadow:none;backdrop-filter:blur(6px);padding:28px;border-radius:24px}
+.hero h1{font-size:clamp(40px,6.4vw,74px);font-weight:700;margin:14px 0 18px;max-width:12ch}
+.hero .lede{font-size:clamp(17px,2.1vw,21px);color:var(--ink2);max-width:40ch;margin:0 0 28px}
+.cta{display:flex;flex-wrap:wrap;gap:10px}
+.card h2{font-size:clamp(26px,3.4vw,36px);margin:8px 0 18px}
+.ad{display:grid;gap:10px}
+.state{border-radius:14px;padding:14px 16px;border:1px solid var(--line);transition:.5s;position:relative}
+.state small{display:block;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px}
+.state p{margin:0;font-size:15px;line-height:1.5}
+.state.before{background:#ece6dc;color:var(--ink2)}
+.state.before small{color:var(--grey)}
+.state.after{background:var(--panel);color:var(--ink);opacity:.38;transform:translateY(6px)}
+.state.after small{color:var(--acc2)}
+.state.after b{color:var(--acc)}
+.beat.on .state.before{opacity:.45;filter:grayscale(1)}
+.beat.on .state.before p{text-decoration:line-through;text-decoration-color:var(--grey)}
+.beat.on .state.after{opacity:1;transform:none;border-color:var(--acc2);box-shadow:0 0 0 4px color-mix(in srgb,var(--acc2) 14%,transparent)}
+.meter{height:6px;border-radius:99px;background:var(--line);margin-top:10px;overflow:hidden}
+.meter i{display:block;height:100%;width:100%;background:var(--grey);transition:width 1.2s cubic-bezier(.2,.7,.2,1) .25s}
+.beat.on .meter i{background:var(--acc2)}
+.fin .card{width:min(100%,520px)}
+.fin .cta{margin-top:18px}
+
+/* static sections */
+.flat{position:relative;z-index:2;background:var(--bg);border-top:1px solid var(--line)}
+section.flat{padding:80px 0}
+section.flat h2{font-size:clamp(28px,4vw,42px);margin-bottom:10px}
+.sub{color:var(--ink2);max-width:60ch;margin:0 0 36px;font-size:17px}
+.steps{counter-reset:s;display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.step{counter-increment:s;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px 22px}
+.step::before{content:counter(s,decimal-leading-zero);font-family:Fraunces,serif;font-weight:700;font-size:26px;color:var(--acc);display:block;margin-bottom:6px}
+.step b{display:block;margin-bottom:4px}
+.step p{margin:0;color:var(--ink2);font-size:15px}
+.contact{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.contact a{display:flex;flex-direction:column;gap:4px;padding:20px;border-radius:14px;background:var(--panel);border:1px solid var(--line);color:var(--ink)}
+.contact a:hover{border-color:var(--acc)}
+.contact small{color:var(--ink2);font-size:13px}
+.contact b{font-size:17px}
+footer{padding:36px 0 56px;color:var(--ink2);font-size:14px}
+footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+
+@media (max-width:767px){
+  nav .links{display:none}
+  .beat{align-items:flex-end;padding-bottom:24px;min-height:135svh}
+  .beat .wrap,.beat.hero .wrap{justify-content:center}
+  .card{width:100%;padding:16px 18px;border-radius:18px}
+  .card h2{font-size:22px;margin:4px 0 12px}
+  .ad{gap:8px}
+  .state{padding:10px 12px}
+  .state p{font-size:14px;line-height:1.45}
+  .state small{margin-bottom:3px}
+  .meter{margin-top:8px;height:5px}
+  .hero{align-items:flex-start;padding-top:96px}
+  .hero .card{padding:14px}
+  .hint,.badge{display:none}
+  .badge-inline{display:block}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .state,.meter i,.btn{transition:none}
+  .state.after{opacity:1;transform:none}
+}
+</style>
+</head>
+<body class="no3d">
+
+<nav><div class="wrap">
+  <a class="logo" href="#">Luan<span style="color:var(--acc)">.</span>dev</a>
+  <div class="links"><a href="#b1">Atendimento</a><a href="#b2">WhatsApp</a><a href="#b3">Financeiro</a><a href="#b4">Campo</a><a href="#como">Como trabalho</a></div>
+  <a class="btn zap" href="https://wa.me/55SEUNUMERO?text=Oi%20Luan%2C%20vi%20a%20empresa%20em%20miniatura%20e%20quero%20acender%20a%20minha" target="_blank" rel="noopener">Falar no WhatsApp</a>
+</div></nav>
+
+<canvas id="stage" aria-hidden="true"></canvas>
+
+<main class="story" id="story">
+
+  <section class="beat hero" id="b0"><div class="wrap"><div class="card">
+    <div class="eyebrow">Desenvolvedor · sistemas sob medida</div>
+    <h1>Sua empresa, acesa setor por setor.</h1>
+    <p class="lede">Role a página. Cada prédio desta empresa em miniatura é uma tarefa manual que eu transformo em automação, painel ou chatbot — e mede em minutos ganhos por dia.</p>
+    <div class="cta">
+      <a class="btn zap" href="https://wa.me/55SEUNUMERO?text=Oi%20Luan%2C%20quero%20uma%20conversa%20de%2030%20minutos" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.6.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.8-1.4.1-.2 0-.3 0-.5l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 12 12 0 0 0 4.6 4c1.7.7 2.3.8 3.1.7a2.7 2.7 0 0 0 1.8-1.2 2.2 2.2 0 0 0 .2-1.2c-.1-.2-.3-.2-.5-.3z"/></svg>Conversa de 30 min</a>
+      <a class="btn" href="#b1">Entrar na empresa ↓</a>
+    </div>
+    <small class="badge-inline">Empresa fictícia · exemplo ilustrativo · toque num prédio para ir até ele</small>
+  </div></div></section>
+
+  <section class="beat" id="b1" data-beat="1"><div class="wrap"><div class="card">
+    <div class="eyebrow">01 · Recepção e cadastro</div>
+    <h2>O cadastro que levava 15 minutos.</h2>
+    <div class="ad">
+      <div class="state before"><small>Antes</small><p>6 abas, 40 campos, 30 que ninguém usava. A atendente digita o mesmo CPF três vezes enquanto o cliente espera no balcão.</p><div class="meter"><i style="width:100%"></i></div></div>
+      <div class="state after"><small>Depois</small><p>Um formulário único ligado ao seu sistema por API: <b>2 minutos</b>. 13 min × 30 cadastros/dia = <b>6,5 h por dia</b> de volta.</p><div class="meter"><i class="m" data-w="13%"></i></div></div>
+    </div>
+  </div></div></section>
+
+  <section class="beat" id="b2" data-beat="2"><div class="wrap"><div class="card">
+    <div class="eyebrow">02 · Central de WhatsApp</div>
+    <h2>O balãozinho que trabalha de madrugada.</h2>
+    <div class="ad">
+      <div class="state before"><small>Antes</small><p>Cliente pergunta o boleto às 23h. Ninguém responde. De manhã são 40 mensagens iguais e uma pessoa só para copiar e colar.</p></div>
+      <div class="state after"><small>Depois</small><p>O chatbot consulta o seu sistema e responde <b>boleto, status e horário às 23h</b>. Não inventa resposta e chama um humano quando não sabe.</p></div>
+    </div>
+  </div></div></section>
+
+  <section class="beat" id="b3" data-beat="3"><div class="wrap"><div class="card">
+    <div class="eyebrow">03 · Financeiro</div>
+    <h2>O painel que responde "por quê?".</h2>
+    <div class="ad">
+      <div class="state before"><small>Antes</small><p>Fechamento no fim do mês em cima de exportação de ontem. A pergunta "por que a inadimplência subiu?" vira uma tarde de conferência.</p></div>
+      <div class="state after"><small>Depois</small><p>Painel com faturamento, inadimplência e chamados ao vivo, e uma caixa onde você pergunta em português. Ele devolve <b>onde olhar</b> — não só o número.</p></div>
+    </div>
+  </div></div></section>
+
+  <section class="beat" id="b4" data-beat="4"><div class="wrap"><div class="card">
+    <div class="eyebrow">04 · Equipe de campo</div>
+    <h2>Fim do bloquinho no carro.</h2>
+    <div class="ad">
+      <div class="state before"><small>Antes</small><p>Nota de abastecimento vai por foto no grupo. Metade se perde, a outra metade alguém digita à noite.</p></div>
+      <div class="state after"><small>Depois</small><p>App no celular do técnico: foto da nota, 3 campos, e a visita cai <b>direto no painel</b>. Sem grupo, sem foto perdida, sem redigitar.</p></div>
+    </div>
+  </div></div></section>
+
+  <section class="beat fin" id="b5" data-beat="5"><div class="wrap"><div class="card">
+    <div class="eyebrow">05 · Escritório do dono</div>
+    <h2>A empresa inteira acesa, num painel só.</h2>
+    <div class="ad">
+      <div class="state before"><small>Antes</small><p>Para saber como está o dia, o dono liga para três pessoas e espera.</p></div>
+      <div class="state after"><small>Depois</small><p>Cadastro, WhatsApp, financeiro e campo entregando dado no mesmo lugar. Uma olhada no celular e o dono sabe <b>o que fazer hoje</b>.</p></div>
+    </div>
+    <div class="cta">
+      <a class="btn zap" href="https://wa.me/55SEUNUMERO?text=Oi%20Luan%2C%20quero%20acender%20a%20minha%20empresa.%20Pode%20me%20mandar%20o%20diagn%C3%B3stico%3F" target="_blank" rel="noopener">Quero acender a minha</a>
+      <a class="btn" href="#como">Como funciona ↓</a>
+    </div>
+  </div></div></section>
+
+</main>
+<div class="badge">Empresa fictícia · exemplo ilustrativo</div>
+<div class="hint" id="hint">Role para andar · clique num prédio para ir até ele</div>
+
+<section class="flat" id="como"><div class="wrap">
+  <h2>Como eu trabalho</h2>
+  <p class="sub">Quem constrói é quem conversa. Sem gerente no meio, sem escopo que cresce sem aviso.</p>
+  <div class="steps">
+    <div class="step"><b>Conversa de 30 minutos</b><p>Você me mostra o dia a dia. Eu só ouço e anoto onde o tempo vaza. Sem custo, sem compromisso.</p></div>
+    <div class="step"><b>Diagnóstico e número fechado</b><p>Em 2 dias você recebe: o que eu faria, quanto tempo sua equipe ganha, e o preço — fechado por projeto, não por hora.</p></div>
+    <div class="step"><b>Construção com você olhando</b><p>Entregas pequenas, toda semana, rodando com os seus dados. Você aprova cada etapa.</p></div>
+    <div class="step"><b>Implantação e medição</b><p>Entra em uso, a equipe aprende em uma tarde, e a gente mede o antes e o depois. O número vai no relatório final.</p></div>
+    <div class="step"><b>Suporte</b><p>30 dias inclusos. Depois, manutenção mensal se fizer sentido — para chatbot e painel, costuma fazer.</p></div>
+  </div>
+</div></section>
+
+<section class="flat" id="contato"><div class="wrap">
+  <h2>Falar comigo</h2>
+  <p class="sub">Me conta a tarefa que mais toma tempo da sua equipe. Eu respondo em até 1 dia útil.</p>
+  <div class="contact">
+    <a href="https://wa.me/55SEUNUMERO?text=Oi%20Luan%2C%20vi%20seu%20site%20e%20quero%20conversar" target="_blank" rel="noopener"><small>WhatsApp</small><b>Chamar no WhatsApp</b></a>
+    <a href="https://www.instagram.com/oluan.dev/" target="_blank" rel="noopener"><small>Instagram</small><b>@oluan.dev</b></a>
+    <a href="https://github.com/oluan-dev" target="_blank" rel="noopener"><small>GitHub</small><b>github.com/oluan-dev</b></a>
+  </div>
+</div></section>
+
+<footer class="flat"><div class="wrap"><span>Luan · desenvolvedor sob medida</span><span>A empresa 3D é fictícia. Os números vêm de projetos reais com dados fictícios.</span></div></footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script>
+// Painéis: funcionam com ou sem 3D.
+(function(){
+  var reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var beats = [].slice.call(document.querySelectorAll('.beat[data-beat]'));
+  var story = document.getElementById('story');
+  window.onBeat = function(){};   // o módulo 3D substitui
+  window.onLit = function(){};
+  function setMeters(b){ b.querySelectorAll('.m').forEach(function(m){ m.style.width = b.classList.contains('on') ? m.dataset.w : '100%'; }); }
+  if (reduced || !window.gsap) {
+    beats.forEach(function(b){ b.classList.add('on'); setMeters(b); });
+    if (!window.gsap) return;
+  }
+  gsap.registerPlugin(ScrollTrigger);
+  ScrollTrigger.create({ trigger: '#b0', start: 'top top', end: 'bottom 55%', onEnterBack: function(){ window.onBeat(0); } });
+  beats.forEach(function(b){
+    var i = +b.dataset.beat;
+    ScrollTrigger.create({
+      trigger: b, start: 'top 55%', end: 'bottom 55%',
+      onEnter: function(){ window.onBeat(i); }, onEnterBack: function(){ window.onBeat(i); }
+    });
+    if (!reduced) ScrollTrigger.create({
+      trigger: b, start: 'top 35%',
+      onEnter: function(){ b.classList.add('on'); setMeters(b); window.onLit(i, true); },
+      onLeaveBack: function(){ b.classList.remove('on'); setMeters(b); window.onLit(i, false); }
+    });
+    else window.onLit(i, true);
+  });
+  ScrollTrigger.create({ trigger: '#como', start: 'top 80%', onEnter: function(){ story.classList.add('done'); }, onLeaveBack: function(){ story.classList.remove('done'); } });
+})();
+</script>
+
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"}}</script>
+<script type="module">
+import * as THREE from 'three';
+
+const canvas = document.getElementById('stage');
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const mobile = matchMedia('(max-width: 767px)').matches;
+let renderer;
+try {
+  renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
+} catch (e) { renderer = null; }
+if (renderer) {
+  document.body.classList.remove('no3d');
+  renderer.setPixelRatio(Math.min(devicePixelRatio || 1, mobile ? 1 : 1.75));
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.05;
+  renderer.shadowMap.enabled = !mobile;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+  const scene = new THREE.Scene();
+  scene.fog = new THREE.Fog(0xf6efe4, 45, 90);
+  const camera = new THREE.PerspectiveCamera(mobile ? 50 : 32, 1, 0.1, 100);
+
+  // luz: céu quente, um sol só, sombras macias (skills 3d-sky-background / 3d-wood-lighting-scorecard)
+  scene.add(new THREE.HemisphereLight(0xfff1dc, 0xc9a77c, 0.9));
+  const sun = new THREE.DirectionalLight(0xfff0d6, 2.2);
+  sun.position.set(8, 14, 6);
+  sun.castShadow = !mobile;
+  sun.shadow.mapSize.set(2048, 2048);
+  sun.shadow.camera.left = sun.shadow.camera.bottom = -16;
+  sun.shadow.camera.right = sun.shadow.camera.top = 16;
+  sun.shadow.camera.far = 50;
+  sun.shadow.normalBias = 0.03;
+  scene.add(sun);
+  const rim = new THREE.DirectionalLight(0xcfe0ff, 0.5); rim.position.set(-8, 6, -10); scene.add(rim);
+
+  const world = new THREE.Group(); scene.add(world);
+  const mat = (c, o = {}) => new THREE.MeshStandardMaterial({ color: c, roughness: 0.85, metalness: 0, flatShading: true, ...o });
+  const box = (w, h, d, m, x, y, z, parent = world) => { const g = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), m); g.position.set(x, y + h / 2, z); g.castShadow = !mobile; g.receiveShadow = true; parent.add(g); return g; };
+
+  // chão: base do diorama (brinquedo sobre mesa)
+  const base = box(22, 0.6, 22, mat(0xe9d9c0), 0, -0.6, 0); base.castShadow = false;
+  const grass = box(20, 0.2, 20, mat(0xbfd8a0), 0, 0, 0); grass.castShadow = false;
+  // ruas em cruz
+  const road = mat(0xd9cbb6);
+  box(20, 0.05, 2.2, road, 0, 0.2, 0).castShadow = false;
+  box(2.2, 0.05, 20, road, 0, 0.2, 0).castShadow = false;
+
+  // árvores low-poly (só desktop)
+  if (!mobile) {
+    const trunk = mat(0x9c6b43), leaf = mat(0x7fb069), leaf2 = mat(0x5e9a52);
+    [[-8.5, -8], [8.5, -8.5], [-8.5, 8], [8.5, 8.5], [-3, 8.8], [3, -8.8], [8.8, 3], [-8.8, -3]].forEach(([x, z], i) => {
+      box(0.3, 0.6, 0.3, trunk, x, 0.2, z);
+      const c = new THREE.Mesh(new THREE.ConeGeometry(0.8, 1.8, 6), i % 2 ? leaf : leaf2);
+      c.position.set(x, 1.7, z); c.castShadow = true; world.add(c);
+    });
+  }
+
+  // setores
+  const sectors = {}; // id -> {group, lamps[], people[], papers[], pos}
+  function building({ id, x, z, w, h, d, color, roof, label }) {
+    const g = new THREE.Group(); g.position.set(x, 0.2, z); world.add(g);
+    const body = box(w, h, d, mat(color), 0, 0, 0, g); body.userData.beat = id;
+    const r = box(w + 0.4, 0.25, d + 0.4, mat(roof), 0, h, 0, g); r.userData.beat = id;
+    // janelas emissivas: apagadas até o setor acender
+    const lampMat = new THREE.MeshStandardMaterial({ color: 0x8f8a84, emissive: 0xffc96b, emissiveIntensity: 0, roughness: 0.6 });
+    const lamps = [];
+    const rows = Math.max(1, Math.floor(h / 1.1));
+    for (let ry = 0; ry < rows; ry++) for (let i = 0; i < 3; i++) {
+      const wn = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.5, 0.06), lampMat);
+      wn.position.set(-w / 2 + 0.6 + i * ((w - 1.2) / 2), 0.7 + ry * 1.1, d / 2 + 0.03);
+      wn.userData.beat = id; g.add(wn); lamps.push(wn);
+    }
+    // porta
+    box(0.6, 0.9, 0.08, mat(0x5a4635), 0, 0, d / 2 + 0.02, g).userData.beat = id;
+    sectors[id] = { group: g, lampMat, lamps, people: [], papers: [], pos: new THREE.Vector3(x, h / 2, z), h };
+    return sectors[id];
+  }
+  const sx = mobile ? 0.85 : 1;
+  building({ id: 1, x: -5 * sx, z: 4.5 * sx, w: 3.6, h: 2.2, d: 3, color: 0xf2b8a2, roof: 0xd0674a });  // recepção
+  building({ id: 3, x: 5 * sx, z: 4.5 * sx, w: 3.6, h: 3.2, d: 3, color: 0xf6dca4, roof: 0xc79b4a });  // financeiro
+  building({ id: 4, x: -5 * sx, z: -4.5 * sx, w: 4.2, h: 1.6, d: 3.2, color: 0xcfd8e6, roof: 0x7b8aa3 });  // campo (galpão)
+  building({ id: 5, x: 5 * sx, z: -4.5 * sx, w: 3, h: 4.4, d: 3, color: 0xe6e0d6, roof: 0x3f4a5a });  // escritório do dono
+  // central de WhatsApp: torrinha no centro
+  (() => {
+    const g = new THREE.Group(); g.position.set(0, 0.2, 0); world.add(g);
+    const b = box(1.4, 1.2, 1.4, mat(0xdff3e3), 0, 0, 0, g); b.userData.beat = 2;
+    const mast = box(0.14, 2.2, 0.14, mat(0x6b7280), 0, 1.2, 0, g); mast.userData.beat = 2;
+    const lampMat = new THREE.MeshStandardMaterial({ color: 0x9aa39c, emissive: 0x25d366, emissiveIntensity: 0, roughness: 0.5 });
+    const tip = new THREE.Mesh(new THREE.SphereGeometry(0.22, 8, 6), lampMat); tip.position.y = 3.5; tip.userData.beat = 2; g.add(tip);
+    sectors[2] = { group: g, lampMat, lamps: [tip], people: [], papers: [], pos: new THREE.Vector3(0, 1.6, 0), h: 3.6 };
+  })();
+
+  // pessoas (cápsula + cabeça) e pilhas de papel: cinza no "antes", cor no "depois"
+  const skin = mat(0xf1c9a5);
+  function person(sec, x, z, color) {
+    const g = new THREE.Group(); g.position.set(x, 0.2, z); world.add(g);
+    const bodyMat = mat(0x9b948c); bodyMat.userData.color = new THREE.Color(color);
+    const bd = new THREE.Mesh(new THREE.CapsuleGeometry(0.18, 0.4, 2, 6), bodyMat); bd.position.y = 0.48; bd.castShadow = !mobile; g.add(bd);
+    const hd = new THREE.Mesh(new THREE.SphereGeometry(0.17, 8, 6), skin); hd.position.y = 0.95; g.add(hd);
+    g.userData = { phase: Math.random() * 6, bodyMat }; sec.people.push(g);
+  }
+  function papers(sec, x, z, n) {
+    for (let i = 0; i < n; i++) { const p = box(0.5, 0.12 + Math.random() * 0.25, 0.4, mat(0xd4d0c8), x + (i % 2) * 0.6, 0.2, z + Math.floor(i / 2) * 0.5); sec.papers.push(p); }
+  }
+  person(sectors[1], -5 * sx - 1, 4.5 * sx + 2.4, 0xe07a4f); person(sectors[1], -5 * sx + 0.3, 4.5 * sx + 2.6, 0x4f7fd9); papers(sectors[1], -5 * sx + 1.6, 4.5 * sx + 2.2, 4);
+  person(sectors[3], 5 * sx - 0.6, 4.5 * sx + 2.4, 0x2f8f5b); papers(sectors[3], 5 * sx + 1.2, 4.5 * sx + 2.3, 6);
+  person(sectors[5], 5 * sx + 0.4, -4.5 * sx + 2.4, 0x3f4a5a);
+  if (!mobile) { person(sectors[2], 1.4, 1.4, 0x25d366); person(sectors[4], -5 * sx + 2.2, -4.5 * sx + 2.6, 0x7b8aa3); }
+
+  // carrinho da equipe de campo
+  const car = new THREE.Group(); world.add(car);
+  box(1.3, 0.45, 0.7, mat(0xffffff), 0, 0.3, 0, car); box(0.6, 0.4, 0.66, mat(0x4f7fd9), -0.2, 0.75, 0, car);
+  const wheelG = new THREE.CylinderGeometry(0.16, 0.16, 0.14, 8), wheelM = mat(0x3a3a3a);
+  [[-0.4, 0.38], [0.4, 0.38], [-0.4, -0.38], [0.4, -0.38]].forEach(([x, z]) => { const w = new THREE.Mesh(wheelG, wheelM); w.rotation.x = Math.PI / 2; w.position.set(x, 0.3, z); car.add(w); });
+  const carPath = new THREE.CatmullRomCurve3([new THREE.Vector3(-5 * sx, 0.2, -2.3 * sx), new THREE.Vector3(-0.6, 0.2, -0.6), new THREE.Vector3(8, 0.2, -0.6), new THREE.Vector3(8.6, 0.2, 0.6), new THREE.Vector3(0.6, 0.2, 0.6), new THREE.Vector3(-0.6, 0.2, 8), new THREE.Vector3(-7, 0.2, 0.6), new THREE.Vector3(-7.2, 0.2, -2.3 * sx)], true, 'catmullrom', 0.3);
+  car.position.copy(carPath.getPointAt(0));
+  let carT = 0;
+
+  // balão de WhatsApp voando entre os prédios
+  const zap = new THREE.Group(); world.add(zap);
+  const zapMat = new THREE.MeshStandardMaterial({ color: 0x25d366, emissive: 0x25d366, emissiveIntensity: 0.25, roughness: 0.4 });
+  const bub = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.6, 0.35), zapMat); zap.add(bub);
+  const tail = new THREE.Mesh(new THREE.ConeGeometry(0.16, 0.3, 4), zapMat); tail.rotation.z = Math.PI; tail.position.set(-0.3, -0.42, 0); zap.add(tail);
+  const dotG = new THREE.SphereGeometry(0.06, 6, 4), dotM = mat(0xffffff, { flatShading: false });
+  [-0.22, 0, 0.22].forEach(x => { const d = new THREE.Mesh(dotG, dotM); d.position.set(x, 0, 0.2); zap.add(d); });
+  const zapPath = new THREE.CatmullRomCurve3([new THREE.Vector3(0, 4.2, 0), new THREE.Vector3(-5 * sx, 3.6, 4.5 * sx), new THREE.Vector3(0, 5, 6), new THREE.Vector3(5 * sx, 4.6, 4.5 * sx), new THREE.Vector3(5 * sx, 6, -4.5 * sx), new THREE.Vector3(-5 * sx, 3.4, -4.5 * sx)], true, 'catmullrom', 0.6);
+  let zapT = 0;
+  zap.position.copy(zapPath.getPointAt(0));
+
+  // painel do dono flutuando (aparece no final)
+  const panel = new THREE.Group(); world.add(panel);
+  const pnl = new THREE.Mesh(new THREE.BoxGeometry(3.2, 2, 0.12), new THREE.MeshStandardMaterial({ color: 0xfffaf2, roughness: 0.5 })); panel.add(pnl);
+  const bars = [0.5, 0.9, 0.7, 1.2, 1.0].map((h, i) => { const b = new THREE.Mesh(new THREE.BoxGeometry(0.35, h, 0.1), mat(i === 3 ? 0xe07a4f : 0x2f8f5b)); b.position.set(-1.2 + i * 0.6, -0.8 + h / 2, 0.1); panel.add(b); return b; });
+  panel.position.set(5 * sx, 7, -4.5 * sx); panel.scale.setScalar(0.001);
+  panel.lookAt(14, 9, 6);
+
+  // câmera: paradas por setor
+  const k = mobile ? 1.45 : 1;
+  const D = 9 * k;
+  const ov = mobile ? 1.1 : 1;
+  const stops = {
+    0: { p: [21 * ov, 15 * ov, 21 * ov], t: [mobile ? 0 : 3, 0.5, 0] },
+    1: { p: [-5 * sx + D * .6, 4.5 * k, 4.5 * sx + D], t: [-5 * sx, 1, 4.5 * sx] },
+    2: { p: [0.6, 7.5 * k, D * 1.3], t: [0, 2, 0] },
+    3: { p: [5 * sx + D * .6, 5 * k, 4.5 * sx + D], t: [5 * sx, 1.4, 4.5 * sx] },
+    4: { p: [-5 * sx - D * .2, 5 * k, -4.5 * sx + D * 1.1], t: [-5 * sx, 0.8, -4.5 * sx] },
+    5: { p: [4 * k, 22 * k, 17 * k], t: [mobile ? 0 : -3, 2.5, -1] },
+  };
+  const cam = { px: 21 * ov, py: 15 * ov, pz: 21 * ov, tx: mobile ? 0 : 3, ty: mobile ? -1 : 0.5, tz: 0 };
+  const target = new THREE.Vector3();
+  let current = 0;
+  window.onBeat = (i) => {
+    const s = stops[i]; if (!s) return; current = i;
+    // celular: o painel ocupa a metade de baixo, então o alvo desce e o prédio sobe na tela
+    gsap.to(cam, { px: s.p[0], py: s.p[1], pz: s.p[2], tx: s.t[0], ty: s.t[1] - (mobile ? 1.5 : 0), tz: s.t[2], duration: reduced ? 0 : 1.8, ease: 'power2.inOut', overwrite: true, onUpdate: reduced ? draw : null });
+  };
+  window.onLit = (i, on) => {
+    const s = sectors[i]; if (!s) return;
+    const dur = reduced ? 0 : 1;
+    gsap.to(s.lampMat, { emissiveIntensity: on ? 1.6 : 0, duration: dur, overwrite: true });
+    s.people.forEach(p => { const c = p.userData.bodyMat.userData.color; gsap.to(p.userData.bodyMat.color, { r: on ? c.r : 0.61, g: on ? c.g : 0.58, b: on ? c.b : 0.55, duration: dur, overwrite: true }); });
+    s.papers.forEach((p, j) => gsap.to(p.scale, { y: on ? 0.05 : 1, duration: dur, delay: on ? j * 0.08 : 0, overwrite: true, onUpdate: () => { p.position.y = 0.2 + p.geometry.parameters.height * p.scale.y / 2; } }));
+    if (i === 5) gsap.to(panel.scale, { x: on ? 1 : 0.001, y: on ? 1 : 0.001, z: on ? 1 : 0.001, duration: dur, ease: 'back.out(1.6)', overwrite: true });
+    if (i === 5 && on) Object.keys(sectors).forEach(j => gsap.to(sectors[j].lampMat, { emissiveIntensity: 1.6, duration: dur }));
+    if (reduced) draw();
+  };
+  const lit = (i) => sectors[i].lampMat.emissiveIntensity > 0.3;
+
+  // orbit pelo mouse (skill add-mouse-driven-orbit): alvo normalizado, amortecido no loop
+  const ptr = { x: 0, y: 0 }, sm = { x: 0, y: 0 };
+  addEventListener('pointermove', e => { if (e.pointerType === 'touch') return; ptr.x = (e.clientX / innerWidth) * 2 - 1; ptr.y = (e.clientY / innerHeight) * 2 - 1; }, { passive: true });
+  addEventListener('pointerleave', () => { ptr.x = ptr.y = 0; });
+
+  // clique no prédio -> vai até ele
+  const ray = new THREE.Raycaster(), mouse = new THREE.Vector2();
+  const clickable = []; world.traverse(o => { if (o.isMesh && o.userData.beat) clickable.push(o); });
+  let down = null;
+  addEventListener('pointerdown', e => { down = [e.clientX, e.clientY]; });
+  addEventListener('pointerup', e => {
+    if (!down || Math.hypot(e.clientX - down[0], e.clientY - down[1]) > 6) return;
+    if (e.target !== canvas && !e.target.closest('.beat')) return;
+    if (e.target.closest('.card')) return;
+    mouse.set((e.clientX / innerWidth) * 2 - 1, -(e.clientY / innerHeight) * 2 + 1);
+    ray.setFromCamera(mouse, camera);
+    const hit = ray.intersectObjects(clickable, false)[0];
+    if (hit) document.getElementById('b' + hit.object.userData.beat).scrollIntoView({ behavior: reduced ? 'auto' : 'smooth' });
+  });
+  addEventListener('pointermove', e => {
+    if (e.pointerType === 'touch' || e.target.closest('.card') || e.target.closest('nav')) { canvas.style.cursor = ''; return; }
+    mouse.set((e.clientX / innerWidth) * 2 - 1, -(e.clientY / innerHeight) * 2 + 1);
+    ray.setFromCamera(mouse, camera);
+    document.body.style.cursor = ray.intersectObjects(clickable, false).length ? 'pointer' : '';
+  }, { passive: true });
+
+  function resize() {
+    const w = innerWidth, h = innerHeight;
+    renderer.setSize(w, h, false);
+    // desktop: o painel ocupa a direita, então o alvo da câmera fica no terço esquerdo (recorte de um quadro 1,5x mais largo)
+    camera.aspect = mobile ? w / h : (w * 1.5) / h;
+    if (mobile) camera.clearViewOffset(); else camera.setViewOffset(w * 1.5, h, w * 0.5, 0, w, h);
+    camera.updateProjectionMatrix();
+    if (reduced) draw();
+  }
+  addEventListener('resize', resize);
+
+  let last = 0, running = true;
+  function draw(time = 0) {
+    const dt = Math.max(0, Math.min(1 / 30, (time - last) / 1000 || 0)); last = time;
+    const t = time / 1000;
+    if (!reduced && !running) { requestAnimationFrame(draw); return; }
+    if (!reduced) {
+      const a = 1 - Math.pow(1 - 0.055, dt * 60);
+      sm.x += (ptr.x - sm.x) * a; sm.y += (ptr.y - sm.y) * a;
+      // balão: voa sempre, mais rápido quando a central acende
+      zapT = (zapT + dt * (lit(2) ? 0.07 : 0.03)) % 1;
+      const zp = zapPath.getPointAt(zapT); zap.position.set(zp.x, zp.y + Math.sin(t * 2.3) * 0.18, zp.z);
+      const zn = zapPath.getTangentAt(zapT); zap.rotation.y = Math.atan2(zn.x, zn.z) + Math.PI / 2; zap.rotation.z = Math.sin(t * 1.7) * 0.08;
+      zapMat.emissiveIntensity = lit(2) ? 0.9 + Math.sin(t * 6) * 0.3 : 0.15;
+      // carrinho: parado no galpão até o campo acender
+      if (lit(4)) { carT = (carT + dt * 0.05) % 1; const cp = carPath.getPointAt(carT), cn = carPath.getTangentAt(carT); car.position.copy(cp); car.rotation.y = Math.atan2(cn.x, cn.z) - Math.PI / 2; }
+      // pessoas: balanço leve quando o setor acende
+      Object.values(sectors).forEach((s, i) => s.people.forEach(p => { p.position.y = 0.2 + (lit(i + 1) ? Math.abs(Math.sin(t * 3 + p.userData.phase)) * 0.08 : 0); }));
+      panel.position.y = 7 + Math.sin(t * 1.2) * 0.15;
+    }
+    const dist = current === 0 || current === 5 ? 2.2 : 0.9;
+    camera.position.set(cam.px - sm.x * dist, cam.py + sm.y * dist * 0.6, cam.pz + sm.x * dist * 0.4);
+    target.set(cam.tx - sm.x * dist * 0.3, cam.ty + sm.y * dist * 0.2, cam.tz);
+    camera.lookAt(target);
+    renderer.render(scene, camera);
+    if (!reduced) requestAnimationFrame(draw);
+  }
+  resize();
+  if (reduced) { Object.keys(sectors).forEach(i => window.onLit(+i, true)); draw(); }
+  else requestAnimationFrame(draw);
+
+  // pausa quando a aba some ou a história terminou
+  let visible = true;
+  const sync = () => { running = visible && !document.hidden; };
+  document.addEventListener('visibilitychange', sync);
+  new IntersectionObserver(([en]) => { visible = en.isIntersecting; sync(); canvas.style.opacity = visible ? 1 : 0; }, { threshold: 0 }).observe(document.getElementById('story'));
+}
+</script>
+</body>
+</html>

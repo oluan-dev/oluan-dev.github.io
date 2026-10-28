@@ -1,0 +1,526 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Luan · Aqui jaz a planilha</title>
+<meta name="description" content="A planilha morreu. Luan constrói automação, painel com IA, chatbot de WhatsApp e app de campo sob medida para PME — medidos em horas devolvidas por dia.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#f4f1ea;--paper2:#ebe7dd;--ink:#141414;--ink2:#5a5852;--dead:#a3a19a;--dead2:#cfccc3;--line:#d9d5ca;
+  --live:#1f9d55;--live2:#0f6f3a;--live-soft:#dff3e6;
+  --serif:"Playfair Display",Georgia,serif;--sans:Inter,system-ui,sans-serif;--mono:"JetBrains Mono",ui-monospace,monospace;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.6 var(--sans);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:inherit}
+h1,h2,h3{font-family:var(--serif);font-weight:600;letter-spacing:-.01em;line-height:1.05;margin:0}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+.mono{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2)}
+.rule{height:1px;background:var(--ink);opacity:.9}
+.rule.thin{height:1px;background:var(--line)}
+
+/* nav */
+nav{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--paper) 88%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+nav .wrap{display:flex;align-items:center;justify-content:space-between;height:56px}
+nav .logo{font-family:var(--serif);font-weight:700;font-size:19px;text-decoration:none}
+nav .links{display:flex;gap:18px}
+nav .links a{font-size:13px;font-weight:500;color:var(--ink2);text-decoration:none}
+nav .links a:hover{color:var(--ink)}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 20px;border-radius:999px;font-weight:600;font-size:15px;border:1px solid var(--ink);color:var(--ink);background:transparent;text-decoration:none;transition:.15s}
+.btn:hover{background:var(--ink);color:var(--paper)}
+.btn.live{background:var(--live);border-color:var(--live);color:#fff}
+.btn.live:hover{background:var(--live2);border-color:var(--live2)}
+.btn.sm{padding:8px 16px;font-size:13px;min-height:44px}
+
+/* hero obituary */
+.hero{padding:88px 20px 56px;text-align:center}
+.hero .cross{font-family:var(--serif);font-size:28px;color:var(--dead);margin-bottom:12px}
+.hero h1{font-size:clamp(44px,8.5vw,112px);font-weight:600}
+.hero h1 em{font-style:italic;font-weight:400}
+.hero .dates{font-family:var(--serif);font-size:clamp(20px,3vw,30px);font-style:italic;color:var(--ink2);margin:14px 0 26px}
+.hero .lede{max-width:56ch;margin:0 auto 10px;font-size:clamp(17px,2vw,20px);color:var(--ink2)}
+.hero .lede b{color:var(--ink)}
+.hero .claim{max-width:52ch;margin:0 auto 34px;font-family:var(--serif);font-size:clamp(18px,2.4vw,24px);line-height:1.35}
+.hero .cta{display:flex;justify-content:center;flex-wrap:wrap;gap:12px}
+.hero .ornament{display:flex;align-items:center;gap:14px;max-width:420px;margin:48px auto 0;color:var(--dead)}
+.hero .ornament i{flex:1;height:1px;background:var(--line)}
+.hero .ornament span{font-family:var(--serif);font-style:italic;font-size:14px}
+
+/* scrub stage */
+.scene{position:relative;height:420vh}
+.scene .stage{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden}
+.scene canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.scene .cap{position:absolute;left:0;right:0;bottom:7vh;text-align:center;padding:0 20px;pointer-events:none}
+.scene .cap p{display:inline-block;max-width:44ch;margin:0;padding:10px 18px;background:color-mix(in srgb,var(--paper) 86%,transparent);border:1px solid var(--line);border-radius:6px;font-family:var(--serif);font-size:clamp(17px,2.2vw,24px);line-height:1.3;opacity:0;transform:translateY(8px);transition:opacity .35s,transform .35s;position:absolute;left:50%;translate:-50% 0;bottom:0}
+.scene .cap p.on{opacity:1;transform:translateY(0)}
+.scene .cap p b{color:var(--live2)}
+.scene .hint{position:absolute;top:68px;left:0;right:0;text-align:center}
+
+/* certidões */
+section{padding:88px 0}
+.sec-head{display:grid;grid-template-columns:1fr auto;align-items:end;gap:20px;margin-bottom:34px}
+section h2{font-size:clamp(32px,5vw,56px)}
+.sub{color:var(--ink2);max-width:58ch;margin:10px 0 0;font-size:17px}
+.certs{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px}
+.cert{border:1px solid var(--ink);padding:22px 22px 18px;background:var(--paper);position:relative;display:flex;flex-direction:column;gap:10px;min-height:270px}
+.cert::before{content:"";position:absolute;inset:6px;border:1px solid var(--line);pointer-events:none}
+.cert .k{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink2);display:flex;justify-content:space-between}
+.cert h3{font-size:22px;font-weight:600;line-height:1.15}
+.cert .dead{color:var(--dead);text-decoration:line-through;text-decoration-thickness:1.5px}
+.cert .cause{color:var(--ink2);font-size:14px;margin:0;flex:1}
+.cert .now{display:flex;align-items:baseline;gap:8px;border-top:1px solid var(--line);padding-top:12px;margin-top:4px}
+.cert .now b{font-family:var(--serif);font-size:30px;color:var(--live2);font-weight:700;line-height:1}
+.cert .now span{font-size:13px;color:var(--ink2)}
+.cert .seal{position:absolute;right:16px;top:14px;width:46px;height:46px;border:1.5px solid var(--live);border-radius:50%;display:grid;place-items:center;transform:rotate(-12deg);color:var(--live2);font-family:var(--mono);font-size:9px;letter-spacing:.06em;text-align:center;line-height:1.1}
+
+/* chapters (pinned) */
+.chapters{position:relative;height:400vh;background:var(--ink);color:var(--paper)}
+.chapters .stage{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden}
+.chapters .inner{position:relative;height:100%;max-width:1080px;margin:0 auto;padding:0 20px}
+.chapters .idx{position:absolute;top:72px;left:20px;right:20px;display:flex;justify-content:space-between;align-items:center}
+.chapters .dots{display:flex;gap:8px}
+.chapters .dots i{width:28px;height:2px;background:#3a3a3a;display:block;transition:background .3s}
+.chapters .dots i.on{background:var(--live)}
+.chap{position:absolute;inset:0;display:grid;grid-template-columns:1.1fr 1fr;align-items:center;gap:40px;padding:90px 20px 70px;opacity:0;visibility:hidden}
+.chap .n{font-family:var(--mono);font-size:12px;letter-spacing:.14em;color:var(--live);margin-bottom:14px}
+.chap h3{font-size:clamp(34px,5.5vw,72px);font-weight:600;color:var(--paper)}
+.chap p{color:#b8b5ad;max-width:44ch;font-size:clamp(15px,1.7vw,18px);margin:18px 0 0}
+.chap .big{text-align:right}
+.chap .big b{display:block;font-family:var(--serif);font-size:clamp(64px,12vw,160px);line-height:.95;color:var(--live);font-weight:700;letter-spacing:-.03em}
+.chap .big span{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#8d8a82;margin-top:10px}
+.chapters .cta-mid{position:absolute;bottom:26px;left:20px;right:20px;display:flex;justify-content:center}
+
+/* steps */
+.steps{display:grid;gap:0;border-top:1px solid var(--ink)}
+.step{display:grid;grid-template-columns:70px 1fr auto;gap:18px;align-items:baseline;padding:20px 0;border-bottom:1px solid var(--line)}
+.step .n{font-family:var(--serif);font-style:italic;font-size:22px;color:var(--dead)}
+.step b{display:block;font-family:var(--serif);font-weight:600;font-size:21px;margin-bottom:4px}
+.step p{margin:0;color:var(--ink2);font-size:15px;max-width:62ch}
+.step .fact{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--live2);white-space:nowrap}
+
+/* services */
+.svc{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}
+.svc div{border:1px solid var(--line);padding:20px;background:#fff8}
+.svc h3{font-size:19px;margin-bottom:8px}
+.svc p{margin:0;color:var(--ink2);font-size:14px}
+.svc .ex{display:inline-block;margin-top:10px;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--live2)}
+
+/* final */
+.final{background:var(--paper2);text-align:center;padding:110px 0}
+.final h2{font-size:clamp(34px,6vw,72px)}
+.final h2 em{font-style:italic;font-weight:400}
+.final p{color:var(--ink2);max-width:50ch;margin:16px auto 30px;font-size:18px}
+.final .meta{margin-top:26px;font-size:13px;color:var(--ink2)}
+footer{padding:28px 0 48px;font-size:13px;color:var(--ink2);border-top:1px solid var(--line)}
+footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+footer a{color:var(--ink2)}
+.note{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--dead)}
+
+@media (max-width:720px){
+  nav .links{display:none}
+  .hero{padding:56px 20px 40px}
+  .scene .cap p{width:calc(100% - 40px);max-width:none;font-size:16px;padding:8px 12px}
+  .scene .cap{bottom:4vh}
+  .chapters .idx span{display:none}
+  section{padding:64px 0}
+  .sec-head{grid-template-columns:1fr}
+  .chap{grid-template-columns:1fr;align-content:center;gap:18px;padding:80px 20px 80px}
+  .chap .big{text-align:left}
+  .chap .big b{font-size:clamp(64px,22vw,110px)}
+  .step{grid-template-columns:44px 1fr}
+  .step .fact{grid-column:2;white-space:normal}
+}
+
+/* reduced motion: no pin, no scrub, everything visible */
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .scene{height:auto}
+  .scene .stage{position:relative;height:70vh;min-height:420px}
+  .scene .cap p{position:static;translate:0;opacity:1;transform:none;display:block;margin:6px auto}
+  .chapters{height:auto}
+  .chapters .stage{position:relative;height:auto}
+  .chapters .inner{padding-top:70px;padding-bottom:40px}
+  .chap{position:relative;opacity:1;visibility:visible;padding:30px 0;border-bottom:1px solid #2a2a2a}
+  .chapters .idx,.chapters .cta-mid{position:static;margin:0 0 10px}
+}
+.no-js .scene{height:auto}.no-js .scene .stage{position:relative;height:70vh}
+.no-js .chapters{height:auto}.no-js .chapters .stage{height:auto;position:relative}
+.no-js .chap{position:relative;opacity:1;visibility:visible;padding:30px 0}
+</style>
+</head>
+<body class="no-js">
+
+<nav><div class="wrap">
+  <a class="logo" href="#">Luan<span style="color:var(--live)">.</span>dev</a>
+  <div class="links"><a href="#certidoes">Certidões</a><a href="#capitulos">Método</a><a href="#servicos">O que eu faço</a><a href="#contato">Contato</a></div>
+  <a class="btn sm live" href="https://wa.me/55SEUNUMERO?text=Oi%20Luan%2C%20quero%20enterrar%20uma%20planilha" target="_blank" rel="noopener">WhatsApp</a>
+</div></nav>
+
+<header class="hero wrap">
+  <div class="cross">✝</div>
+  <div class="mono">Nota de falecimento</div>
+  <h1 style="margin-top:10px">Aqui jaz <em>a planilha</em></h1>
+  <div class="dates">1979 — 2026</div>
+  <p class="lede">Morreu de causas naturais: <b>6 abas, 40 campos e 30 que ninguém usava</b>. Não deixa saudade. Deixa um painel que responde "por quê?".</p>
+  <p class="claim">Eu sou o Luan. Construo automação, painel com IA, chatbot de WhatsApp e app de campo sob medida para a sua empresa — e meço o resultado em horas devolvidas por dia.</p>
+  <div class="cta">
+    <a class="btn live" href="https://wa.me/55SEUNUMERO?text=Oi%20Luan%2C%20quero%20enterrar%20uma%20planilha" target="_blank" rel="noopener">Enterrar a minha</a>
+    <a class="btn" href="#certidoes">Ler as certidões</a>
+  </div>
+  <div class="ornament"><i></i><span>role para acompanhar o velório</span><i></i></div>
+</header>
+
+<!-- scrub scene: grid -> particles -> dashboard -->
+<div class="scene" id="scene" aria-label="Animação: uma grade de células se desfaz e vira um painel vivo">
+  <div class="stage">
+    <canvas id="cv"></canvas>
+    <div class="hint mono">Antes → depois</div>
+    <div class="cap">
+      <p data-stop="0">Era assim. Uma grade cinza onde o dia da sua equipe sumia célula por célula.</p>
+      <p data-stop="1">Aí os dados se soltaram da grade e foram para onde deveriam estar desde o início.</p>
+      <p data-stop="2">E viraram isto: <b>um painel vivo</b>, ligado ao seu sistema, que mostra o número e aponta o caminho.</p>
+    </div>
+  </div>
+</div>
+
+<section id="certidoes"><div class="wrap">
+  <div class="sec-head">
+    <div><h2>Certidões de óbito</h2><p class="sub">Tarefas manuais que já enterrei. Os números vêm de projetos reais; os dados mostrados nos exemplos são fictícios.</p></div>
+    <span class="mono">Registro civil · tarefas manuais</span>
+  </div>
+  <div class="certs">
+    <article class="cert">
+      <div class="seal">MORTO<br>2026</div>
+      <div class="k"><span>Certidão nº 01</span></div>
+      <h3><span class="dead">Cadastro de 15 minutos</span></h3>
+      <p class="cause">Causa: 6 abas, 40 campos, 30 que ninguém usava. Um formulário único ligado ao sistema por API fez o serviço.</p>
+      <div class="now"><b>2 min</b><span>por cadastro · 13 min × 30/dia = 6,5 h devolvidas por dia</span></div>
+    </article>
+    <article class="cert">
+      <div class="seal">MORTO<br>2026</div>
+      <div class="k"><span>Certidão nº 02</span></div>
+      <h3><span class="dead">Boleto que esperava o expediente</span></h3>
+      <p class="cause">Causa: chatbot de WhatsApp que consulta o sistema, não inventa resposta e chama gente quando não sabe.</p>
+      <div class="now"><b>23h</b><span>cliente pergunta, recebe o boleto, dorme</span></div>
+    </article>
+    <article class="cert">
+      <div class="seal">MORTO<br>2026</div>
+      <div class="k"><span>Certidão nº 03</span></div>
+      <h3><span class="dead">Bloquinho do técnico de campo</span></h3>
+      <p class="cause">Causa: app no celular. Foto da nota, 3 campos, e a visita cai direto no painel. Sem foto perdida no grupo.</p>
+      <div class="now"><b>3 campos</b><span>foto da nota, do celular para o sistema, sem digitação</span></div>
+    </article>
+    <article class="cert">
+      <div class="seal">MORTO<br>2026</div>
+      <div class="k"><span>Certidão nº 04</span></div>
+      <h3><span class="dead">Relatório de sexta à noite</span></h3>
+      <p class="cause">Causa: painel com IA. Faturamento, inadimplência, chamados — e uma caixa onde você pergunta em português "por que subiu?".</p>
+      <div class="now"><b>Por quê?</b><span>respondido com onde olhar e o que fazer</span></div>
+    </article>
+  </div>
+</div></section>
+
+<!-- 4 pinned chapters -->
+<div class="chapters" id="capitulos">
+  <div class="stage"><div class="inner">
+    <div class="idx"><span class="mono" style="color:#8d8a82">Como a planilha morre · 4 capítulos</span><div class="dots"><i class="on"></i><i></i><i></i><i></i></div></div>
+
+    <div class="chap">
+      <div><div class="n">CAPÍTULO 01 — CONVERSA</div><h3>Você me mostra o dia a dia.</h3><p>Eu só ouço e anoto onde o tempo vaza. Sem custo, sem compromisso, sem gerente no meio: quem constrói é quem conversa.</p></div>
+      <div class="big"><b>30</b><span>minutos de conversa</span></div>
+    </div>
+    <div class="chap">
+      <div><div class="n">CAPÍTULO 02 — DIAGNÓSTICO</div><h3>Você recebe o que eu faria, quanto ganha e quanto custa.</h3><p>Preço fechado por projeto, não por hora. Sem escopo que cresce sem aviso.</p></div>
+      <div class="big"><b>2</b><span>dias até o diagnóstico</span></div>
+    </div>
+    <div class="chap">
+      <div><div class="n">CAPÍTULO 03 — CONSTRUÇÃO</div><h3>Entregas pequenas, rodando com os seus dados.</h3><p>Você aprova cada etapa olhando a coisa funcionar. Nada de sumir três meses e voltar com surpresa.</p></div>
+      <div class="big"><b>1×</b><span>entrega por semana</span></div>
+    </div>
+    <div class="chap">
+      <div><div class="n">CAPÍTULO 04 — MEDIÇÃO</div><h3>A equipe aprende em uma tarde. Depois a gente mede.</h3><p>Antes e depois no relatório final. Suporte incluso; depois, manutenção mensal se fizer sentido.</p></div>
+      <div class="big"><b>30</b><span>dias de suporte inclusos</span></div>
+    </div>
+
+    <div class="cta-mid"><a class="btn live" href="https://wa.me/55SEUNUMERO?text=Oi%20Luan%2C%20quero%20marcar%20a%20conversa%20de%2030%20minutos" target="_blank" rel="noopener">Marcar a conversa de 30 minutos</a></div>
+  </div></div>
+</div>
+
+<section id="como"><div class="wrap">
+  <div class="sec-head"><div><h2>Como eu trabalho</h2><p class="sub">Cinco etapas. Quem conversa é quem constrói.</p></div></div>
+  <div class="steps">
+    <div class="step"><span class="n">i</span><div><b>Conversa de 30 minutos</b><p>Você me mostra como é o dia a dia. Eu só ouço e anoto onde o tempo vaza.</p></div><span class="fact">sem custo</span></div>
+    <div class="step"><span class="n">ii</span><div><b>Diagnóstico e número fechado</b><p>O que eu faria, quanto tempo sua equipe ganha e o preço, fechado por projeto.</p></div><span class="fact">em 2 dias</span></div>
+    <div class="step"><span class="n">iii</span><div><b>Construção com você olhando</b><p>Entregas pequenas, toda semana, rodando com os seus dados. Você aprova cada etapa.</p></div><span class="fact">toda semana</span></div>
+    <div class="step"><span class="n">iv</span><div><b>Implantação e medição</b><p>Entra em uso, a equipe aprende em uma tarde, e a gente mede o antes e o depois.</p></div><span class="fact">antes × depois</span></div>
+    <div class="step"><span class="n">v</span><div><b>Suporte</b><p>30 dias inclusos. Depois, manutenção mensal se fizer sentido — para chatbot e painel, costuma fazer.</p></div><span class="fact">30 dias inclusos</span></div>
+  </div>
+</div></section>
+
+<section id="servicos" style="padding-top:0"><div class="wrap">
+  <div class="sec-head"><div><h2>O que eu faço</h2><p class="sub">Cinco frentes. Todas começam olhando onde o tempo da sua equipe vai embora.</p></div></div>
+  <div class="svc">
+    <div><h3>Automação de serviço repetitivo</h3><p>O que sua equipe faz 30 vezes por dia em 6 abas vira um clique ligado ao seu sistema por API.</p><span class="ex">15 min → 2 min</span></div>
+    <div><h3>BI com IA que aponta caminho</h3><p>Painel com os números que importam e uma caixa onde você pergunta em português "por que a inadimplência subiu?".</p><span class="ex">responde "por quê?"</span></div>
+    <div><h3>Chatbot com IA</h3><p>WhatsApp que responde boleto, status e horário consultando o seu sistema, 24 h, e chama um humano quando não sabe.</p><span class="ex">boleto às 23h</span></div>
+    <div><h3>Acompanhamento de equipe</h3><p>App no celular do funcionário: foto da nota, abastecimento, visita — caindo direto no sistema e no painel.</p><span class="ex">sem grupo de WhatsApp</span></div>
+    <div><h3>Integrações</h3><p>Dois sistemas que não conversam passam a conversar. Relatório que chega sozinho. A grade antiga vira banco de dados e descansa em paz.</p><span class="ex">sistema ↔ sistema</span></div>
+    <div style="background:var(--live-soft);border-color:transparent"><h3>Não está na lista?</h3><p>Se é tarefa manual que se repete e tem dado por trás, provavelmente dá para enterrar. Me conta.</p><span class="ex">resposta em 1 dia útil</span></div>
+  </div>
+</div></section>
+
+<section class="final" id="contato"><div class="wrap">
+  <div class="mono">Convite</div>
+  <h2 style="margin-top:10px">Qual tarefa você quer <em>enterrar</em> primeiro?</h2>
+  <p>Me conta a que mais toma tempo da sua equipe. Eu respondo em até 1 dia útil. Diagnóstico em 2 dias, preço fechado por projeto.</p>
+  <a class="btn live" href="https://wa.me/55SEUNUMERO?text=Oi%20Luan%2C%20a%20tarefa%20que%20mais%20toma%20tempo%20aqui%20%C3%A9%3A%20" target="_blank" rel="noopener">Chamar no WhatsApp</a>
+  <div class="meta"><a href="https://www.instagram.com/oluan.dev/" target="_blank" rel="noopener">@oluan.dev</a> · <a href="https://github.com/oluan-dev" target="_blank" rel="noopener">github.com/oluan-dev</a></div>
+</div></section>
+
+<footer><div class="wrap"><span>Luan · desenvolvedor sob medida</span><span class="note">Exemplos usam dados fictícios. Nenhum dado de cliente real aparece aqui.</span></div></footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script>
+(function(){
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var hasGsap = typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined';
+  if (hasGsap) { gsap.registerPlugin(ScrollTrigger); document.body.classList.remove('no-js'); } // sem GSAP: CSS .no-js deixa tudo visível
+
+  /* ---------- procedural canvas: grid -> particles -> dashboard ---------- */
+  var cv = document.getElementById('cv');
+  var ctx = cv.getContext('2d');
+  var caps = Array.prototype.slice.call(document.querySelectorAll('.scene .cap p'));
+  var W = 0, H = 0, dpr = 1, parts = [], layout = null, lastP = -1, curP = 0;
+  var LIVE = '#1f9d55', LIVE2 = '#0f6f3a', DEAD = '#a3a19a', INK = '#141414', PAPER = '#f4f1ea';
+
+  function rng(seed){ return function(){ seed |= 0; seed = seed + 0x6D2B79F5 | 0; var t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+  function clamp01(v){ return v < 0 ? 0 : v > 1 ? 1 : v; }
+  function smooth(a, b, v){ var t = clamp01((v - a) / (b - a)); return t * t * (3 - 2 * t); }
+  function easeInOut(t){ return t < .5 ? 2*t*t : -1 + (4 - 2*t) * t; }
+
+  var BARS = [0.42, 0.55, 0.48, 0.66, 0.74, 0.7, 0.88];
+  var LINE = [0.22, 0.3, 0.28, 0.4, 0.45, 0.5, 0.58, 0.64, 0.7, 0.74]; // 0 = topo; tempo por cadastro caindo de 15 para 2 min
+
+  function build(){
+    var r = cv.getBoundingClientRect();
+    dpr = Math.min(2, window.devicePixelRatio || 1);
+    W = r.width; H = r.height;
+    cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    var mobile = W < 720;
+    var pad = mobile ? 20 : Math.max(40, W * 0.08);
+    var top = mobile ? 96 : H * 0.14, bottom = mobile ? H * 0.70 : H * 0.78;
+    var cols = mobile ? 9 : 18, rows = mobile ? 12 : 11;
+    var gw = W - pad * 2, gh = bottom - top;
+    var cw = gw / cols, ch = gh / rows;
+
+    // dashboard layout (right column line chart, left bars + kpi)
+    var L = {};
+    L.grid = { x: pad, y: top, cw: cw, ch: ch, cols: cols, rows: rows };
+    if (mobile) {
+      L.kpi = { x: pad, y: top, w: gw, h: gh * 0.26 };
+      L.bars = { x: pad, y: top + gh * 0.34, w: gw, h: gh * 0.30 };
+      L.line = { x: pad, y: top + gh * 0.72, w: gw, h: gh * 0.28 };
+    } else {
+      L.kpi = { x: pad, y: top, w: gw * 0.44, h: gh * 0.34 };
+      L.bars = { x: pad, y: top + gh * 0.44, w: gw * 0.44, h: gh * 0.56 };
+      L.line = { x: pad + gw * 0.52, y: top, w: gw * 0.48, h: gh };
+    }
+    layout = L;
+
+    // targets: sample points inside dashboard shapes
+    var rand = rng(7);
+    var targets = [];
+    var n = cols * rows;
+    for (var i = 0; i < n; i++) {
+      var u = rand(), x, y;
+      if (u < 0.45) { // bars
+        var bi = Math.floor(rand() * BARS.length);
+        var bw = L.bars.w / BARS.length, gap = bw * 0.28;
+        var bh = L.bars.h * BARS[bi];
+        x = L.bars.x + bi * bw + gap / 2 + rand() * (bw - gap);
+        y = L.bars.y + L.bars.h - rand() * bh;
+      } else if (u < 0.8) { // line (thick band)
+        var t = rand(), seg = t * (LINE.length - 1), k = Math.floor(seg), f = seg - k;
+        var ly = LINE[k] + (LINE[Math.min(k + 1, LINE.length - 1)] - LINE[k]) * f;
+        x = L.line.x + t * L.line.w;
+        y = L.line.y + L.line.h * 0.12 + ly * L.line.h * 0.8 + (rand() - 0.5) * 10;
+      } else { // kpi card outline
+        var e = rand(), side = Math.floor(rand() * 4);
+        if (side === 0) { x = L.kpi.x + e * L.kpi.w; y = L.kpi.y; }
+        else if (side === 1) { x = L.kpi.x + L.kpi.w; y = L.kpi.y + e * L.kpi.h; }
+        else if (side === 2) { x = L.kpi.x + e * L.kpi.w; y = L.kpi.y + L.kpi.h; }
+        else { x = L.kpi.x; y = L.kpi.y + e * L.kpi.h; }
+      }
+      targets.push([x, y]);
+    }
+
+    parts = [];
+    var rand2 = rng(42);
+    for (var rI = 0; rI < rows; rI++) for (var cI = 0; cI < cols; cI++) {
+      var idx = rI * cols + cI;
+      parts.push({
+        sx: pad + cI * cw + cw * 0.15, sy: top + rI * ch + ch * 0.3,
+        sw: cw * (0.35 + rand2() * 0.5), sh: Math.max(3, ch * 0.22),
+        tx: targets[idx][0], ty: targets[idx][1],
+        delay: rand2() * 0.55, arc: (rand2() - 0.5) * 140, live: rand2() < 0.5
+      });
+    }
+    lastP = -1;
+  }
+
+  function roundRect(x, y, w, h, r){ ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); }
+
+  function render(p){
+    if (!layout) return;
+    if (p === lastP) return; lastP = p; curP = p;
+    var L = layout, G = L.grid;
+    ctx.clearRect(0, 0, W, H);
+
+    // --- grid lines (dead) ---
+    var gridA = 1 - smooth(0.12, 0.5, p);
+    if (gridA > 0) {
+      ctx.globalAlpha = gridA;
+      ctx.strokeStyle = '#d2cfc5'; ctx.lineWidth = 1;
+      ctx.beginPath();
+      for (var c = 0; c <= G.cols; c++) { var x = G.x + c * G.cw; ctx.moveTo(x, G.y); ctx.lineTo(x, G.y + G.rows * G.ch); }
+      for (var r = 0; r <= G.rows; r++) { var y = G.y + r * G.ch; ctx.moveTo(G.x, y); ctx.lineTo(G.x + G.cols * G.cw, y); }
+      ctx.stroke();
+      // header letters
+      ctx.fillStyle = DEAD; ctx.font = '500 11px "JetBrains Mono", monospace'; ctx.textAlign = 'center';
+      for (var c2 = 0; c2 < G.cols; c2++) ctx.fillText(String.fromCharCode(65 + c2), G.x + c2 * G.cw + G.cw / 2, G.y - 8);
+      ctx.textAlign = 'right';
+      for (var r2 = 0; r2 < G.rows; r2++) ctx.fillText(String(r2 + 1), G.x - 8, G.y + r2 * G.ch + G.ch / 2 + 4);
+      // "selected" cell
+      ctx.strokeStyle = DEAD; ctx.lineWidth = 2; ctx.strokeRect(G.x + 2 * G.cw, G.y + 3 * G.ch, G.cw, G.ch);
+    }
+
+    // --- dashboard (alive) ---
+    var dA = smooth(0.74, 0.96, p);
+    if (dA > 0) {
+      ctx.globalAlpha = dA;
+      // kpi card
+      ctx.fillStyle = '#fff'; ctx.strokeStyle = '#d9d5ca'; ctx.lineWidth = 1;
+      roundRect(L.kpi.x, L.kpi.y, L.kpi.w, L.kpi.h, 10); ctx.fill(); ctx.stroke();
+      ctx.textAlign = 'left'; ctx.fillStyle = '#5a5852'; ctx.font = '500 11px "JetBrains Mono", monospace';
+      ctx.fillText('HORAS DEVOLVIDAS POR DIA', L.kpi.x + 18, L.kpi.y + 26);
+      var hours = (6.5 * dA).toFixed(1).replace('.', ',');
+      var big = Math.min(L.kpi.h * 0.42, L.kpi.w * 0.22);
+      ctx.fillStyle = LIVE2; ctx.font = '700 ' + big + 'px "Playfair Display", serif';
+      ctx.fillText(hours + ' h', L.kpi.x + 16, L.kpi.y + L.kpi.h * 0.5 + big * 0.35);
+      ctx.fillStyle = '#5a5852'; ctx.font = '400 12px Inter, sans-serif';
+      ctx.fillText('13 min × 30 cadastros/dia', L.kpi.x + 18, L.kpi.y + L.kpi.h - 14);
+      // bars
+      var bw = L.bars.w / BARS.length, gap = bw * 0.28;
+      ctx.fillStyle = '#5a5852'; ctx.font = '500 11px "JetBrains Mono", monospace';
+      ctx.fillText('CADASTROS POR DIA', L.bars.x + 2, L.bars.y - 8);
+      for (var b = 0; b < BARS.length; b++) {
+        var bh = L.bars.h * BARS[b] * dA;
+        ctx.fillStyle = b === BARS.length - 1 ? LIVE2 : LIVE;
+        roundRect(L.bars.x + b * bw + gap / 2, L.bars.y + L.bars.h - bh, bw - gap, bh, 3); ctx.fill();
+      }
+      ctx.strokeStyle = '#d9d5ca'; ctx.beginPath(); ctx.moveTo(L.bars.x, L.bars.y + L.bars.h + 0.5); ctx.lineTo(L.bars.x + L.bars.w, L.bars.y + L.bars.h + 0.5); ctx.stroke();
+      // line chart
+      ctx.fillStyle = '#5a5852'; ctx.font = '500 11px "JetBrains Mono", monospace';
+      ctx.fillText('TEMPO POR CADASTRO (MIN)', L.line.x + 2, L.line.y - 8);
+      ctx.strokeStyle = '#e4e0d6'; ctx.lineWidth = 1; ctx.beginPath();
+      for (var gl = 0; gl <= 4; gl++) { var gy = L.line.y + L.line.h * 0.12 + gl * L.line.h * 0.8 / 4; ctx.moveTo(L.line.x, gy); ctx.lineTo(L.line.x + L.line.w, gy); }
+      ctx.stroke();
+      var drawN = Math.max(2, Math.round(LINE.length * dA));
+      ctx.strokeStyle = LIVE; ctx.lineWidth = 3; ctx.lineJoin = 'round'; ctx.lineCap = 'round'; ctx.beginPath();
+      for (var i = 0; i < drawN; i++) {
+        var px = L.line.x + i / (LINE.length - 1) * L.line.w;
+        var py = L.line.y + L.line.h * 0.12 + LINE[i] * L.line.h * 0.8;
+        if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+      }
+      ctx.stroke();
+      var lx = L.line.x + (drawN - 1) / (LINE.length - 1) * L.line.w, ly = L.line.y + L.line.h * 0.12 + LINE[drawN - 1] * L.line.h * 0.8;
+      ctx.fillStyle = LIVE2; ctx.beginPath(); ctx.arc(lx, ly, 5, 0, Math.PI * 2); ctx.fill();
+      ctx.font = '600 12px Inter, sans-serif'; ctx.textAlign = 'left'; ctx.fillStyle = INK;
+      ctx.fillText('15 min', L.line.x, L.line.y + L.line.h * 0.12 + LINE[0] * L.line.h * 0.8 - 12);
+      if (dA > 0.95) { ctx.textAlign = 'right'; ctx.fillStyle = LIVE2; ctx.fillText('2 min', L.line.x + L.line.w, ly + 22); }
+      ctx.textAlign = 'left';
+    }
+
+    // --- particles ---
+    var pA = 1 - smooth(0.8, 0.97, p);
+    if (pA > 0) {
+      for (var k = 0; k < parts.length; k++) {
+        var q = parts[k];
+        var t = easeInOut(clamp01((p - 0.14 - q.delay * 0.4) / 0.42));
+        var x = q.sx + (q.tx - q.sx) * t, y = q.sy + (q.ty - q.sy) * t + Math.sin(t * Math.PI) * q.arc;
+        var w = q.sw + (6 - q.sw) * t, h = q.sh + (6 - q.sh) * t;
+        var cA = smooth(0.35, 0.75, p);
+        ctx.globalAlpha = pA * (0.55 + 0.45 * cA);
+        ctx.fillStyle = cA > 0.5 ? (q.live ? LIVE : LIVE2) : DEAD;
+        roundRect(x - (w - q.sw) * 0.5, y - (h - q.sh) * 0.5, w, h, 2); ctx.fill();
+      }
+    }
+    ctx.globalAlpha = 1;
+
+    // captions
+    var stop = p < 0.3 ? 0 : p < 0.7 ? 1 : 2;
+    for (var ci = 0; ci < caps.length; ci++) caps[ci].classList.toggle('on', ci === stop);
+  }
+
+  var scrub = !reduce && hasGsap;
+  function rebuild(){ build(); render(scrub ? curP : 1); }
+  build();
+  if (!scrub) {
+    render(1);
+    caps.forEach(function(c){ c.classList.add('on'); });
+  } else {
+    ScrollTrigger.create({
+      trigger: '#scene', start: 'top top', end: 'bottom bottom', scrub: 0.6,
+      invalidateOnRefresh: true,
+      onUpdate: function(self){ render(self.progress); },
+      onRefresh: function(self){ build(); render(self.progress); }
+    });
+    render(0);
+  }
+  var rt; window.addEventListener('resize', function(){ clearTimeout(rt); rt = setTimeout(rebuild, 150); });
+
+  /* ---------- 4 pinned chapters ---------- */
+  var chaps = hasGsap ? gsap.utils.toArray('.chap') : [];
+  var dots = document.querySelectorAll('.chapters .dots i');
+  if (!reduce && hasGsap && chaps.length) {
+    gsap.set(chaps[0], { autoAlpha: 1 });
+    var tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: '#capitulos', start: 'top top', end: 'bottom bottom', scrub: 0.8,
+        onUpdate: function(self){
+          var i = Math.min(3, Math.floor(self.progress * 4));
+          dots.forEach(function(d, j){ d.classList.toggle('on', j === i); });
+        }
+      }
+    });
+    chaps.forEach(function(ch, i){
+      var big = ch.querySelector('.big b'), txt = ch.querySelector('h3');
+      if (i > 0) {
+        tl.to(chaps[i - 1], { autoAlpha: 0, y: -30, duration: 0.5, ease: 'none' }, i * 2)
+          .fromTo(ch, { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: 0.5, ease: 'none' }, i * 2 + 0.3);
+      }
+      tl.fromTo(big, { scale: 0.85, transformOrigin: 'right bottom' }, { scale: 1, duration: 0.8, ease: 'none' }, i * 2 + 0.3)
+        .fromTo(txt, { x: -12 }, { x: 0, duration: 0.8, ease: 'none' }, i * 2 + 0.3);
+      if (i === chaps.length - 1) tl.to({}, { duration: 1.4 }); // hold last chapter
+    });
+
+    // small reveals for cards / steps
+    gsap.utils.toArray('.cert, .step, .svc > div').forEach(function(el, i){
+      gsap.from(el, { y: 24, autoAlpha: 0, duration: 0.8, ease: 'power3.out', delay: (i % 4) * 0.06,
+        scrollTrigger: { trigger: el, start: 'top 88%', once: true } });
+    });
+  }
+
+  window.addEventListener('load', function(){ if (hasGsap) ScrollTrigger.refresh(); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function(){ rebuild(); if (hasGsap) ScrollTrigger.refresh(); });
+})();
+</script>
+</body>
+</html>

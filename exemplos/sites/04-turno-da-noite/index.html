@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>O turno da noite · Luan</title>
+<meta name="description" content="Das 18h às 8h, enquanto sua equipe dorme, chatbot, integração e painel com IA trabalham sozinhos. Luan, desenvolvedor sob medida para PMEs.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;1,9..144,300&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#f4efe6;--ink2:#b9b3a8;--acc:#f2b36b;--wa:#25d366;
+  --sky:#1a1230;
+}
+html{scroll-behavior:auto}
+*{box-sizing:border-box}
+body{margin:0;background:var(--sky);color:var(--ink);font:17px/1.65 Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden;transition:color .4s}
+html.day{--ink:#1b1a22;--ink2:#555260;--acc:#8a4b0e}
+a{color:inherit}
+canvas#sky{position:fixed;inset:0;width:100%;height:100%;z-index:0;display:block}
+.fallback canvas#sky{display:none}
+.fallback body{background:linear-gradient(#0b0c1e,#24163a 55%,#c25b3a)}
+.serif{font-family:Fraunces,Georgia,serif;font-weight:300;letter-spacing:-.02em;line-height:1.02}
+h1,h2,h3{margin:0}
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px;position:relative;z-index:1}
+
+/* relógio fixo */
+#clock{position:fixed;top:22px;right:28px;z-index:5;text-align:right;line-height:1}
+#clock .t{font-family:Fraunces,serif;font-weight:300;font-size:clamp(44px,7vw,96px);font-variant-numeric:tabular-nums;letter-spacing:-.04em}
+#clock .l{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink2);margin-top:6px}
+#brand{position:fixed;top:30px;left:28px;z-index:5;font-family:Fraunces,serif;font-size:20px;letter-spacing:-.01em}
+#brand span{color:var(--acc)}
+
+/* capítulos */
+.ch{min-height:100vh;display:grid;align-content:center;padding:18vh 24px;position:relative;z-index:1}
+.ch .k{font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--ink2);margin-bottom:28px;display:flex;gap:14px;align-items:center}
+.ch .k::before{content:"";width:36px;height:1px;background:var(--ink2)}
+.ch h2{font-size:clamp(40px,7.2vw,104px);max-width:14ch}
+.ch p.body{font-size:clamp(19px,2.2vw,26px);max-width:34ch;margin:36px 0 0;line-height:1.45;color:var(--ink)}
+.ch .fact{margin-top:40px;font-family:Fraunces,serif;font-style:italic;font-size:clamp(18px,2vw,22px);color:var(--acc)}
+.ch.right{justify-items:end;text-align:right}
+.ch.right .k{flex-direction:row-reverse}
+.ch.right h2,.ch.right p.body{text-align:right}
+
+/* palavras */
+.w{display:inline-block;opacity:var(--o,1);transform:translateY(calc((1 - var(--o,1)) * .18em));filter:blur(calc((1 - var(--o,1)) * 6px));will-change:opacity,transform}
+.rv .w{opacity:0;transform:translateY(20px);filter:none;transition:opacity .8s cubic-bezier(.16,1,.3,1),transform .8s cubic-bezier(.16,1,.3,1);transition-delay:calc(var(--i) * .07s)}
+.rv.on .w{opacity:1;transform:none}
+
+/* hero */
+#h0{padding-top:28vh}
+#h0 h1{font-size:clamp(52px,10vw,150px);max-width:9ch}
+#h0 .lede{font-size:clamp(18px,2.1vw,24px);max-width:40ch;margin-top:32px;color:var(--ink2)}
+.cta{display:inline-flex;align-items:center;gap:10px;margin-top:40px;padding:16px 26px;border-radius:999px;background:var(--wa);color:#07210f;font-weight:600;font-size:16px;text-decoration:none;transition:transform .2s}
+.cta:hover{transform:translateY(-2px)}
+.cta svg{width:20px;height:20px}
+.hint{position:absolute;bottom:32px;left:24px;font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink2)}
+
+/* como trabalho */
+#como{padding:14vh 24px 10vh}
+#top{position:fixed;inset:0 0 auto;height:130px;z-index:4;pointer-events:none;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);-webkit-mask:linear-gradient(#000 45%,transparent);mask:linear-gradient(#000 45%,transparent)}
+#como h2{font-size:clamp(36px,5vw,64px);margin-bottom:12px}
+#como .sub{color:var(--ink2);max-width:52ch;margin-bottom:56px}
+ol.steps{list-style:none;margin:0;padding:0;border-top:1px solid color-mix(in srgb,var(--ink) 25%,transparent)}
+ol.steps li{display:grid;grid-template-columns:72px 1fr;gap:24px;padding:28px 0;border-bottom:1px solid color-mix(in srgb,var(--ink) 25%,transparent)}
+ol.steps .n{font-family:Fraunces,serif;font-size:36px;font-weight:300;color:var(--acc);line-height:1}
+ol.steps b{display:block;font-size:20px;font-family:Fraunces,serif;font-weight:500;margin-bottom:6px}
+ol.steps p{margin:0;color:var(--ink2);max-width:60ch}
+
+/* final */
+#fim{min-height:100vh;display:grid;align-content:center;text-align:center;padding:16vh 24px 10vh}
+#fim h2{font-size:clamp(44px,8vw,120px);max-width:12ch;margin:0 auto}
+#fim p{color:var(--ink2);max-width:46ch;margin:28px auto 0;font-size:19px}
+#fim .links{margin-top:48px;display:flex;gap:28px;justify-content:center;flex-wrap:wrap;font-size:14px;color:var(--ink2)}
+footer{position:relative;z-index:1;padding:28px 24px 40px;text-align:center;font-size:13px;color:var(--ink2)}
+
+@media (max-width:640px){
+  #clock{top:16px;right:16px}#brand{top:22px;left:16px;font-size:17px}
+  .ch{padding:14vh 20px}.ch.right{justify-items:start;text-align:left}.ch.right h2,.ch.right p.body{text-align:left}.ch.right .k{flex-direction:row}
+  ol.steps li{grid-template-columns:48px 1fr;gap:14px}ol.steps .n{font-size:28px}
+}
+@media (prefers-reduced-motion:reduce){
+  .w,.rv .w{opacity:1!important;transform:none!important;filter:none!important;transition:none!important}
+}
+</style>
+</head>
+<body>
+<canvas id="sky" aria-hidden="true"></canvas>
+<div id="top" aria-hidden="true"></div>
+<a id="brand" href="#h0">Luan<span>.</span>dev</a>
+<div id="clock" aria-live="off"><div class="t" id="clockT">18:00</div><div class="l">sua equipe foi embora</div></div>
+
+<header class="ch wrap" id="h0">
+  <div class="k">Capítulo 0 · 18h</div>
+  <h1 class="serif rv" data-rv>A equipe vai embora. O trabalho fica.</h1>
+  <p class="lede">O que acontece entre as 18h e as 8h decide quantas horas sua equipe perde amanhã. Eu construo o que trabalha enquanto ninguém está olhando: chatbot, integração, painel com IA.</p>
+  <a class="cta" href="https://wa.me/55SEUNUMERO?text=Oi%20Luan%2C%20quero%20saber%20o%20que%20d%C3%A1%20pra%20automatizar%20na%20minha%20empresa" target="_blank" rel="noopener">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.6.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 12 12 0 0 0 4.6 4 5.2 5.2 0 0 0 3.2.7 2.7 2.7 0 0 0 1.8-1.3 2.2 2.2 0 0 0 .2-1.3c-.1-.1-.3-.2-.5-.3z"/></svg>
+    Falar no WhatsApp
+  </a>
+  <div class="hint">Role. A noite passa.</div>
+</header>
+
+<section class="ch wrap" id="c1">
+  <div class="k">Capítulo 1 · 23h</div>
+  <h2 class="serif" data-scrub>Um cliente pergunta o boleto. Ninguém está na empresa. Ele recebe em segundos.</h2>
+  <p class="body" data-scrub>O chatbot de WhatsApp consulta o seu sistema, responde boleto, status e horário, e não inventa resposta. Quando não sabe, chama uma pessoa de manhã.</p>
+  <div class="fact">Caso real: boleto respondido às 23h, sem ninguém de plantão.</div>
+</section>
+
+<section class="ch wrap right" id="c2">
+  <div class="k">Capítulo 2 · 02h</div>
+  <h2 class="serif" data-scrub>Dois sistemas que nunca se falaram trocam os pedidos do dia.</h2>
+  <p class="body" data-scrub>A integração passa pedido, cadastro e baixa de um lado para o outro, sem alguém digitando duas vezes. O que era conferência de manhã deixa de existir.</p>
+</section>
+
+<section class="ch wrap" id="c3">
+  <div class="k">Capítulo 3 · 05h</div>
+  <h2 class="serif" data-scrub>O painel recalcula. A IA já anotou por que a inadimplência subiu.</h2>
+  <p class="body" data-scrub>Não é um gráfico que você precisa interpretar. É um painel que responde em português: "por quê?" — e aponta onde olhar, com o número do lado.</p>
+  <div class="fact">Exemplo ilustrativo de pergunta: "por que a inadimplência subiu esse mês?"</div>
+</section>
+
+<section class="ch wrap right" id="c4">
+  <div class="k">Capítulo 4 · 07h</div>
+  <h2 class="serif" data-scrub>O relatório chega no seu celular antes do café.</h2>
+  <p class="body" data-scrub>Faturamento, chamados, o que fechou e o que travou. Enviado sozinho, todo dia, na hora que você escolher.</p>
+</section>
+
+<section class="ch wrap" id="c5">
+  <div class="k">Capítulo 5 · 08h</div>
+  <h2 class="serif" data-scrub>A equipe chega. Não tem retrabalho esperando.</h2>
+  <p class="body" data-scrub>Cadastro que levava 15 minutos leva 2. Em 30 cadastros por dia, são 6 horas e meia de volta — todo dia.</p>
+  <div class="fact">Caso real: 15 min → 2 min por cadastro. 13 min × 30/dia = 6,5 h/dia.</div>
+  <a class="cta" href="https://wa.me/55SEUNUMERO?text=Oi%20Luan%2C%20quero%20um%20turno%20da%20noite%20na%20minha%20empresa" target="_blank" rel="noopener">Quero isso na minha empresa</a>
+</section>
+
+<section class="wrap" id="como">
+  <h2 class="serif">Como eu trabalho</h2>
+  <p class="sub">Quem constrói é quem conversa. Sem gerente no meio, sem escopo que cresce sem aviso.</p>
+  <ol class="steps">
+    <li><span class="n">01</span><div><b>Conversa de 30 minutos</b><p>Você me mostra o dia a dia. Eu só ouço e anoto onde o tempo vaza. Sem custo, sem compromisso.</p></div></li>
+    <li><span class="n">02</span><div><b>Diagnóstico e número fechado</b><p>Em 2 dias você recebe o que eu faria, quanto tempo sua equipe ganha, e o preço: fechado por projeto, não por hora.</p></div></li>
+    <li><span class="n">03</span><div><b>Construção com você olhando</b><p>Entregas pequenas, toda semana, rodando com os seus dados. Você aprova cada etapa.</p></div></li>
+    <li><span class="n">04</span><div><b>Implantação e medição</b><p>Entra em uso, a equipe aprende em uma tarde, e medimos o antes e o depois. O número vai no relatório final.</p></div></li>
+    <li><span class="n">05</span><div><b>Suporte</b><p>30 dias inclusos. Depois, manutenção mensal se fizer sentido — para chatbot e painel, costuma fazer.</p></div></li>
+  </ol>
+</section>
+
+<section class="wrap" id="fim">
+  <h2 class="serif rv" data-rv>Seu turno da noite pode começar amanhã.</h2>
+  <p>Me conta a tarefa que mais toma tempo da sua equipe. Eu respondo em até 1 dia útil.</p>
+  <div><a class="cta" href="https://wa.me/55SEUNUMERO?text=Oi%20Luan%2C%20vi%20o%20turno%20da%20noite%20e%20quero%20conversar" target="_blank" rel="noopener">Falar no WhatsApp</a></div>
+  <div class="links"><a href="https://www.instagram.com/oluan.dev/" target="_blank" rel="noopener">@oluan.dev</a><a href="https://github.com/oluan-dev" target="_blank" rel="noopener">github.com/oluan-dev</a></div>
+</section>
+<footer>Luan · desenvolvedor sob medida · Exemplos usam dados fictícios; nenhum dado de cliente real aparece aqui.</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script>
+(function(){
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var html = document.documentElement;
+
+  /* ---------- split words (TreeWalker, keeps markup) ---------- */
+  function split(el, cls){
+    var walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT), nodes=[], n, i=0;
+    while((n=walker.nextNode())) nodes.push(n);
+    el.setAttribute('aria-label', el.textContent.trim());
+    nodes.forEach(function(t){
+      var frag = document.createDocumentFragment();
+      t.data.split(/(\s+)/).forEach(function(p){
+        if(!p) return;
+        if(!p.trim()){ frag.appendChild(document.createTextNode(p)); return; }
+        var s=document.createElement('span'); s.className='w'; s.textContent=p; s.setAttribute('aria-hidden','true');
+        s.style.setProperty('--i', i++); frag.appendChild(s);
+      });
+      t.parentNode.replaceChild(frag, t);
+    });
+    return el.querySelectorAll('.w');
+  }
+
+  /* ---------- sky shader ---------- */
+  var cv = document.getElementById('sky'), gl = cv.getContext('webgl', {antialias:false});
+  var setT = function(){};
+  if(gl){
+    var vs='attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}';
+    var fs='precision mediump float;uniform vec2 r;uniform float t;'+
+    'float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}'+
+    'void main(){vec2 uv=gl_FragCoord.xy/r;float y=uv.y;'+
+    // keyframes: 0 dusk, .25 night, .7 deep night, .85 dawn, 1 morning
+    'vec3 duskT=vec3(.12,.07,.22),duskB=vec3(.80,.36,.22);'+
+    'vec3 niteT=vec3(.02,.02,.07),niteB=vec3(.08,.07,.18);'+
+    'vec3 dawnT=vec3(.25,.18,.40),dawnB=vec3(.98,.60,.42);'+
+    'vec3 mornT=vec3(.52,.72,.94),mornB=vec3(.93,.90,.84);'+
+    'vec3 top,bot;'+
+    'if(t<.25){float k=smoothstep(0.,.25,t);top=mix(duskT,niteT,k);bot=mix(duskB,niteB,k);}'+
+    'else if(t<.7){top=niteT;bot=niteB;}'+
+    'else if(t<.85){float k=smoothstep(.7,.85,t);top=mix(niteT,dawnT,k);bot=mix(niteB,dawnB,k);}'+
+    'else{float k=smoothstep(.85,1.,t);top=mix(dawnT,mornT,k);bot=mix(dawnB,mornB,k);}'+
+    'vec3 c=mix(bot,top,pow(y,.8));'+
+    // stars
+    'float night=smoothstep(.05,.3,t)*(1.-smoothstep(.72,.9,t));'+
+    'vec2 g=gl_FragCoord.xy/2.5;vec2 id=floor(g);float s=h(id);'+
+    'float star=step(.992,s)*pow(h(id+1.7),3.)*(.6+.4*sin(t*40.+s*60.));'+
+    'c+=star*night*vec3(1.,.95,.85)*y;'+
+    // sun
+    'float sy=mix(-.35,.12,smoothstep(.8,1.,t));vec2 su=vec2(uv.x-.72,(uv.y-sy)*r.y/r.x);'+
+    'float d=length(su);float sun=smoothstep(.07,.05,d)+.25*exp(-d*6.);'+
+    'c+=sun*smoothstep(.78,.9,t)*vec3(1.,.8,.5);'+
+    'c+=(h(gl_FragCoord.xy)-.5)*.015;'+
+    'gl_FragColor=vec4(c,1.);}';
+    function sh(type,src){var s=gl.createShader(type);gl.shaderSource(s,src);gl.compileShader(s);return s;}
+    var prog=gl.createProgram();gl.attachShader(prog,sh(gl.VERTEX_SHADER,vs));gl.attachShader(prog,sh(gl.FRAGMENT_SHADER,fs));gl.linkProgram(prog);
+    if(!gl.getProgramParameter(prog,gl.LINK_STATUS)){ gl=null; }
+    else{
+      gl.useProgram(prog);
+      var buf=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buf);
+      gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,1,1]),gl.STATIC_DRAW);
+      var loc=gl.getAttribLocation(prog,'p');gl.enableVertexAttribArray(loc);gl.vertexAttribPointer(loc,2,gl.FLOAT,false,0,0);
+      var uR=gl.getUniformLocation(prog,'r'), uT=gl.getUniformLocation(prog,'t'), cur=-1;
+      function size(){var d=Math.min(devicePixelRatio||1, innerWidth<700?1:1.5);cv.width=innerWidth*d;cv.height=innerHeight*d;gl.viewport(0,0,cv.width,cv.height);gl.uniform2f(uR,cv.width,cv.height);cur=-1;}
+      addEventListener('resize',size);size();
+      setT=function(v){ if(Math.abs(v-cur)<.0015) return; cur=v; gl.uniform1f(uT,v); gl.drawArrays(gl.TRIANGLE_STRIP,0,4); };
+    }
+  }
+  if(!gl) html.classList.add('fallback'); // ponytail: CSS gradient, no stars; page still reads fine
+
+  /* ---------- clock + day/night ink ---------- */
+  var clockT=document.getElementById('clockT'), lab=document.querySelector('#clock .l');
+  function progress(v, l){
+    var mins = Math.round(v*14*60), hh=(18+Math.floor(mins/60))%24, mm=mins%60;
+    clockT.textContent=(hh<10?'0':'')+hh+':'+(mm<10?'0':'')+mm;
+    if(l && lab.textContent!==l) lab.textContent=l;
+    html.classList.toggle('day', v>.9);
+    setT(v);
+  }
+
+  /* a chapter "owns" the clock once its top crosses 70% of the viewport; the hour holds for
+     the first 55% of the gap to the next chapter, then runs to the next hour */
+  var hours=[['#h0',18,'sua equipe foi embora'],['#c1',23,'o chatbot está acordado'],['#c2',26,'a integração trabalha'],['#c3',29,'o painel recalcula'],['#c4',31,'o relatório saiu'],['#c5',32,'a equipe chega']], pts=[];
+  function measure(){ pts=hours.map(function(x){ return document.querySelector(x[0]).offsetTop; }); }
+  function clockFromScroll(){
+    var y=scrollY+innerHeight*.7, k=0;
+    for(var i=1;i<pts.length;i++) if(y>=pts[i]) k=i;
+    var v=(hours[k][1]-18)/14;
+    if(k<pts.length-1){
+      var f=(y-pts[k])/(pts[k+1]-pts[k]); f=Math.max(0,(f-.55)/.45);
+      v+=((hours[k+1][1]-hours[k][1])/14)*f;
+    }
+    progress(v, hours[k][2]);
+  }
+  measure(); clockFromScroll();
+  addEventListener('scroll', clockFromScroll, {passive:true});
+  addEventListener('resize', function(){ measure(); clockFromScroll(); });
+
+  if(reduce || !window.gsap){
+    document.querySelectorAll('[data-rv]').forEach(function(e){ e.classList.remove('rv'); });
+    return;
+  }
+  gsap.registerPlugin(ScrollTrigger);
+
+  /* staggered reveal once (hero + final) */
+  var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('on');io.unobserve(e.target);}});},{threshold:.2,rootMargin:'0px 0px -10% 0px'});
+  document.querySelectorAll('[data-rv]').forEach(function(e){ split(e); io.observe(e); });
+
+  /* scroll-scrubbed word reveal per chapter */
+  document.querySelectorAll('[data-scrub]').forEach(function(el){
+    var ws=split(el), n=ws.length;
+    ws.forEach(function(w){ w.style.setProperty('--o', .15); });
+    ScrollTrigger.create({
+      trigger: el, start:'top 90%', end:'bottom 60%', scrub:true,
+      onUpdate:function(st){
+        var p=st.progress*(n+2);
+        for(var i=0;i<n;i++){ var o=Math.min(1,Math.max(0,p-i)); ws[i].style.setProperty('--o', .15+.85*o); }
+      }
+    });
+  });
+
+  /* clock follows the chapter on screen: hour fixed at each chapter's center, linear between */
+  ScrollTrigger.addEventListener('refresh', function(){ measure(); clockFromScroll(); });
+  document.fonts && document.fonts.ready.then(function(){ ScrollTrigger.refresh(); });
+})();
+</script>
+</body>
+</html>
