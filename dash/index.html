@@ -203,6 +203,8 @@ td .btn{height:28px;padding:0 10px;font-size:12px;border-radius:8px;color:var(--
 .md .foot .btn.red{margin-right:auto}
 .err{color:var(--red);font:12px var(--mono);min-height:1em;margin:0}
 #valor{font:700 20px var(--display);letter-spacing:-.02em}
+.sugw{position:relative}.sug{position:absolute;top:100%;left:0;right:0;z-index:3;margin-top:4px;max-height:190px;overflow:auto;display:grid;background:var(--bg3);border:1px solid var(--line2);border-radius:10px;box-shadow:0 12px 30px rgba(0,0,0,.5)}
+.sug button{text-align:left;background:none;border:0;padding:10px 12px;color:var(--ink);font-size:14px;border-top:1px solid var(--line)}.sug button:first-child{border-top:0}.sug button:hover,.sug button.on{background:rgba(200,255,46,.1)}.sug small{display:block;padding:8px 12px;color:var(--ink3);font:11px var(--mono)}
 
 /* toast */
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);z-index:30;padding:10px 16px;border-radius:12px;background:#121408;border:1px solid rgba(200,255,46,.45);font:500 13px Inter;box-shadow:0 12px 36px rgba(0,0,0,.5);opacity:0;transition:.3s var(--ease);pointer-events:none;max-width:calc(100vw - 32px)}
@@ -259,7 +261,7 @@ td .btn{height:28px;padding:0 10px;font-size:12px;border-radius:8px;color:var(--
     </div>
     <div class="f"><label for="desc">Descrição</label><input id="desc" placeholder="Site + painel · 1ª parcela" autocomplete="off"></div>
     <div class="g2">
-      <div class="f" id="fCli"><label for="cliente">Cliente</label><input id="cliente" list="clientesL" placeholder="Nome do cliente" autocomplete="off"><datalist id="clientesL"></datalist></div>
+      <div class="f sugw" id="fCli"><label for="cliente">Cliente</label><input id="cliente" placeholder="Nome do cliente" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="cliSug"><div class="sug" id="cliSug" hidden></div></div>
       <div class="f"><label for="cat">Categoria</label><select id="cat"></select></div>
     </div>
     <div class="f"><label for="status">Situação</label><select id="status"><option value="pago">Já caiu na conta</option><option value="previsto">Ainda vai cair · cobrança aberta</option></select></div>
@@ -373,7 +375,7 @@ function render() { if (!pronto) return; const k = kpis(S.mes);
   $("nLanc").textContent = porMes(S.mes).length; $("nCli").textContent = clientes(S.mes.slice(0, 4)).length; $("nCob").textContent = k.abertos.length; $("nCob").className = "n" + (k.atrasados.length ? " red" : "");
   document.querySelectorAll("#menu a").forEach(a => a.classList.toggle("on", a.dataset.r === rota));
   $("tela").innerHTML = T[rota]();
-  $("clientesL").innerHTML = clientes("").map(c => `<option value="${esc(c.nome)}">`).join(""); }
+}
 
 // ===== ações =====
 function ir(r) { rota = r in T ? r : "visao"; if (location.hash !== "#" + rota) history.replaceState(null, "", "#" + rota); render(); window.scrollTo({ top: 0 }); }
@@ -407,7 +409,16 @@ function abrir(i) { editando = i || null; $("fTit").textContent = i ? "Editar la
   document.querySelector(`input[name=tipo][value=${i ? i.tipo : "receita"}]`).checked = true; cats();
   $("valor").value = i ? fmt(i.valor) : ""; $("data").value = i ? i.data : (S.mes === HOJE.slice(0, 7) ? HOJE : S.mes + "-01"); $("desc").value = i ? i.desc : ""; $("cliente").value = i ? i.cliente : ""; if (i) $("cat").value = i.cat; $("status").value = i ? i.status : "pago";
   $("ov").hidden = false; $("valor").focus(); }
-function fechar() { $("ov").hidden = true; }
+function fechar() { $("ov").hidden = true; sugFecha(); }
+// lista de clientes no campo do formulário
+function sugMostra() { const q = $("cliente").value.trim().toLowerCase(), todos = clientes("").map(c => c.nome), lista = todos.filter(n => n.toLowerCase().includes(q)), box = $("cliSug");
+  box.innerHTML = lista.length ? lista.map(n => `<button type="button" data-nome="${esc(n)}">${esc(n)}</button>`).join("") : `<small>${todos.length ? "nenhum cliente com “" + esc(q) + "” · vai ficar como cliente novo" : "nenhum cliente cadastrado ainda · o nome digitado vira um"}</small>`;
+  box.hidden = false; $("cliente").setAttribute("aria-expanded", "true"); }
+function sugFecha() { $("cliSug").hidden = true; $("cliente").setAttribute("aria-expanded", "false"); }
+$("cliente").addEventListener("focus", sugMostra); $("cliente").addEventListener("input", sugMostra);
+$("cliente").addEventListener("blur", () => setTimeout(sugFecha, 150));
+$("cliSug").addEventListener("mousedown", e => { const b = e.target.closest("[data-nome]"); if (!b) return; e.preventDefault(); $("cliente").value = b.dataset.nome; sugFecha(); $("cat").focus(); });
+$("cliente").addEventListener("keydown", e => { if (e.key === "Escape") { sugFecha(); e.stopPropagation(); } if (e.key === "Enter" && !$("cliSug").hidden) { const b = $("cliSug").querySelector("[data-nome]"); if (b) { e.preventDefault(); $("cliente").value = b.dataset.nome; sugFecha(); $("cat").focus(); } } });
 $("btnNovo").onclick = () => abrir(); $("fX").onclick = fechar; $("fCancel").onclick = fechar; $("ov").onclick = e => { if (e.target === $("ov")) fechar(); };
 $("fDel").onclick = async () => { if ($("fDel").textContent !== "Apagar de vez") { $("fDel").textContent = "Apagar de vez"; return; } try { await deleteDoc(doc(LANC, editando.id)); fechar(); toast("Lançamento apagado"); } catch (e) { erroRede(e); } };
 $("form").onsubmit = async e => { e.preventDefault(); const valor = paraCentavos($("valor").value), data = $("data").value, desc = $("desc").value.trim(), tipo = document.querySelector("input[name=tipo]:checked").value;
