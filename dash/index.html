@@ -85,12 +85,12 @@ main{padding:0 clamp(16px,3vw,36px) 48px;min-width:0}
 .c.acc{background:linear-gradient(var(--bg2),var(--bg2)) padding-box,linear-gradient(180deg,rgba(200,255,46,.6),rgba(200,255,46,.05)) border-box}
 .c.red{background:linear-gradient(var(--bg2),var(--bg2)) padding-box,linear-gradient(180deg,rgba(255,107,74,.55),rgba(255,107,74,.05)) border-box}
 .lbl{font:500 11px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);display:flex;justify-content:space-between;gap:8px}
-.kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+.kpis{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px}
 .kpis.k3{grid-template-columns:repeat(3,minmax(0,1fr))}
 @media(max-width:1100px){.kpis{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:620px){.kpis,.kpis.k3{grid-template-columns:repeat(2,minmax(0,1fr))}.kpis .c:last-child:nth-child(odd){grid-column:1/-1}}
 .kpis .c{display:grid;gap:8px;align-content:start}
-.kpis .v{font:700 clamp(20px,2vw,26px)/1 var(--display);letter-spacing:-.03em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kpis .v{font:700 clamp(20px,1.7vw,24px)/1 var(--display);letter-spacing:-.03em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .kpis .d{font:11px var(--mono);color:var(--ink2)}
 .c-acc{color:var(--acc)}.c-red{color:var(--red)}.c-yel{color:var(--yel)}.c-dim{color:var(--ink3)}
 .spark{height:22px;display:flex;align-items:flex-end;gap:2px}
@@ -197,6 +197,8 @@ td .btn{height:28px;padding:0 10px;font-size:12px;border-radius:8px;color:var(--
 .tipo input{position:absolute;opacity:0;pointer-events:none}
 .tipo label:has(input:checked){background:var(--acc);color:var(--acc-ink);border-color:transparent}
 .tipo label.s:has(input:checked){background:var(--red);color:#0a0a0a}
+.tipo label.r:has(input:checked){background:var(--yel);color:#0a0a0a}
+@media(max-width:480px){.tipo label{font-size:13px}}
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 @media(max-width:480px){.g2{grid-template-columns:1fr}}
 .md .foot{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
@@ -254,7 +256,7 @@ td .btn{height:28px;padding:0 10px;font-size:12px;border-radius:8px;color:var(--
 <div class="ov" id="ov" hidden>
   <form class="md" id="form" novalidate>
     <h2><span id="fTit">Novo lançamento</span><button class="x" type="button" id="fX" aria-label="Fechar">✕</button></h2>
-    <div class="tipo"><label><input type="radio" name="tipo" value="receita" checked>+ Entrou</label><label class="s"><input type="radio" name="tipo" value="despesa">− Saiu</label></div>
+    <div class="tipo"><label><input type="radio" name="tipo" value="receita" checked>+ Entrou</label><label class="s"><input type="radio" name="tipo" value="despesa">− Saiu</label><label class="r"><input type="radio" name="tipo" value="retirada">↗ Retirei</label></div>
     <div class="g2">
       <div class="f"><label for="valor">Valor (R$)</label><input id="valor" inputmode="decimal" placeholder="1.500,00" autocomplete="off"></div>
       <div class="f"><label for="data">Data</label><input id="data" type="date"></div>
@@ -299,23 +301,25 @@ let tt; function toast(h, bad) { const t = $("toast"); t.innerHTML = h; t.classN
 const erroRede = e => toast("Não salvou (" + (e.code || e.message) + "). Tente de novo.", true);
 
 // ===== estado =====
-const CATS = { receita: ["Projeto", "Mensalidade", "Ajuste", "Outro"], despesa: ["Imposto", "Ferramenta", "Hospedagem", "Equipamento", "Anúncio", "Outro"] };
+const CATS = { receita: ["Projeto", "Mensalidade", "Ajuste", "Outro"], despesa: ["Imposto", "Ferramenta", "Hospedagem", "Equipamento", "Anúncio", "Outro"], retirada: ["Retirada para conta pessoal", "Pró-labore"] };
 let HOJE = hojeLocal(), S = { lanc: [], cli: [], meta: 0, mes: HOJE.slice(0, 7) }, rota = "visao", filtro = "todos", busca = "", pronto = false, unsub = [];
 const porMes = ym => S.lanc.filter(i => i.data.slice(0, 7) === ym);
 const pagosMes = ym => porMes(ym).filter(i => i.status === "pago");
-function kpis(ym) { const m = pagosMes(ym), rec = soma(m.filter(i => i.tipo === "receita")), gas = soma(m.filter(i => i.tipo === "despesa"));
+const SINAL = { receita: "+", despesa: "−", retirada: "↗" };
+function kpis(ym) { const m = pagosMes(ym), rec = soma(m.filter(i => i.tipo === "receita")), gas = soma(m.filter(i => i.tipo === "despesa")), ret = soma(m.filter(i => i.tipo === "retirada"));
+  const todos = S.lanc.filter(i => i.status === "pago"), caixa = soma(todos.filter(i => i.tipo === "receita")) - soma(todos.filter(i => i.tipo === "despesa")) - soma(todos.filter(i => i.tipo === "retirada"));
   const abertos = S.lanc.filter(i => i.tipo === "receita" && i.status === "previsto").sort((a, b) => a.data.localeCompare(b.data));
-  return { rec, gas, sobra: rec - gas, nRec: m.filter(i => i.tipo === "receita").length, nGas: m.filter(i => i.tipo === "despesa").length, abertos, aReceber: soma(abertos), atrasados: abertos.filter(i => i.data < HOJE), pMeta: S.meta ? rec / S.meta * 100 : 0 }; }
-function seis(ym) { return Array.from({ length: 6 }, (_, k) => addMes(ym, k - 5)).map(m => { const p = pagosMes(m); return { ym: m, nome: nomeMes(m), rec: soma(p.filter(i => i.tipo === "receita")), gas: soma(p.filter(i => i.tipo === "despesa")) }; }); }
+  return { rec, gas, ret, caixa, sobra: rec - gas, nRec: m.filter(i => i.tipo === "receita").length, nGas: m.filter(i => i.tipo === "despesa").length, abertos, aReceber: soma(abertos), atrasados: abertos.filter(i => i.data < HOJE), pMeta: S.meta ? rec / S.meta * 100 : 0 }; }
+function seis(ym) { return Array.from({ length: 6 }, (_, k) => addMes(ym, k - 5)).map(m => { const p = pagosMes(m); return { ym: m, nome: nomeMes(m), rec: soma(p.filter(i => i.tipo === "receita")), gas: soma(p.filter(i => i.tipo === "despesa")), ret: soma(p.filter(i => i.tipo === "retirada")) }; }); }
 function clientes(ano) { const t = {}; for (const c of S.cli) t[c.nome] = { nome: c.nome, ano: 0, total: 0, n: 0, aberto: 0, ultimo: "", id: c.id }; for (const i of S.lanc) { if (i.tipo !== "receita" || !i.cliente) continue; const c = t[i.cliente] || (t[i.cliente] = { nome: i.cliente, ano: 0, total: 0, n: 0, aberto: 0, ultimo: "" });
   if (i.status === "pago") { c.total += i.valor; c.n++; if (i.data.startsWith(ano)) c.ano += i.valor; if (i.data > c.ultimo) c.ultimo = i.data; } else c.aberto += i.valor; }
   return Object.values(t).sort((a, b) => b.ano - a.ano || b.total - a.total); }
 
 // ===== pedaços de tela =====
-const pill = i => { const prev = i.status === "previsto", late = prev && i.data < HOJE, r = i.tipo === "receita"; return `<span class="pill ${late ? "late" : prev ? "wait" : "ok"}">${late ? "atrasado" : prev ? (r ? "a receber" : "a pagar") : (r ? "recebido" : "pago")}</span>`; };
-const linha = i => { const r = i.tipo === "receita", prev = i.status === "previsto"; return `<tr data-id="${esc(i.id)}"><td class="d">${dm(i.data)}</td><td class="t"><b>${esc(i.desc)}</b><small>${esc(i.cliente || "—")}</small></td><td class="hide"><span class="pill" style="padding-left:8px">${esc(i.cat)}</span></td><td class="st">${pill(i)}</td><td class="v ${prev ? "" : r ? "c-acc" : "c-red"}">${r ? "+" : "−"} ${fmt(i.valor)}</td><td>${prev ? `<button class="btn" type="button" data-pago="${esc(i.id)}">${r ? "recebido" : "pago"}</button>` : `<button class="btn" type="button" data-edit="${esc(i.id)}">editar</button>`}</td></tr>`; };
-function filtra(lista) { const q = busca.trim().toLowerCase(); return lista.filter(i => (filtro === "todos" || (filtro === "entrou" && i.tipo === "receita") || (filtro === "saiu" && i.tipo === "despesa") || (filtro === "abertos" && i.status === "previsto")) && (!q || (i.desc + " " + i.cliente + " " + i.cat).toLowerCase().includes(q))).sort((a, b) => b.data.localeCompare(a.data) || (b.criadoEm || "").localeCompare(a.criadoEm || "")); }
-const chips = () => ["todos", "entrou", "saiu", "abertos"].map(f => `<button class="chip ${filtro === f ? "on" : ""}" type="button" data-f="${f}">${f}</button>`).join("");
+const pill = i => { if (i.tipo === "retirada") return `<span class="pill c-yel">retirado</span>`; const prev = i.status === "previsto", late = prev && i.data < HOJE, r = i.tipo === "receita"; return `<span class="pill ${late ? "late" : prev ? "wait" : "ok"}">${late ? "atrasado" : prev ? (r ? "a receber" : "a pagar") : (r ? "recebido" : "pago")}</span>`; };
+const linha = i => { const r = i.tipo === "receita", prev = i.status === "previsto"; return `<tr data-id="${esc(i.id)}"><td class="d">${dm(i.data)}</td><td class="t"><b>${esc(i.desc)}</b><small>${esc(i.cliente || "—")}</small></td><td class="hide"><span class="pill" style="padding-left:8px">${esc(i.cat)}</span></td><td class="st">${pill(i)}</td><td class="v ${prev ? "" : r ? "c-acc" : i.tipo === "retirada" ? "c-yel" : "c-red"}">${SINAL[i.tipo] || "−"} ${fmt(i.valor)}</td><td>${prev ? `<button class="btn" type="button" data-pago="${esc(i.id)}">${r ? "recebido" : "pago"}</button>` : `<button class="btn" type="button" data-edit="${esc(i.id)}">editar</button>`}</td></tr>`; };
+function filtra(lista) { const q = busca.trim().toLowerCase(); return lista.filter(i => (filtro === "todos" || (filtro === "entrou" && i.tipo === "receita") || (filtro === "saiu" && i.tipo === "despesa") || (filtro === "retirei" && i.tipo === "retirada") || (filtro === "abertos" && i.status === "previsto")) && (!q || (i.desc + " " + i.cliente + " " + i.cat).toLowerCase().includes(q))).sort((a, b) => b.data.localeCompare(a.data) || (b.criadoEm || "").localeCompare(a.criadoEm || "")); }
+const chips = () => ["todos", "entrou", "saiu", "retirei", "abertos"].map(f => `<button class="chip ${filtro === f ? "on" : ""}" type="button" data-f="${f}">${f}</button>`).join("");
 const tabela = (lista, vazio) => `<div class="tw"><table><thead><tr><th>data</th><th>lançamento</th><th class="hide">categoria</th><th>situação</th><th class="v">valor</th><th></th></tr></thead><tbody>${lista.length ? lista.map(linha).join("") : `<tr><td colspan="6" class="vazio">${vazio}</td></tr>`}</tbody></table></div>`;
 function grafico() { const s = seis(S.mes), mx = Math.max(1, ...s.flatMap(m => [m.rec, m.gas])); return `<div class="c"><div class="lbl"><span>6 meses · clique num mês</span><span><span class="c-acc">■</span> entrou &nbsp;<span class="c-red">□</span> saiu</span></div>
  <div class="chart">${s.map(m => `<div class="col${m.ym === S.mes ? " cur" : ""}" data-mes="${m.ym}" title="${m.nome}: entrou ${brl(m.rec)} · saiu ${brl(m.gas)}"><i style="height:${m.rec / mx * 100}%"></i><i style="height:${m.gas / mx * 100}%"></i></div>`).join("")}</div>
@@ -328,10 +332,11 @@ const T = {};
 T.visao = () => { const k = kpis(S.mes), s = seis(S.mes), mx = Math.max(1, ...s.flatMap(m => [m.rec, m.gas])), ano = S.mes.slice(0, 4), cl = clientes(ano).filter(c => c.ano > 0), tot = cl.reduce((t, c) => t + c.ano, 0), lista = filtra(porMes(S.mes));
   return `<section class="kpis">
   <div class="c acc"><span class="lbl">sobrou</span><span class="v ${k.sobra < 0 ? "c-red" : "c-acc"}">${brl(k.sobra)}</span><span class="d">${k.rec ? "margem " + Math.round(k.sobra / k.rec * 100) + "%" : "nada recebido ainda"}</span></div>
-  <div class="c"><span class="lbl">entrou</span><span class="v">${brl(k.rec)}</span><div class="spark">${s.map(m => `<i class="${m.ym === S.mes ? "on" : ""}" style="height:${Math.max(8, m.rec / mx * 100)}%"></i>`).join("")}</div></div>
+  <div class="c"><span class="lbl">entrou ${S.meta ? `<span class="${k.pMeta >= 100 ? "c-acc" : ""}">${Math.round(k.pMeta)}% da meta</span>` : ""}</span><span class="v">${brl(k.rec)}</span>${S.meta ? `<div class="bar2"><i style="width:${Math.min(100, k.pMeta)}%"></i></div>` : `<div class="spark">${s.map(m => `<i class="${m.ym === S.mes ? "on" : ""}" style="height:${Math.max(8, m.rec / mx * 100)}%"></i>`).join("")}</div>`}</div>
   <div class="c"><span class="lbl">saiu</span><span class="v">${brl(k.gas)}</span><div class="spark">${s.map(m => `<i style="height:${Math.max(8, m.gas / mx * 100)}%"></i>`).join("")}</div></div>
+  <div class="c"><span class="lbl">retirei</span><span class="v c-yel">${brl(k.ret)}</span><span class="d">para a conta pessoal</span></div>
+  <div class="c"><span class="lbl">em caixa</span><span class="v ${k.caixa < 0 ? "c-red" : ""}">${brl(k.caixa)}</span><span class="d">desde o início, já tirando retiradas</span></div>
   <div class="c ${k.atrasados.length ? "red" : ""}"><span class="lbl">a receber ${k.atrasados.length ? `<span class="c-red">${pl(k.atrasados.length, "atrasada")}</span>` : ""}</span><span class="v c-yel">${brl(k.aReceber)}</span><span class="d">${pl(k.abertos.length, "cobrança")}</span></div>
-  <div class="c"><span class="lbl">meta <span>${S.meta ? brl(S.meta) : "—"}</span></span><span class="v ${k.pMeta >= 100 ? "c-acc" : ""}">${S.meta ? Math.round(k.pMeta) + "%" : "—"}</span><div class="bar2"><i style="width:${Math.min(100, k.pMeta)}%"></i></div></div>
  </section>
  <div class="cols"><div class="stack">${grafico()}
   <div class="c"><div class="th"><h2>Lançamentos de ${nomeMes(S.mes, true)}</h2>${chips()}</div>${tabela(lista, S.lanc.length ? "Nada em " + nomeMes(S.mes, true) + " com esse filtro." : VAZIO_GERAL)}</div></div>
@@ -339,9 +344,9 @@ T.visao = () => { const k = kpis(S.mes), s = seis(S.mes), mx = Math.max(1, ...s.
   <div class="c"><div class="lbl" style="margin-bottom:12px"><span>cobranças abertas</span><span>${brl(k.aReceber)}</span></div><div class="ab">${k.abertos.length ? k.abertos.map(i => cardCob(i, false)).join("") : `<div class="vazio">nenhuma cobrança aberta</div>`}</div></div>
   <div class="c"><div class="lbl" style="margin-bottom:12px"><span>clientes · ${ano}</span><span>${brl(tot)}</span></div><div class="cli">${cl.length ? cl.map((c, k) => `<div data-cli="${esc(c.nome)}"><span class="av ${k ? "" : "top"}">${ini(c.nome)}</span><span class="nome">${esc(c.nome)}</span><span class="v">${brl(c.ano)}</span><span class="bar2"><i style="width:${c.ano / cl[0].ano * 100}%"></i></span></div>`).join("") : `<div class="vazio">nenhum recebimento em ${ano}</div>`}</div></div>
  </div></div>`; };
-T.lancamentos = () => { const lista = filtra(porMes(S.mes)), rec = soma(lista.filter(i => i.tipo === "receita" && i.status === "pago")), gas = soma(lista.filter(i => i.tipo === "despesa" && i.status === "pago"));
+T.lancamentos = () => { const lista = filtra(porMes(S.mes)), rec = soma(lista.filter(i => i.tipo === "receita" && i.status === "pago")), gas = soma(lista.filter(i => i.tipo === "despesa" && i.status === "pago")), ret = soma(lista.filter(i => i.tipo === "retirada"));
   return `<div class="c"><div class="th"><h2>${nomeMes(S.mes, true)} ${S.mes.slice(0, 4)} · ${pl(lista.length, "lançamento")}</h2>${chips()}</div>
- <div class="lbl" style="margin-bottom:10px"><span>${busca ? "busca: “" + esc(busca) + "” · <button class='chip' type='button' data-limpar='1' style='height:22px'>limpar</button>" : "todos os lançamentos do mês"}</span><span><span class="c-acc">+ ${fmt(rec)}</span> &nbsp; <span class="c-red">− ${fmt(gas)}</span></span></div>
+ <div class="lbl" style="margin-bottom:10px"><span>${busca ? "busca: “" + esc(busca) + "” · <button class='chip' type='button' data-limpar='1' style='height:22px'>limpar</button>" : "todos os lançamentos do mês"}</span><span><span class="c-acc">+ ${fmt(rec)}</span> &nbsp; <span class="c-red">− ${fmt(gas)}</span>${ret ? ` &nbsp; <span class="c-yel">↗ ${fmt(ret)}</span>` : ""}</span></div>
  ${tabela(lista, S.lanc.length ? "Nada aqui com esse filtro." : VAZIO_GERAL)}</div>`; };
 T.clientes = () => { const ano = S.mes.slice(0, 4), cl = clientes(ano);
   const novo = `<form class="c th" id="fCliNovo" style="margin-bottom:10px"><h2>Novo cliente</h2><input id="cliNovo" placeholder="Nome do cliente" autocomplete="off" maxlength="80" style="flex:1;min-width:160px;height:38px;background:var(--bg);border:1px solid var(--line2);border-radius:10px;padding:0 12px"><button class="btn acc" type="submit">Adicionar</button></form>`;
@@ -359,13 +364,13 @@ T.cobrancas = () => { const k = kpis(S.mes), futuras = k.abertos.filter(i => i.d
  <div class="cols c2"><div class="c"><div class="lbl" style="margin-bottom:12px"><span>atrasadas</span></div><div class="ab">${k.atrasados.length ? k.atrasados.map(i => cardCob(i, true)).join("") : `<div class="vazio">nenhuma atrasada</div>`}</div></div>
  <div class="c"><div class="lbl" style="margin-bottom:12px"><span>a vencer</span></div><div class="ab">${futuras.length ? futuras.map(i => cardCob(i, true)).join("") : `<div class="vazio">nada a vencer</div>`}</div></div></div>`; };
 T.relatorios = () => { const s = seis(S.mes), ano = S.mes.slice(0, 4), p = S.lanc.filter(i => i.status === "pago" && i.data.startsWith(ano)), cat = {};
-  for (const i of p.filter(i => i.tipo === "despesa")) cat[i.cat] = (cat[i.cat] || 0) + i.valor; const cs = Object.entries(cat).sort((a, b) => b[1] - a[1]), cmx = cs.length ? cs[0][1] : 1, gasAno = cs.reduce((t, c) => t + c[1], 0), recAno = soma(p.filter(i => i.tipo === "receita"));
-  return `<section class="kpis k3"><div class="c"><span class="lbl">entrou em ${ano}</span><span class="v c-acc">${brl(recAno)}</span></div><div class="c"><span class="lbl">saiu em ${ano}</span><span class="v">${brl(gasAno)}</span></div><div class="c acc"><span class="lbl">sobrou em ${ano}</span><span class="v">${brl(recAno - gasAno)}</span><span class="d">margem ${recAno ? Math.round((recAno - gasAno) / recAno * 100) : 0}%</span></div></section>
- <div class="cols c2"><div class="c"><div class="lbl" style="margin-bottom:14px"><span>mês a mês · clique para abrir</span></div><div class="tw"><table class="mtab"><thead><tr><th>mês</th><th class="v">entrou</th><th class="v">saiu</th><th class="v">sobrou</th></tr></thead><tbody>${s.map(m => `<tr data-mes="${m.ym}"><td class="d">${m.nome} ${m.ym.slice(2, 4)}</td><td class="v c-acc">${fmt(m.rec)}</td><td class="v c-red">${fmt(m.gas)}</td><td class="v">${brl(m.rec - m.gas)}</td></tr>`).join("")}</tbody></table></div></div>
+  for (const i of p.filter(i => i.tipo === "despesa")) cat[i.cat] = (cat[i.cat] || 0) + i.valor; const cs = Object.entries(cat).sort((a, b) => b[1] - a[1]), cmx = cs.length ? cs[0][1] : 1, gasAno = cs.reduce((t, c) => t + c[1], 0), recAno = soma(p.filter(i => i.tipo === "receita")), retAno = soma(p.filter(i => i.tipo === "retirada")), k = kpis(S.mes);
+  return `<section class="kpis" style="grid-template-columns:repeat(5,minmax(0,1fr))"><div class="c"><span class="lbl">entrou em ${ano}</span><span class="v c-acc">${brl(recAno)}</span></div><div class="c"><span class="lbl">saiu em ${ano}</span><span class="v">${brl(gasAno)}</span></div><div class="c acc"><span class="lbl">sobrou em ${ano}</span><span class="v">${brl(recAno - gasAno)}</span><span class="d">margem ${recAno ? Math.round((recAno - gasAno) / recAno * 100) : 0}%</span></div><div class="c"><span class="lbl">retirei em ${ano}</span><span class="v c-yel">${brl(retAno)}</span><span class="d">${recAno - gasAno > 0 ? Math.round(retAno / (recAno - gasAno) * 100) + "% do que sobrou" : ""}</span></div><div class="c"><span class="lbl">em caixa hoje</span><span class="v ${k.caixa < 0 ? "c-red" : ""}">${brl(k.caixa)}</span><span class="d">desde o início</span></div></section>
+ <div class="cols c2"><div class="c"><div class="lbl" style="margin-bottom:14px"><span>mês a mês · clique para abrir</span></div><div class="tw"><table class="mtab"><thead><tr><th>mês</th><th class="v">entrou</th><th class="v">saiu</th><th class="v">sobrou</th><th class="v">retirei</th></tr></thead><tbody>${s.map(m => `<tr data-mes="${m.ym}"><td class="d">${m.nome} ${m.ym.slice(2, 4)}</td><td class="v c-acc">${fmt(m.rec)}</td><td class="v c-red">${fmt(m.gas)}</td><td class="v">${brl(m.rec - m.gas)}</td><td class="v c-yel">${m.ret ? fmt(m.ret) : "—"}</td></tr>`).join("")}</tbody></table></div></div>
  <div class="c"><div class="lbl" style="margin-bottom:14px"><span>gastos por categoria · ${ano}</span><span>${brl(gasAno)}</span></div><div class="rel">${cs.length ? cs.map(([n, v]) => `<div><span class="n">${esc(n)}</span><span class="bar2"><i style="width:${v / cmx * 100}%"></i></span><span class="v">${brl(v)}<span class="c-dim"> · ${Math.round(v / gasAno * 100)}%</span></span></div>`).join("") : `<div class="vazio">nenhum gasto em ${ano}</div>`}</div></div></div>`; };
 T.ajustes = () => `<div class="c"><div class="form">
  <div class="f"><label for="aMeta">Meta mensal (R$)</label><input id="aMeta" inputmode="decimal" value="${S.meta ? fmt(S.meta) : ""}" placeholder="5.000,00"><span class="hint">aparece no cartão "meta" da visão geral · deixe vazio para tirar</span></div>
- <div class="f"><label>Categorias</label><span class="hint">entrou: ${CATS.receita.join(" · ")}<br>saiu: ${CATS.despesa.join(" · ")}</span></div>
+ <div class="f"><label>Categorias</label><span class="hint">entrou: ${CATS.receita.join(" · ")}<br>saiu: ${CATS.despesa.join(" · ")}<br>retirei: ${CATS.retirada.join(" · ")} — retirada não é gasto: não muda o "sobrou", só sai do "em caixa"</span></div>
  <div class="f"><label>Conta</label><span class="hint">${esc(auth.currentUser?.email || "")} · ${pl(S.lanc.length, "lançamento")} guardados no Firebase (projeto caixa-oluan)</span></div>
  <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn acc" type="button" id="aSalvar">Salvar meta</button></div></div></div>`;
 
@@ -403,7 +408,7 @@ $("tela").addEventListener("submit", async e => { if (e.target.id !== "fCliNovo"
 
 // ===== modal =====
 let editando = null;
-function cats() { const tipo = document.querySelector("input[name=tipo]:checked").value; $("cat").innerHTML = CATS[tipo].map(c => `<option>${c}</option>`).join(""); $("fCli").hidden = tipo !== "receita"; }
+function cats() { const tipo = document.querySelector("input[name=tipo]:checked").value; $("cat").innerHTML = CATS[tipo].map(c => `<option>${c}</option>`).join(""); $("fCli").hidden = tipo !== "receita"; $("status").closest(".f").hidden = tipo === "retirada"; }
 document.querySelectorAll("input[name=tipo]").forEach(r => r.onchange = cats);
 function abrir(i) { editando = i || null; $("fTit").textContent = i ? "Editar lançamento" : "Novo lançamento"; $("fOk").textContent = i ? "Salvar" : "Lançar"; $("fOk").disabled = false; $("fDel").hidden = !i; $("fDel").textContent = "Apagar"; $("fErr").textContent = "";
   document.querySelector(`input[name=tipo][value=${i ? i.tipo : "receita"}]`).checked = true; cats();
@@ -423,10 +428,10 @@ $("btnNovo").onclick = () => abrir(); $("fX").onclick = fechar; $("fCancel").onc
 $("fDel").onclick = async () => { if ($("fDel").textContent !== "Apagar de vez") { $("fDel").textContent = "Apagar de vez"; return; } try { await deleteDoc(doc(LANC, editando.id)); fechar(); toast("Lançamento apagado"); } catch (e) { erroRede(e); } };
 $("form").onsubmit = async e => { e.preventDefault(); const valor = paraCentavos($("valor").value), data = $("data").value, desc = $("desc").value.trim(), tipo = document.querySelector("input[name=tipo]:checked").value;
   if (!valor) return $("fErr").textContent = "Valor inválido. Escreva assim: 1.500,00"; if (!data) return $("fErr").textContent = "Escolha a data."; if (!desc) return $("fErr").textContent = "Escreva uma descrição curta.";
-  const reg = { tipo, valor, data, desc, cliente: tipo === "receita" ? $("cliente").value.trim() : "", cat: $("cat").value, status: $("status").value }, novo = !editando;
+  const reg = { tipo, valor, data, desc, cliente: tipo === "receita" ? $("cliente").value.trim() : "", cat: $("cat").value, status: tipo === "retirada" ? "pago" : $("status").value }, novo = !editando;
   $("fOk").disabled = true;
   try { if (editando) await updateDoc(doc(LANC, editando.id), reg); else await addDoc(LANC, { ...reg, criadoEm: new Date().toISOString(), criado: serverTimestamp() });
-    S.mes = data.slice(0, 7); fechar(); toast(`${novo ? "Lançado" : "Salvo"}: <b>${tipo === "receita" ? "+" : "−"} ${brl(valor)}</b>`); render(); }
+    S.mes = data.slice(0, 7); fechar(); toast(`${novo ? "Lançado" : "Salvo"}: <b>${SINAL[tipo]} ${brl(valor)}</b>`); render(); }
   catch (e) { $("fErr").textContent = "Não salvou (" + (e.code || e.message) + "). Tente de novo."; $("fOk").disabled = false; } };
 
 // ===== login =====
@@ -435,7 +440,7 @@ const MSG = { "auth/unauthorized-domain": "Este endereço ainda não está liber
 $("btnLogin").onclick = async () => { $("loginErr").textContent = ""; try { await setPersistence(auth, browserLocalPersistence); await signInWithPopup(auth, provider); }
   catch (e) { if (e.code === "auth/popup-blocked" || e.code === "auth/operation-not-supported-in-this-environment") { try { await signInWithRedirect(auth, provider); return; } catch (e2) { e = e2; } } $("loginErr").textContent = MSG[e.code] ?? ("Não entrou (" + e.code + ")."); } };
 $("btnSair").onclick = () => signOut(auth);
-function mostrarLogin(msg) { unsub.forEach(u => u()); unsub = []; pronto = false; S = { lanc: [], meta: 0, mes: hojeLocal().slice(0, 7) }; $("app").hidden = true; $("login").hidden = false; if (msg) $("loginErr").textContent = msg; }
+function mostrarLogin(msg) { unsub.forEach(u => u()); unsub = []; pronto = false; S = { lanc: [], cli: [], meta: 0, mes: hojeLocal().slice(0, 7) }; $("app").hidden = true; $("login").hidden = false; if (msg) $("loginErr").textContent = msg; }
 onAuthStateChanged(auth, async user => {
   if (!user) return mostrarLogin();
   if (user.email !== DONO || !user.emailVerified) { await signOut(auth); return mostrarLogin(`A conta ${user.email} não tem acesso.`); }
