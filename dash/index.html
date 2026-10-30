@@ -277,7 +277,7 @@ import { getFirestore, collection, doc, onSnapshot, addDoc, setDoc, updateDoc, d
 const DONO = "luan@oluan.com.br";
 const fb = initializeApp({ apiKey: "AIzaSyAKym9u1MDwFfqPJfh-RzLYUOaU2AujKUg", authDomain: "caixa-oluan.firebaseapp.com", projectId: "caixa-oluan", appId: "1:807827124097:web:60196678e2a0969a340280" });
 const auth = getAuth(fb), db = getFirestore(fb);
-const LANC = collection(db, "lancamentos"), CONFIG = doc(db, "config", "geral");
+const LANC = collection(db, "lancamentos"), CLI = collection(db, "clientes"), CONFIG = doc(db, "config", "geral");
 
 // ===== utilidades =====
 const $ = id => document.getElementById(id);
@@ -298,14 +298,14 @@ const erroRede = e => toast("Não salvou (" + (e.code || e.message) + "). Tente 
 
 // ===== estado =====
 const CATS = { receita: ["Projeto", "Mensalidade", "Ajuste", "Outro"], despesa: ["Imposto", "Ferramenta", "Hospedagem", "Equipamento", "Anúncio", "Outro"] };
-let HOJE = hojeLocal(), S = { lanc: [], meta: 0, mes: HOJE.slice(0, 7) }, rota = "visao", filtro = "todos", busca = "", pronto = false, unsub = [];
+let HOJE = hojeLocal(), S = { lanc: [], cli: [], meta: 0, mes: HOJE.slice(0, 7) }, rota = "visao", filtro = "todos", busca = "", pronto = false, unsub = [];
 const porMes = ym => S.lanc.filter(i => i.data.slice(0, 7) === ym);
 const pagosMes = ym => porMes(ym).filter(i => i.status === "pago");
 function kpis(ym) { const m = pagosMes(ym), rec = soma(m.filter(i => i.tipo === "receita")), gas = soma(m.filter(i => i.tipo === "despesa"));
   const abertos = S.lanc.filter(i => i.tipo === "receita" && i.status === "previsto").sort((a, b) => a.data.localeCompare(b.data));
   return { rec, gas, sobra: rec - gas, nRec: m.filter(i => i.tipo === "receita").length, nGas: m.filter(i => i.tipo === "despesa").length, abertos, aReceber: soma(abertos), atrasados: abertos.filter(i => i.data < HOJE), pMeta: S.meta ? rec / S.meta * 100 : 0 }; }
 function seis(ym) { return Array.from({ length: 6 }, (_, k) => addMes(ym, k - 5)).map(m => { const p = pagosMes(m); return { ym: m, nome: nomeMes(m), rec: soma(p.filter(i => i.tipo === "receita")), gas: soma(p.filter(i => i.tipo === "despesa")) }; }); }
-function clientes(ano) { const t = {}; for (const i of S.lanc) { if (i.tipo !== "receita" || !i.cliente) continue; const c = t[i.cliente] || (t[i.cliente] = { nome: i.cliente, ano: 0, total: 0, n: 0, aberto: 0, ultimo: "" });
+function clientes(ano) { const t = {}; for (const c of S.cli) t[c.nome] = { nome: c.nome, ano: 0, total: 0, n: 0, aberto: 0, ultimo: "", id: c.id }; for (const i of S.lanc) { if (i.tipo !== "receita" || !i.cliente) continue; const c = t[i.cliente] || (t[i.cliente] = { nome: i.cliente, ano: 0, total: 0, n: 0, aberto: 0, ultimo: "" });
   if (i.status === "pago") { c.total += i.valor; c.n++; if (i.data.startsWith(ano)) c.ano += i.valor; if (i.data > c.ultimo) c.ultimo = i.data; } else c.aberto += i.valor; }
   return Object.values(t).sort((a, b) => b.ano - a.ano || b.total - a.total); }
 
@@ -342,11 +342,12 @@ T.lancamentos = () => { const lista = filtra(porMes(S.mes)), rec = soma(lista.fi
  <div class="lbl" style="margin-bottom:10px"><span>${busca ? "busca: “" + esc(busca) + "” · <button class='chip' type='button' data-limpar='1' style='height:22px'>limpar</button>" : "todos os lançamentos do mês"}</span><span><span class="c-acc">+ ${fmt(rec)}</span> &nbsp; <span class="c-red">− ${fmt(gas)}</span></span></div>
  ${tabela(lista, S.lanc.length ? "Nada aqui com esse filtro." : VAZIO_GERAL)}</div>`; };
 T.clientes = () => { const ano = S.mes.slice(0, 4), cl = clientes(ano);
-  if (!cl.length) return `<div class="c"><p class="vazio">Nenhum cliente ainda.<br>Lance um recebimento com o <b>nome do cliente</b> e ele aparece aqui.</p></div>`;
-  return `<div class="grid3">${cl.map((c, k) => `<div class="c ccard" data-cli="${esc(c.nome)}"><div class="hd"><span class="av ${k ? "" : "top"}">${ini(c.nome)}</span><div style="min-width:0"><b>${esc(c.nome)}</b><small>${pl(c.n, "pagamento")} · último ${c.ultimo ? dm(c.ultimo) : "—"}</small></div></div>
+  const novo = `<form class="c th" id="fCliNovo" style="margin-bottom:10px"><h2>Novo cliente</h2><input id="cliNovo" placeholder="Nome do cliente" autocomplete="off" maxlength="80" style="flex:1;min-width:160px;height:38px;background:var(--bg);border:1px solid var(--line2);border-radius:10px;padding:0 12px"><button class="btn acc" type="submit">Adicionar</button></form>`;
+  if (!cl.length) return novo + `<div class="c"><p class="vazio">Nenhum cliente ainda.<br>Adicione acima ou lance um recebimento com o <b>nome do cliente</b>.</p></div>`;
+  return novo + `<div class="grid3">${cl.map((c, k) => `<div class="c ccard" data-cli="${esc(c.nome)}"><div class="hd"><span class="av ${k ? "" : "top"}">${ini(c.nome)}</span><div style="min-width:0"><b>${esc(c.nome)}</b><small>${c.n ? pl(c.n, "pagamento") + " · último " + dm(c.ultimo) : "sem pagamento ainda"}</small></div></div>
  <div class="tot">${brl(c.ano)}<span class="c-dim" style="font:11px var(--mono);margin-left:8px">em ${ano}</span></div>
  <div class="row"><span>desde o início</span><b>${brl(c.total)}</b></div><div class="row"><span>em aberto</span><b class="${c.aberto ? "c-yel" : ""}">${brl(c.aberto)}</b></div>
- <div class="bar2"><i style="width:${cl[0].ano ? c.ano / cl[0].ano * 100 : 0}%"></i></div></div>`).join("")}</div>
+ <div class="bar2"><i style="width:${cl[0].ano ? c.ano / cl[0].ano * 100 : 0}%"></i></div>${c.id && !c.n && !c.aberto ? `<button class="btn" type="button" data-delcli="${esc(c.id)}" style="height:28px;font-size:12px;color:var(--ink3);justify-self:start">remover</button>` : ""}</div>`).join("")}</div>
  <p class="lbl" style="margin-top:16px">clique num cliente para ver os lançamentos dele</p>`; };
 T.cobrancas = () => { const k = kpis(S.mes), futuras = k.abertos.filter(i => i.data >= HOJE);
   return `<section class="kpis k3">
@@ -382,7 +383,8 @@ $("busca").oninput = e => { busca = e.target.value; if (rota !== "lancamentos" &
 document.addEventListener("keydown", e => { if (e.key === "/" && !["INPUT", "SELECT", "TEXTAREA"].includes(document.activeElement.tagName) && !$("app").hidden) { e.preventDefault(); $("busca").focus(); } if (e.key === "Escape" && !$("ov").hidden) fechar(); });
 const ach = id => S.lanc.find(x => x.id === id);
 const semId = ({ id, ...r }) => r;
-$("tela").addEventListener("click", async e => { const t = e.target.closest("[data-pago],[data-edit],[data-adiar],[data-zap],[data-f],[data-mes],[data-cli],[data-limpar],tr[data-id],#aSalvar"); if (!t) return; const d = t.dataset;
+$("tela").addEventListener("click", async e => { const t = e.target.closest("[data-pago],[data-edit],[data-adiar],[data-zap],[data-f],[data-mes],[data-cli],[data-limpar],[data-delcli],tr[data-id],#aSalvar"); if (!t) return; const d = t.dataset;
+  if (d.delcli) { try { await deleteDoc(doc(CLI, d.delcli)); toast("Cliente removido"); } catch (e) { erroRede(e); } return; }
   if (d.f) { filtro = d.f; render(); return; }
   if (d.mes !== undefined) { S.mes = d.mes; if (rota === "relatorios") ir("visao"); else render(); return; }
   if (d.limpar) { busca = ""; $("busca").value = ""; render(); return; }
@@ -392,6 +394,10 @@ $("tela").addEventListener("click", async e => { const t = e.target.closest("[da
   if (d.zap) { const i = ach(d.zap); const txt = encodeURIComponent(`Oi! Passando para lembrar do pagamento de ${brl(i.valor)} (${i.desc}), com vencimento em ${dm(i.data)}. Qualquer dúvida é só me chamar. Obrigado!`); window.open("https://wa.me/?text=" + txt, "_blank", "noopener"); return; }
   if (t.id === "aSalvar") { const v = $("aMeta").value.trim(), c = v ? paraCentavos(v) : 0; if (c === null) { toast("Meta inválida. Escreva assim: 5.000,00", true); return; } try { await setDoc(CONFIG, { meta: c }, { merge: true }); toast("Meta salva: <b>" + (c ? brl(c) : "sem meta") + "</b>"); } catch (e) { erroRede(e); } return; }
   const id = d.edit || d.id; if (id) abrir(ach(id)); });
+
+$("tela").addEventListener("submit", async e => { if (e.target.id !== "fCliNovo") return; e.preventDefault(); const nome = $("cliNovo").value.trim(); if (!nome) return $("cliNovo").focus();
+  if (clientes("").some(c => c.nome.toLowerCase() === nome.toLowerCase())) { toast("Já existe um cliente com esse nome.", true); return; }
+  try { await addDoc(CLI, { nome, criadoEm: new Date().toISOString() }); toast(`Cliente <b>${esc(nome)}</b> adicionado`); } catch (e) { erroRede(e); } });
 
 // ===== modal =====
 let editando = null;
@@ -429,6 +435,7 @@ onAuthStateChanged(auth, async user => {
   let primeira = true;
   unsub.push(onSnapshot(LANC, snap => { S.lanc = snap.docs.map(d => ({ id: d.id, ...d.data() })).filter(i => i.data && i.valor); if (primeira) { primeira = false; pronto = true; ir(location.hash.slice(1) || "visao"); } else render(); },
     e => { toast("Perdi a conexão com o banco (" + e.code + "). Recarregue a página.", true); }));
+  unsub.push(onSnapshot(CLI, snap => { S.cli = snap.docs.map(d => ({ id: d.id, ...d.data() })).filter(c => c.nome); render(); }, () => {}));
   unsub.push(onSnapshot(CONFIG, s => { S.meta = s.exists() ? (s.data().meta || 0) : 0; render(); }, () => {}));
 });
 </script>
