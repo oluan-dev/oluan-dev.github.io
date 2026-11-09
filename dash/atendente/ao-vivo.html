@@ -225,6 +225,13 @@ footer{display:flex;align-items:center;justify-content:space-between;padding:0 2
   .embed .legend{display:grid}
   .embed .ln{grid-template-columns:72px 150px minmax(0,1fr) 64px;font-size:12px}.embed .ln .n{display:block}
 }
+/* só o grafo (card do Início e do Testar): sem cartões, sem registro, sem rolagem */
+.so-grafo,.so-grafo body{overflow:hidden}
+.so-grafo .app{height:100vh;min-height:0;grid-template-rows:minmax(0,1fr)}
+.so-grafo main{grid-template-columns:minmax(0,1fr)}
+.so-grafo .left{display:grid;grid-template-rows:minmax(0,1fr)}
+.so-grafo .stage{height:auto;border:0}
+.so-grafo aside,.so-grafo .log,.so-grafo .legend{display:none}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -314,6 +321,7 @@ const rgba = (h,a) => { const n=parseInt(h.slice(1),16); return `rgba(${n>>16},$
 const ACC = '#c8ff2e';
 const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const EMBED = window.self !== window.top; if (EMBED) document.documentElement.classList.add('embed');
+if (new URLSearchParams(location.search).get('so') === 'grafo') document.documentElement.classList.add('so-grafo');
 let silencio = false;                         // evento antigo (reposto ao abrir): entra quieto, sem pulso
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));

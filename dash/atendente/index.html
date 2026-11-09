@@ -383,6 +383,7 @@ const hm = t => new Date(t * 1000).toLocaleTimeString('pt-BR', {hour: '2-digit',
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
 const msg = (el, txt, ok = true) => { $(el).className = ok ? 'ok' : 'err'; $(el).textContent = txt; };
 const vivoUrl = () => 'ao-vivo.html';
+const soGrafo = () => vivoUrl() + (vivoUrl().includes('?') ? '&' : '?') + 'so=grafo';   // card pequeno: só o grafo, sem rolagem
 const inicial = n => (String(n || '?').replace(/^(dra?\.?|sra?\.?)\s+/i, '').trim()[0] || '?').toUpperCase();
 const nomeDe = c => c.nome || c.chat.split('@')[0];
 let C = {}, baseSel = null, L = [], atual = null, filtro = 'todas', PORID = null, INI = null, validadeSel = 'hoje';
@@ -398,9 +399,9 @@ function ir(t) {
   document.querySelectorAll('[data-t]').forEach(b => b.classList.toggle('on', b.dataset.t === t));
   $('main').scrollTop = 0; try { localStorage.setItem('aba', t); } catch (e) {}
   if (location.hash !== '#' + t) history.replaceState(null, '', location.pathname + location.search + '#' + t);
-  if (t === 'inicio') { inicioAba(); if (!$('fMini').src) $('fMini').src = vivoUrl(); }
+  if (t === 'inicio') { inicioAba(); if (!$('fMini').src) $('fMini').src = soGrafo(); }
   if (t === 'aovivo' && !$('fTela').src) { $('fTela').src = vivoUrl(); $('aTela').href = vivoUrl(); }
-  if (t === 'testar' && !$('fTeste').src) $('fTeste').src = vivoUrl();
+  if (t === 'testar' && !$('fTeste').src) $('fTeste').src = soGrafo();
   if (t === 'conversas') conversas();
   if (t === 'lider') historicoLider();
   if (t === 'conexoes') conexoesAba();
