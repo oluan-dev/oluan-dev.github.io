@@ -1,0 +1,705 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta name="robots" content="noindex,nofollow"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Atendente · oLuan</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+/* Painel v2 (2026-11-07): menu por tarefa (Acompanhar · Comandar · Ensinar o robô · Sistema), topo só com estado,
+   semana e Pausar; Conversas no jeito do WhatsApp Web. Celular: barra de baixo + "Mais". Molde oluan.com.br. */
+:root{--bg:#070708;--bg2:#0d0d10;--bg3:#131317;--bg4:#1a1a1f;--ink:#f2f1ee;--ink2:#a4a39e;--ink3:#6f6e69;--line:rgba(255,255,255,.08);--line2:rgba(255,255,255,.14);
+  --acc:#c8ff2e;--acc-ink:#0a0a0a;--red:#ff6b4a;--yel:#f5c542;--blue:#7fb2ff;--display:"Space Grotesk",Inter,system-ui,sans-serif;--body:Inter,system-ui,sans-serif;--mono:"JetBrains Mono",ui-monospace,monospace;color-scheme:dark}
+*{box-sizing:border-box}html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--ink);font:400 14.5px/1.5 var(--body);-webkit-font-smoothing:antialiased}
+button,input,textarea,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.mono{font:500 11px/1.4 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--ink3)}
+.eyebrow{font:500 11px/1.4 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--acc)}
+.ok{color:var(--acc);font:500 12px var(--mono)}.err{color:var(--red);font:500 12px var(--mono)}
+textarea,input.campo{width:100%;background:var(--bg2);border:1px solid var(--line2);border-radius:12px;color:var(--ink);font:400 14px/1.6 var(--body);padding:12px 14px;outline:none}
+textarea:focus,input.campo:focus{border-color:var(--acc)}
+textarea{min-height:46vh;resize:vertical;font-family:var(--mono);font-size:13.5px}
+
+/* moldura */
+.app{display:grid;grid-template-columns:236px minmax(0,1fr);grid-template-rows:60px minmax(0,1fr);height:100%}
+.topo{grid-column:1/-1;display:flex;align-items:center;gap:12px;padding:0 max(18px,env(safe-area-inset-right,0px)) 0 max(18px,env(safe-area-inset-left,0px));border-bottom:1px solid var(--line);min-width:0}
+.logo{font:700 21px/1 var(--display);letter-spacing:-.02em}.logo i{font-style:normal;color:var(--acc)}
+.produto{font:500 13.5px var(--body);color:var(--ink2);padding-left:12px;border-left:1px solid var(--line);white-space:nowrap}
+.sp{flex:1}
+.pill{display:inline-flex;align-items:center;gap:8px;height:32px;padding:0 13px;border:1px solid var(--line);border-radius:99px;font:500 12px var(--mono);color:var(--ink2);white-space:nowrap}
+.pill b{width:8px;height:8px;border-radius:50%;background:var(--acc);box-shadow:0 0 10px var(--acc);flex:none}
+.pill.vivo{color:var(--acc);border-color:rgba(200,255,46,.3)}.pill.vivo b{animation:pisca 1.6s infinite}
+.pill.off{color:var(--red);border-color:rgba(255,107,74,.4)}.pill.off b{background:var(--red);box-shadow:none}
+.pill.warn{color:var(--yel);border-color:rgba(245,197,66,.35)}.pill.warn b{background:var(--yel);box-shadow:none}
+@keyframes pisca{50%{opacity:.25}}
+.pausa{all:unset;cursor:pointer;height:32px;padding:0 15px;border-radius:99px;border:1px solid rgba(255,107,74,.45);color:var(--red);font:600 13px var(--body);display:inline-flex;align-items:center;white-space:nowrap}
+.pausa:hover{background:rgba(255,107,74,.08)}.pausa.on{background:var(--red);color:#120806;border-color:var(--red)}
+nav.lado{border-right:1px solid var(--line);padding:16px 10px;overflow:auto;display:flex;flex-direction:column;gap:18px}
+.grupo{display:grid;gap:2px}.grupo>span{font:500 10.5px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--ink3);padding:0 12px 6px}
+.item{all:unset;cursor:pointer;display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:10px;color:var(--ink2);font:500 14px var(--body)}
+.item svg,nav.baixo svg{width:17px;height:17px;flex:none;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.item:hover{background:var(--bg3);color:var(--ink)}.item.on{background:var(--bg3);color:var(--ink);box-shadow:inset 3px 0 0 var(--acc)}
+.item .n{margin-left:auto;font:600 11px var(--mono);color:var(--acc-ink);background:var(--acc);border-radius:99px;padding:1px 7px}
+.item .n:empty{display:none}.item .n.cinza{background:var(--bg4);color:var(--ink2)}.item .ponto{margin-left:auto;color:var(--acc);font-size:10px}
+main{overflow:auto;min-width:0}
+.tela{display:none;padding:24px 26px 40px;max-width:1320px}.tela.on{display:block}
+.tela.cheia{max-width:none;padding:0;height:100%}.tela.cheia.on{display:grid}
+h1{font:700 28px/1.1 var(--display);letter-spacing:-.025em;margin:0;text-wrap:balance}
+.sub{color:var(--ink2);margin:6px 0 20px;max-width:70ch}
+.card{background:var(--bg2);border:1px solid var(--line);border-radius:16px;padding:18px;min-width:0}
+.btn{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:8px;padding:10px 18px;border-radius:99px;background:var(--acc);color:var(--acc-ink);font:600 13.5px var(--body);white-space:nowrap}
+.btn.sec{background:var(--bg3);color:var(--ink);border:1px solid var(--line)}.btn.sec:hover{border-color:var(--line2)}
+.btn.red{background:transparent;color:var(--red);border:1px solid rgba(255,107,74,.4)}
+.btn:disabled,.btn[aria-disabled=true]{opacity:.4;cursor:wait}
+.chip{all:unset;cursor:pointer;font:500 12px var(--body);padding:6px 12px;border-radius:99px;border:1px solid var(--line);color:var(--ink2);white-space:nowrap}
+.chip.on{color:var(--acc);border-color:rgba(200,255,46,.4);background:rgba(200,255,46,.07)}
+.st{font:500 10.5px var(--mono);letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:99px;border:1px solid var(--line);color:var(--ink3);white-space:nowrap}
+.st.robo,.st.on{color:var(--acc);border-color:rgba(200,255,46,.3)}.st.voce{color:var(--blue);border-color:rgba(127,178,255,.35)}
+.st.espera{color:var(--yel);border-color:rgba(245,197,66,.35)}.st.quente,.st.off{color:var(--red);border-color:rgba(255,107,74,.35)}
+.linha{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:12px}
+.filtros{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.cabeca{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.vazio{color:var(--ink3);font-size:13.5px;padding:6px 0}
+
+/* início */
+.numeros{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:14px 0}
+.num small{display:block;font:500 10.5px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);margin-bottom:12px}
+.num b{display:block;font:700 40px/1 var(--display);letter-spacing:-.04em;font-variant-numeric:tabular-nums}.num b.acc{color:var(--acc)}.num b.yel{color:var(--yel)}
+.num span{display:block;margin-top:8px;color:var(--ink2);font-size:13px}
+.dois{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:14px}
+.vivo-box{padding:0;overflow:hidden;display:flex;flex-direction:column}
+.vivo-box .ph{display:flex;justify-content:space-between;align-items:center;padding:12px 18px;border-bottom:1px solid var(--line)}
+.vivo-box iframe{border:0;width:100%;height:540px;background:var(--bg);display:block}
+.lista{display:grid;gap:8px}
+.linha-c{all:unset;cursor:pointer;display:grid;grid-template-columns:38px minmax(0,1fr) auto;gap:12px;align-items:center;padding:11px 12px;border-radius:12px;border:1px solid var(--line);background:var(--bg)}
+.linha-c:hover{border-color:var(--line2)}
+.av{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font:700 14px var(--display);background:var(--bg4);color:var(--ink2);flex:none}
+.av.q{background:rgba(255,107,74,.12);color:var(--red)}.av.e{background:rgba(245,197,66,.12);color:var(--yel)}.av.r{background:rgba(200,255,46,.1);color:var(--acc)}.av.v{background:rgba(127,178,255,.12);color:var(--blue)}
+.linha-c b,.conv b{display:block;font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.linha-c em,.conv em{display:block;font-style:normal;color:var(--ink3);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.trecho{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:13px}
+.trecho:last-child{border-bottom:0}.trecho b{font-weight:600}.trecho small{color:var(--ink3);font:500 11px var(--mono)}
+.trecho i{font-style:normal;font:600 12px var(--mono);color:var(--acc);grid-row:1/3;grid-column:2;align-self:center}
+.aviso-ativo{display:flex;gap:12px;align-items:center;flex-wrap:wrap;border-left:3px solid var(--yel);background:var(--bg2);padding:12px 14px;border-radius:0 12px 12px 0;color:var(--ink2);font-size:13.5px}
+.aviso-ativo b{color:var(--ink)}
+
+/* ao vivo */
+#t-aovivo{grid-template-rows:auto minmax(0,1fr);gap:10px;padding:12px 14px}
+#t-aovivo iframe{width:100%;height:100%;min-height:600px;border:1px solid var(--line);border-radius:14px;background:var(--bg);display:block}
+
+/* conversas */
+#t-conversas{grid-template-columns:330px minmax(0,1fr) 320px;height:100%}
+.col{min-height:0;display:flex;flex-direction:column;border-right:1px solid var(--line)}.col:last-child{border-right:0}
+.col-h{padding:14px 16px;border-bottom:1px solid var(--line);display:grid;gap:10px}
+.busca{width:100%;background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:9px 12px;color:var(--ink);font:400 13.5px var(--body);outline:none}
+.busca:focus{border-color:var(--acc)}
+.convs{overflow:auto;flex:1}
+.conv{all:unset;cursor:pointer;display:grid;grid-template-columns:42px minmax(0,1fr) auto;gap:11px;padding:12px 16px;border-bottom:1px solid rgba(255,255,255,.04);width:100%;box-sizing:border-box}
+.conv:hover{background:var(--bg2)}.conv.on{background:var(--bg3)}.conv .av{width:42px;height:42px}
+.conv .lado-d{display:grid;justify-items:end;gap:6px;font:500 11px var(--mono);color:var(--ink3)}
+.chat-h{display:flex;align-items:center;gap:12px;padding:12px 18px;border-bottom:1px solid var(--line);min-height:65px}
+.chat-h b{display:block;font-weight:600}.chat-h small{display:block;color:var(--ink3);font:500 11.5px var(--mono)}
+.msgs{flex:1;overflow:auto;padding:20px 22px;display:flex;flex-direction:column;gap:7px}
+.b{max-width:72%;padding:9px 13px;border-radius:14px;font-size:14px;line-height:1.45;white-space:pre-wrap;overflow-wrap:anywhere}
+.b small{display:block;font:500 10px var(--mono);color:var(--ink3);margin-top:4px;text-align:right;white-space:normal}
+.b.cliente{align-self:flex-start;background:var(--bg3);border-bottom-left-radius:4px}
+.b.robo,.b.lider{align-self:flex-end;background:#18240f;border:1px solid rgba(200,255,46,.22);border-bottom-right-radius:4px}
+.b.luan{align-self:flex-end;background:#121c2a;border:1px solid rgba(127,178,255,.3);border-bottom-right-radius:4px}
+.b .tag{display:block;font:500 9.5px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--yel);margin-bottom:4px}
+.dia{align-self:center;font:500 10.5px var(--mono);color:var(--ink3);padding:4px 10px;border:1px solid var(--line);border-radius:99px;margin:6px 0}
+.faixa{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 18px;border-top:1px solid var(--line);background:var(--bg2);font-size:13px;color:var(--ink2)}
+.compor{display:flex;gap:10px;padding:12px 18px;border-top:1px solid var(--line)}
+.compor input{flex:1;min-width:0;background:var(--bg2);border:1px solid var(--line);border-radius:99px;padding:10px 16px;color:var(--ink);outline:none}
+.compor input:focus{border-color:var(--acc)}
+.ctx{overflow:auto;padding:16px;display:grid;gap:12px;align-content:start}.ctx .card{padding:14px}
+.ctx h3{font:500 10.5px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--acc);margin:0 0 10px}
+.ctx textarea{min-height:80px;font:400 13px/1.5 var(--body)}
+.ctx p{margin:0;font-size:13px;color:var(--ink2)}
+.sem-conv{margin:auto;text-align:center;color:var(--ink3);padding:40px}
+#voltar{display:none}
+
+/* ensinar */
+.arquivos{display:grid;grid-template-columns:260px minmax(0,1fr);gap:14px}
+.arq{all:unset;cursor:pointer;display:block;padding:11px 13px;border-radius:12px;border:1px solid var(--line);background:var(--bg2)}
+.arq.on{border-color:rgba(200,255,46,.45)}.arq b{display:block;font-weight:600;font-size:14px}.arq small{color:var(--ink3);font:500 11px var(--mono)}
+.arq.novo{border-style:dashed;color:var(--ink3)}
+.duas-col{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.campo-t{display:grid;gap:6px}.campo-t label{font:600 14px var(--body)}.campo-t small{color:var(--ink3);font-size:12.5px}
+.campo-t textarea{min-height:42vh}
+.testar{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:14px;align-items:start}
+.testar .msgs{padding:0;min-height:120px}
+.tag2{display:inline-block;font:500 10.5px var(--mono);padding:2px 8px;border-radius:99px;background:rgba(200,255,46,.12);color:var(--acc);margin:2px 4px 0 0}
+pre.cerebro{white-space:pre-wrap;font:400 12.5px/1.6 var(--mono);color:#d8d7d2;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:16px;max-height:60vh;overflow:auto;margin:12px 0 0}
+pre.cerebro .h{color:var(--acc)}
+
+/* sistema */
+.cx{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:12px}
+.cx .card{display:grid;gap:8px;align-content:start}
+.cx h3,.bloco h3{font:700 16px var(--display);margin:0;display:flex;align-items:center;gap:10px}
+.cx p,.bloco p{margin:0;color:var(--ink2);font-size:13.5px}
+.bloco{margin-bottom:12px;display:grid;gap:12px}
+.fila{display:grid;grid-template-columns:1fr 2fr auto;gap:10px;align-items:center;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--bg)}
+.fila.ch{grid-template-columns:1fr 1.6fr auto}.fila input{width:100%;background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:9px 11px;font-size:13px;color:var(--ink)}
+.chips{grid-column:1/-1;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.mini{all:unset;cursor:pointer;font:500 12px var(--body);color:var(--ink2);padding:7px 12px;border-radius:99px;border:1px solid var(--line)}.mini:hover{color:var(--ink)}.mini.red{color:var(--red);border-color:rgba(255,107,74,.35)}
+.end{font:500 12.5px var(--mono);color:var(--ink);word-break:break-all}
+table.t{width:100%;border-collapse:collapse;font:400 12.5px/1.4 var(--body)}
+table.t th{font:500 10.5px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);text-align:left;padding:8px 10px;border-bottom:1px solid var(--line)}
+table.t td{padding:8px 10px;border-bottom:1px solid rgba(255,255,255,.04);color:var(--ink2)}
+.rol{overflow-x:auto}
+.breve{display:flex;gap:8px;flex-wrap:wrap}.breve span{font:500 12px var(--body);color:var(--ink3);padding:7px 12px;border:1px dashed var(--line2);border-radius:99px}
+.ajuste{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px;align-items:center;padding:14px 0;border-bottom:1px solid var(--line)}.ajuste:last-child{border-bottom:0}
+.ajuste b{display:block;font-weight:600}.ajuste small{color:var(--ink3);font-size:12.5px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:99px;padding:3px;gap:2px;flex-wrap:wrap}
+.seg button{all:unset;cursor:pointer;padding:6px 12px;border-radius:99px;font:500 12px var(--mono);color:var(--ink3)}
+.seg button.on{background:var(--bg4);color:var(--ink)}
+.trava{font:500 12px var(--mono);color:var(--ink2)}
+details summary{cursor:pointer;color:var(--ink2);font:600 14px var(--body)}
+nav.baixo{display:none}
+
+@media(max-width:1100px){.cx{grid-template-columns:1fr}#t-conversas{grid-template-columns:300px minmax(0,1fr)}#t-conversas .ctxcol{display:none}}
+@media(max-width:900px){
+  .app{grid-template-columns:minmax(0,1fr);grid-template-rows:56px minmax(0,1fr) 64px}
+  .produto,#pSemana{display:none}.pill.vivo span,#pEstado span{display:none}#pEstado{padding:0 11px}
+  nav.lado{display:none}nav.lado.aberto{display:flex;position:fixed;inset:56px 0 64px 0;background:var(--bg);z-index:25;border:0}
+  nav.baixo{display:grid;grid-template-columns:repeat(5,1fr);border-top:1px solid var(--line);background:var(--bg);padding-bottom:env(safe-area-inset-bottom,0px)}
+  nav.baixo button{all:unset;cursor:pointer;display:grid;justify-items:center;align-content:center;gap:3px;font:500 10.5px var(--body);color:var(--ink3)}
+  nav.baixo svg{width:20px;height:20px}nav.baixo button.on{color:var(--acc)}
+  .tela{padding:18px 16px 30px}.numeros{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .dois,.arquivos,.duas-col,.testar{grid-template-columns:1fr}.vivo-box iframe{height:620px}
+  #t-conversas{grid-template-columns:1fr}#t-conversas .col.chat,#t-conversas .ctxcol{display:none}
+  #t-conversas.aberta .col.lista-c{display:none}#t-conversas.aberta .col.chat{display:flex}#voltar{display:inline-block}
+  .b{max-width:86%}#t-aovivo{padding:10px}#t-aovivo iframe{min-height:0}
+  .fila,.fila.ch{grid-template-columns:1fr}
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+.login{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:24px;background:var(--bg) radial-gradient(60% 40% at 50% 30%,rgba(200,255,46,.08),transparent 70%)}
+.login[hidden]{display:none}
+.login .box{width:min(380px,100%);display:grid;gap:18px;text-align:center;justify-items:center}
+.login .logo{font-size:32px}.login .logo small{display:block;font:500 12px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--ink3);margin-top:8px}
+.login p{margin:0;color:var(--ink2)}
+.gbtn{display:inline-flex;align-items:center;gap:12px;height:48px;padding:0 22px;border-radius:999px;border:0;background:var(--acc);color:var(--acc-ink);font:600 15px var(--body);cursor:pointer}
+.gbtn:hover{background:#dbff6a}.gbtn[aria-busy=true]{opacity:.6;pointer-events:none}
+.login .err{color:var(--red);font:12px var(--mono);max-width:40ch;min-height:1em}
+.login .quem{font:12px var(--mono);color:var(--ink3)}
+.sinal{position:fixed;left:50%;transform:translateX(-50%);top:68px;z-index:40;background:#2a1712;border:1px solid rgba(255,107,74,.4);color:#ffb3a1;font:500 12.5px var(--body);padding:8px 14px;border-radius:10px;max-width:calc(100% - 32px)}
+.sinal[hidden]{display:none}
+.trocar{font:500 12px var(--mono);color:var(--ink2);text-decoration:none;border:1px solid var(--line);border-radius:99px;height:32px;padding:0 12px;display:inline-flex;align-items:center}
+.trocar{background:none;cursor:pointer}.trocar:hover{color:var(--ink);border-color:var(--line2)}
+.so-cel{display:none}
+@media(max-width:900px){.topo .trocar{display:none}.so-cel{display:block}}
+</style></head><body>
+<div class="login" id="login">
+  <div class="box">
+    <div class="logo">oLuan<i>.</i><small>atendente</small></div>
+    <p id="loginTxt">Entre com a conta Google do oLuan.</p>
+    <button class="gbtn" id="btnLogin" type="button"><svg viewBox="0 0 24 24" width="18" height="18"><path fill="#0a0a0a" d="M21.6 12.2c0-.7-.1-1.4-.2-2H12v3.9h5.4a4.6 4.6 0 0 1-2 3v2.5h3.2c1.9-1.7 3-4.3 3-7.4z"/><path fill="#0a0a0a" opacity=".7" d="M12 22c2.7 0 5-.9 6.6-2.4l-3.2-2.5c-.9.6-2 1-3.4 1-2.6 0-4.8-1.8-5.6-4.1H3.1v2.6A10 10 0 0 0 12 22z"/><path fill="#0a0a0a" opacity=".5" d="M6.4 14c-.2-.6-.3-1.3-.3-2s.1-1.4.3-2V7.4H3.1a10 10 0 0 0 0 9.2z"/><path fill="#0a0a0a" opacity=".85" d="M12 5.9c1.5 0 2.8.5 3.8 1.5l2.9-2.9A10 10 0 0 0 3.1 7.4L6.4 10c.8-2.3 3-4.1 5.6-4.1z"/></svg>Entrar com Google</button>
+    <p class="err" id="loginErr"></p>
+    <p class="quem">só luan@oluan.com.br entra</p>
+  </div>
+</div>
+<div class="sinal" id="semSinal" hidden></div>
+
+<div class="app">
+  <header class="topo">
+    <span class="logo">oLuan<i>.</i></span><span class="produto">Atendente · WhatsApp</span><span class="sp"></span>
+    <span class="pill vivo" id="pEstado" title=""><b></b><span>no ar</span></span>
+    <span class="pill" id="pSemana" title=""><b></b><span>semana</span></span>
+    <button class="pausa" id="bPausa" type="button">Pausar tudo</button>
+    <a class="trocar" href="../" title="Ir para o financeiro">Financeiro</a><button class="trocar sair" type="button">Sair</button>
+  </header>
+
+  <nav class="lado" id="lado" aria-label="Menu">
+    <div class="grupo"><span>Acompanhar</span>
+      <button class="item" data-t="inicio" type="button"><svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Início</button>
+      <button class="item" data-t="aovivo" type="button"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="2.5"/><circle cx="5" cy="6" r="1.8"/><circle cx="19" cy="6" r="1.8"/><circle cx="6" cy="19" r="1.8"/><circle cx="18" cy="18" r="1.8"/><path d="M6.4 7.2l4 3.4M17.6 7.2l-4 3.4M7.3 17.8l3.2-4M16.7 16.8l-3-3.2"/></svg>Ao vivo<span class="ponto">●</span></button>
+      <button class="item" data-t="conversas" type="button"><svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg>Conversas<span class="n" id="nConv"></span></button></div>
+    <div class="grupo"><span>Comandar</span>
+      <button class="item" data-t="lider" type="button"><svg viewBox="0 0 24 24"><path d="M12 3l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.4 6.8 19.1l1-5.8L3.5 9.2l5.9-.9z"/></svg>Líder</button>
+      <button class="item" data-t="avisos" type="button"><svg viewBox="0 0 24 24"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 8 3 8H3s3-1 3-8"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>Avisos<span class="n cinza" id="nAvisos"></span></button></div>
+    <div class="grupo"><span>Ensinar o robô</span>
+      <button class="item" data-t="conhecimento" type="button"><svg viewBox="0 0 24 24"><path d="M4 5a2 2 0 0 1 2-2h12v16H6a2 2 0 0 0-2 2z"/><path d="M4 19V5"/></svg>Conhecimento</button>
+      <button class="item" data-t="personalidade" type="button"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Personalidade</button>
+      <button class="item" data-t="regras" type="button"><svg viewBox="0 0 24 24"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z"/></svg>Regras</button>
+      <button class="item" data-t="testar" type="button"><svg viewBox="0 0 24 24"><path d="M9 3h6M10 3v6L4.5 19a1.5 1.5 0 0 0 1.3 2h12.4a1.5 1.5 0 0 0 1.3-2L14 9V3"/></svg>Testar</button></div>
+    <div class="grupo"><span>Sistema</span>
+      <button class="item" data-t="conexoes" type="button"><svg viewBox="0 0 24 24"><path d="M9 7H6a5 5 0 0 0 0 10h3M15 7h3a5 5 0 0 1 0 10h-3M8 12h8"/></svg>Conexões</button>
+      <button class="item" data-t="ajustes" type="button"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg>Ajustes</button></div>
+    <div class="grupo so-cel"><span>Conta</span><a class="item" href="../" style="text-decoration:none">Financeiro</a><button class="item sair" type="button">Sair</button></div>
+  </nav>
+
+  <main id="main">
+    <!-- INÍCIO -->
+    <section class="tela" id="t-inicio">
+      <div class="cabeca"><div><span class="eyebrow" id="iData"></span><h1 id="iTitulo">Carregando…</h1><p class="sub" id="iSub" style="margin-bottom:0"></p></div>
+        <button class="btn sec" data-ir="testar" type="button">Testar o robô</button></div>
+      <div class="numeros">
+        <div class="card num"><small>Conversas hoje</small><b id="iConv">–</b><span id="iRobo"></span></div>
+        <div class="card num"><small>Esperando você</small><b class="yel" id="iEsp">–</b><span>o robô não vai responder sozinho</span></div>
+        <div class="card num"><small>Clientes quentes</small><b class="acc" id="iQuente">–</b><span>o robô avisou você nas últimas 24 h</span></div>
+        <div class="card num"><small>Tempo de resposta</small><b id="iTempo">–</b><span>média de hoje</span></div>
+      </div>
+      <div class="dois">
+        <div class="card vivo-box"><div class="ph"><span class="eyebrow">Ao vivo</span><button class="chip" data-ir="aovivo" type="button">abrir Ao vivo</button></div><iframe id="fMini" title="Ao vivo (resumo)"></iframe></div>
+        <div style="display:grid;gap:14px;align-content:start">
+          <div class="card"><div class="cabeca" style="margin-bottom:12px"><span class="eyebrow">Precisa de você</span><button class="chip" data-ir="conversas" type="button">ver todas</button></div><div class="lista" id="iPrecisa"></div></div>
+          <div class="card"><span class="eyebrow">Hoje o robô mais usou</span><div style="margin-top:8px" id="iUsados"></div></div>
+          <div class="aviso-ativo" id="iAviso"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- AO VIVO -->
+    <section class="tela cheia" id="t-aovivo">
+      <div class="cabeca"><span class="mono">Ao vivo · o que o robô faz agora</span><a class="btn sec" id="aTela" target="_blank" rel="opener" style="padding:7px 14px;font-size:12.5px">Tela cheia ↗</a></div>
+      <iframe id="fTela" title="Ao vivo"></iframe>
+    </section>
+
+    <!-- CONVERSAS -->
+    <section class="tela cheia" id="t-conversas">
+      <div class="col lista-c">
+        <div class="col-h"><input class="busca" id="busca" placeholder="Buscar nome ou mensagem" aria-label="Buscar conversa">
+          <div class="filtros" id="filtros"><button class="chip on" data-f="todas" type="button">Todas</button><button class="chip" data-f="voce" type="button">Com você</button><button class="chip" data-f="quente" type="button">Quentes</button><button class="chip" data-f="robo" type="button">Só o robô</button></div></div>
+        <div class="convs" id="convs"></div>
+      </div>
+      <div class="col chat">
+        <div class="chat-h"><button class="chip" id="voltar" type="button" aria-label="Voltar para a lista">←</button><span class="av" id="cAv">·</span><div style="flex:1;min-width:0"><b id="cNome">Escolha uma conversa</b><small id="cInfo"></small></div><span class="st" id="cSt"></span></div>
+        <div class="msgs" id="cMsgs"><div class="sem-conv">Escolha uma conversa na lista.</div></div>
+        <div class="faixa" id="faixa" hidden></div>
+        <div class="compor" id="compor" hidden><input id="cTexto" placeholder="Responder como você (o robô fica quieto nesta conversa por 12 h)" aria-label="Mensagem"><button class="btn" type="button" id="cEnviar">Enviar</button><span id="mEnviar"></span></div>
+      </div>
+      <div class="col ctxcol"><div class="ctx" id="ctx"><p class="vazio">O que o robô usou aparece aqui.</p></div></div>
+    </section>
+
+    <!-- LÍDER -->
+    <section class="tela" id="t-lider"><span class="eyebrow">Comandar</span><h1>Líder de atendimento</h1>
+      <p class="sub">Fale como se desse uma ordem a um funcionário. O líder (Opus) entende e comanda o robô: chama um cliente, deixa instrução para uma conversa, muda o aviso, a base, liga ou desliga o robô. Mensagem para cliente sempre espera o seu ok.</p>
+      <div class="card msgs" id="cLider" style="max-height:56vh;min-height:280px"></div>
+      <div class="linha"><textarea id="tLider" style="min-height:70px;flex:1;font-family:var(--body)" placeholder="Ex.: chama o Raphael Paes no 21 9xxxx-xxxx, ele é cliente da R8…"></textarea></div>
+      <div class="linha"><button class="btn" id="bLider" type="button">Enviar ao líder</button><span id="mLider"></span></div>
+      <div class="filtros" id="sugLider" style="margin-top:12px"><span class="mono">sugestões:</span><button class="chip" type="button">chama o cliente … no número … e diz que …</button><button class="chip" type="button">na conversa com …, seja mais direto</button><button class="chip" type="button">muda o aviso do momento para …</button><button class="chip" type="button">ensina na base que …</button></div>
+    </section>
+
+    <!-- AVISOS -->
+    <section class="tela" id="t-avisos"><span class="eyebrow">Comandar</span><h1>Avisos do momento</h1>
+      <p class="sub">O que vale acima de tudo, até a hora que você escolher. O robô usa isso em toda conversa.</p>
+      <div class="card"><div class="cabeca" style="margin-bottom:12px"><span id="mAgora"></span><button class="chip" id="bAgoraLimpa" type="button">encerrar agora</button></div>
+        <textarea id="tAgora" style="min-height:22vh;font-family:var(--body)" placeholder="Ex.: hoje estou viajando, volto segunda. Pré-agende conversas a partir de terça."></textarea>
+        <div class="filtros" id="validade" style="margin-top:12px"><span class="mono">vale por:</span><button class="chip" data-v="1" type="button">1 hora</button><button class="chip" data-v="4" type="button">4 horas</button><button class="chip on" data-v="hoje" type="button">até o fim de hoje</button><button class="chip" data-v="72" type="button">3 dias</button><button class="chip" data-v="168" type="button">7 dias</button><button class="chip" data-v="0" type="button">sem prazo</button></div>
+        <div class="linha"><button class="btn" id="bAgora" type="button">Salvar aviso</button></div></div>
+      <p class="mono" style="margin:18px 0 8px">Modelos prontos</p>
+      <div class="filtros" id="modelosAviso"><button class="chip" type="button" data-txt="Hoje estou viajando e volto na segunda. Diga que eu respondo assim que voltar e deixe a conversa pré-agendada.">Estou viajando</button><button class="chip" type="button" data-txt="Esta semana a agenda está cheia. Pré-agende as conversas para a próxima semana.">Agenda cheia</button><button class="chip" type="button" data-txt="Hoje é feriado. Diga que eu respondo no próximo dia útil.">Feriado</button><button class="chip" type="button" data-txt="Hoje estou em reunião à tarde. Diga que eu respondo à noite.">Em reunião</button></div>
+    </section>
+
+    <!-- CONHECIMENTO -->
+    <section class="tela" id="t-conhecimento"><span class="eyebrow">Ensinar o robô</span><h1>Conhecimento</h1>
+      <p class="sub">O que o robô sabe sobre o negócio. Cada arquivo é um assunto. Ao salvar, a base é vetorizada de novo sozinha e o robô já usa a versão nova. <span id="bStatus"></span></p>
+      <div class="arquivos"><div class="lista" id="lBase"></div>
+        <div><input class="campo" id="iBaseNome" placeholder="nome-do-assunto" aria-label="Nome do arquivo"><textarea id="tBase" style="margin-top:10px" aria-label="Texto do arquivo"></textarea>
+          <div class="linha"><button class="btn" id="bBase" type="button">Salvar e vetorizar</button><button class="btn red" id="bBaseApaga" type="button">Apagar</button><span id="mBase"></span></div></div></div>
+      <div class="card" style="margin-top:16px"><span class="eyebrow">Ver o que a base traz</span>
+        <div class="linha"><input class="campo" id="iBusca" placeholder="Frase de cliente, ex.: vocês fazem sistema para oficina?" style="flex:1"><button class="btn sec" id="bBusca" type="button">Buscar</button></div><div id="rBusca" style="margin-top:10px"></div></div>
+    </section>
+
+    <!-- PERSONALIDADE -->
+    <section class="tela" id="t-personalidade"><span class="eyebrow">Ensinar o robô</span><h1>Personalidade</h1>
+      <p class="sub">Quem o robô é e como ele fala. As duas partes vão em toda resposta.</p>
+      <div class="duas-col">
+        <div class="campo-t"><label for="t-nucleo">Quem é e o que vende</label><small>Em poucas linhas, e como ele conduz a conversa.</small><textarea id="t-nucleo"></textarea><div class="linha" style="margin-top:4px"><button class="btn" data-salva="nucleo" type="button">Salvar</button><span id="m-nucleo"></span></div></div>
+        <div class="campo-t"><label for="t-estilo">Jeito de falar</label><small>O tom, o ritmo, as expressões e o que nunca usar.</small><textarea id="t-estilo"></textarea><div class="linha" style="margin-top:4px"><button class="btn" data-salva="estilo" type="button">Salvar</button><span id="m-estilo"></span></div></div>
+      </div>
+    </section>
+
+    <!-- REGRAS -->
+    <section class="tela" id="t-regras"><span class="eyebrow">Ensinar o robô</span><h1>Regras</h1>
+      <p class="sub">O que o robô faz e o que ele nunca faz. O formato técnico da resposta fica fixo no código, para nada quebrar.</p>
+      <textarea id="t-regras" aria-label="Regras"></textarea><div class="linha"><button class="btn" data-salva="regras" type="button">Salvar</button><span id="m-regras"></span></div>
+    </section>
+
+    <!-- TESTAR -->
+    <section class="tela" id="t-testar"><span class="eyebrow">Ensinar o robô</span><h1>Testar</h1>
+      <p class="sub">Escreva como se fosse um cliente, uma mensagem por linha. O robô responde aqui, não manda nada para ninguém, e o grafo ao lado mostra o que ele consultou.</p>
+      <div class="testar">
+        <div class="card"><textarea id="tTeste" style="min-height:110px;font-family:var(--body)" placeholder="oi&#10;vi seu site, vocês fazem app pra academia?"></textarea>
+          <div class="linha"><button class="btn" id="bTeste" type="button">Ver resposta</button><span id="mTeste"></span></div>
+          <div class="msgs" id="cTeste" style="margin-top:14px"></div><div id="aTeste" style="margin-top:10px"></div></div>
+        <div class="card vivo-box"><div class="ph"><span class="eyebrow">O que o robô consultou</span><span class="mono">ao vivo</span></div><iframe id="fTeste" title="Grafo ao vivo" style="height:560px"></iframe></div>
+      </div>
+    </section>
+
+    <!-- CONEXÕES -->
+    <section class="tela" id="t-conexoes"><span class="eyebrow">Sistema</span><h1>Conexões</h1>
+      <p class="sub">Tudo o que o atendente usa de fora, e o lugar para ligar os próximos sistemas: CRM, agenda, ERP, planilhas.</p>
+      <div class="cx" id="xStatus"></div>
+      <div class="card bloco"><h3>Webhooks de saída <span class="st" id="xNHooks">0</span></h3>
+        <p>A cada evento escolhido, o atendente manda um POST em JSON para o endereço. Serve para levar conversas a um CRM, a uma planilha ou a outro sistema. Se houver segredo, ele vai no cabeçalho Authorization.</p>
+        <div id="xHooks" style="display:grid;gap:10px"></div><div><button class="mini" id="xAddHook" type="button">+ Adicionar webhook</button></div></div>
+      <div class="card bloco"><h3>Chaves de API <span class="st" id="xNChaves">0</span></h3>
+        <p>Guardadas na VM. O painel nunca mostra a chave inteira, só os 4 últimos caracteres. Nenhuma integração usa estas chaves ainda; elas ficam prontas para as próximas.</p>
+        <div id="xChaves" style="display:grid;gap:10px"></div><div><button class="mini" id="xAddChave" type="button">+ Adicionar chave</button></div></div>
+      <div class="linha" style="margin:0 0 14px"><button class="btn" id="xSalvar" type="button">Salvar conexões</button><span id="mX"></span></div>
+      <div class="card bloco"><h3>API do atendente <span class="st on">entrada</span></h3>
+        <p>Outros sistemas podem falar com o atendente por estes endereços, mandando o token do painel no cabeçalho <span class="end">x-token</span>.</p>
+        <div class="linha" style="margin:0"><span class="end" id="xBase"></span><button class="mini" id="xCopia" type="button" hidden>Copiar token</button><span class="mono">token: só no painel da VM</span><span id="mCopia"></span></div>
+        <div class="rol"><table class="t"><tr><th>Método</th><th>Endereço</th><th>O que faz</th></tr>
+          <tr><td>POST</td><td class="end">/api/responder</td><td>responde uma conversa agora: {"chat", "instrucao"}</td></tr>
+          <tr><td>POST</td><td class="end">/api/testar</td><td>simula um cliente e devolve a resposta, sem enviar: {"mensagens": [...]}</td></tr>
+          <tr><td>GET</td><td class="end">/api/conversas</td><td>lista as conversas com a última mensagem</td></tr>
+          <tr><td>GET</td><td class="end">/api/inicio</td><td>o resumo do dia (conversas, esperando, quentes)</td></tr>
+          <tr><td>GET</td><td class="end">/api/eventos?desde=N</td><td>o que aconteceu depois do evento N (chegou, busca, respondeu…)</td></tr>
+          <tr><td>GET</td><td class="end">/api/buscar?q=…</td><td>busca na base, com os trechos e as notas</td></tr></table></div></div>
+      <div class="card bloco"><h3>Próximas integrações</h3><p>Ainda não existem. Cada uma entra como um cartão aqui em cima quando for feita.</p>
+        <div class="breve"><span>Google Agenda</span><span>Planilha / CRM</span><span>Sistema da empresa (ERP)</span><span>E-mail</span><span>Pagamento PIX</span></div></div>
+    </section>
+
+    <!-- AJUSTES -->
+    <section class="tela" id="t-ajustes"><span class="eyebrow">Sistema</span><h1>Ajustes</h1>
+      <p class="sub">O que quase nunca muda. Fica longe do "Pausar tudo" de propósito.</p>
+      <div class="card">
+        <div class="ajuste"><div><b>Quem o robô atende</b><small>No modo teste, só os números liberados (libere pela conversa).</small></div><div class="seg" id="segModo"><button data-v="teste" type="button">modo teste</button><button data-v="todos" type="button">todos</button></div></div>
+        <div class="ajuste"><div><b>Modelo do Claude</b><small id="aModeloReal">Sonnet é o equilíbrio entre qualidade e uso da assinatura.</small></div><div class="seg" id="segModelo"></div></div>
+        <div class="ajuste"><div><b>Esforço</b><small>Quanto ele pensa antes de responder.</small></div><div class="seg" id="segEsforco"></div></div>
+        <div class="ajuste"><div><b>Limite por hora</b><small>Freio de uso da assinatura.</small></div><span class="trava" id="aLimite"></span></div>
+        <div class="ajuste"><div><b>Quando você responde à mão</b><small>O robô fica quieto naquela conversa.</small></div><span class="trava">12 h</span></div>
+        <div class="ajuste" style="grid-template-columns:1fr"><details><summary>O que o robô recebe (avançado)</summary><p class="sub" style="margin:8px 0 0">O texto exato que vai para a IA a cada resposta. Os trechos da base entram junto com a conversa.</p><pre class="cerebro" id="preCerebro"></pre></details></div>
+      </div>
+      <span id="mAjuste" style="display:block;margin-top:10px"></span>
+    </section>
+  </main>
+
+  <nav class="baixo" aria-label="Atalhos">
+    <button data-t="inicio" type="button"><svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Início</button>
+    <button data-t="aovivo" type="button"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="2.5"/><circle cx="5" cy="6" r="1.8"/><circle cx="19" cy="6" r="1.8"/><circle cx="6" cy="19" r="1.8"/><circle cx="18" cy="18" r="1.8"/><path d="M6.4 7.2l4 3.4M17.6 7.2l-4 3.4M7.3 17.8l3.2-4M16.7 16.8l-3-3.2"/></svg>Ao vivo</button>
+    <button data-t="conversas" type="button"><svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg>Conversas</button>
+    <button data-t="lider" type="button"><svg viewBox="0 0 24 24"><path d="M12 3l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.4 6.8 19.1l1-5.8L3.5 9.2l5.9-.9z"/></svg>Líder</button>
+    <button data-t="mais" type="button"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>Mais</button>
+  </nav>
+</div>
+<script>
+const TOKEN = '';
+const $ = id => document.getElementById(id);
+const api = (rota, dados) => window.atendenteApi(rota, dados);
+const hora = t => new Date(t * 1000).toLocaleString('pt-BR', {day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit'});
+const hm = t => new Date(t * 1000).toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'});
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
+const msg = (el, txt, ok = true) => { $(el).className = ok ? 'ok' : 'err'; $(el).textContent = txt; };
+const vivoUrl = () => 'ao-vivo.html';
+const inicial = n => (String(n || '?').replace(/^(dra?\.?|sra?\.?)\s+/i, '').trim()[0] || '?').toUpperCase();
+const nomeDe = c => c.nome || c.chat.split('@')[0];
+let C = {}, baseSel = null, L = [], atual = null, filtro = 'todas', PORID = null, INI = null, validadeSel = 'hoje';
+
+// ---------------- navegação
+const TELAS = ['inicio', 'aovivo', 'conversas', 'lider', 'avisos', 'conhecimento', 'personalidade', 'regras', 'testar', 'conexoes', 'ajustes'];
+const ANTIGAS = {agora: 'avisos', base: 'conhecimento', nucleo: 'personalidade', estilo: 'personalidade', cerebro: 'ajustes'};
+function ir(t) {
+  if (t === 'mais') { $('lado').classList.toggle('aberto'); return; }
+  t = ANTIGAS[t] || t; if (!TELAS.includes(t)) t = 'inicio';
+  $('lado').classList.remove('aberto');
+  document.querySelectorAll('.tela').forEach(s => s.classList.toggle('on', s.id === 't-' + t));
+  document.querySelectorAll('[data-t]').forEach(b => b.classList.toggle('on', b.dataset.t === t));
+  $('main').scrollTop = 0; try { localStorage.setItem('aba', t); } catch (e) {}
+  if (location.hash !== '#' + t) history.replaceState(null, '', location.pathname + location.search + '#' + t);
+  if (t === 'inicio') { inicioAba(); if (!$('fMini').src) $('fMini').src = vivoUrl(); }
+  if (t === 'aovivo' && !$('fTela').src) { $('fTela').src = vivoUrl(); $('aTela').href = vivoUrl(); }
+  if (t === 'testar' && !$('fTeste').src) $('fTeste').src = vivoUrl();
+  if (t === 'conversas') conversas();
+  if (t === 'lider') historicoLider();
+  if (t === 'conexoes') conexoesAba();
+}
+document.addEventListener('click', e => { const b = e.target.closest('[data-t],[data-ir]'); if (b) ir(b.dataset.t || b.dataset.ir); });
+addEventListener('hashchange', () => ir(location.hash.slice(1)));
+addEventListener('message', e => { if (e.origin === location.origin && e.data && e.data.tipo === 'abrirBase' && C.base && C.base[e.data.arquivo]) { ir('conhecimento'); abrirBase(e.data.arquivo); } });
+
+// ---------------- estado geral (topo, ajustes, textos)
+async function carregar(manter) {
+  C = await api('/api/cerebro');
+  if (C.erro) { document.body.innerHTML = '<p style="padding:30px">O robô não respondeu: ' + esc(C.erro) + '. Veja se a VM está ligada e recarregue.</p>'; return; }
+  for (const k of ['nucleo', 'estilo', 'regras']) if (!manter) $('t-' + k).value = C[k];
+  $('preCerebro').innerHTML = esc(C.sistema).replace(/^(#.*)$/gm, '<span class="h">$1</span>') + '\n\n<span class="h"># BASE DE CONHECIMENTO</span>\n(entra a cada conversa, com os trechos achados pela busca)';
+  const m = C.momento || {}; if (!manter) $('tAgora').value = m.texto || '';
+  $('nAvisos').textContent = C.momento_ativo ? '1' : '';
+  $('mAgora').innerHTML = C.momento_ativo ? `<span class="st on">ativo${m.ate ? ' até ' + hora(m.ate) : ' · sem prazo'}</span>` : m.texto ? '<span class="st off">vencido</span>' : '<span class="st">nenhum aviso ativo</span>';
+  // topo: estado, semana, pausa
+  const pe = $('pEstado'); pe.className = 'pill ' + (C.pausado ? 'off' : C.modo_teste ? 'warn' : 'vivo');
+  pe.querySelector('span').textContent = C.pausado ? 'robô pausado' : C.modo_teste ? 'no ar · modo teste' : 'no ar · atendendo todos';
+  pe.title = `${C.uso_hora}/${C.limite_hora} respostas na última hora`;
+  $('bPausa').textContent = C.pausado ? 'Religar o robô' : 'Pausar tudo'; $('bPausa').classList.toggle('on', !!C.pausado);
+  const se = C.semana || {}, ps = $('pSemana'), vc = n => n > 0 && n < .01 ? '< 0,01' : (n >= 10 ? Math.round(n) : +n.toFixed(2)).toLocaleString('pt-BR');
+  ps.className = 'pill ' + (se.conta_pct == null ? 'warn' : se.conta_pct >= 80 ? 'off' : '');
+  ps.querySelector('span').textContent = se.conta_pct == null ? 'semana: esperando uma resposta' : `semana · robô ${se.robo_pct == null ? 'calculando' : (se.robo_pct > 0 && se.robo_pct < .01 ? '' : '≈ ') + vc(se.robo_pct) + '%'} · conta ${vc(se.conta_pct)}%`;
+  ps.title = se.conta_pct == null ? '' : `Conta ${vc(se.conta_pct)}%: o que o Claude informa, de tudo que usa a assinatura (robô, seu Claude Code, claude.ai).\nRobô ≈ ${se.robo_pct == null ? '?' : vc(se.robo_pct) + '%'}: a fatia do robô nesse total, pelo gasto dele contra o seu Claude Code deste computador.\nRenova ${new Date(se.renova * 1000).toLocaleString('pt-BR', {weekday: 'long', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit'})}.`;
+  // ajustes
+  $('segModo').querySelectorAll('button').forEach(b => b.classList.toggle('on', (b.dataset.v === 'teste') === !!C.modo_teste));
+  $('segModelo').innerHTML = C.modelos.map(x => `<button data-v="${x}" class="${x === C.modelo ? 'on' : ''}" type="button">${x}</button>`).join('');
+  const ROT = {low: 'baixo', medium: 'médio', high: 'alto', xhigh: 'muito alto', max: 'máximo'};
+  $('segEsforco').innerHTML = C.esforcos.map(x => `<button data-v="${x}" class="${x === C.esforco ? 'on' : ''}" type="button">${ROT[x] || x}</button>`).join('');
+  $('aModeloReal').textContent = C.modelo_real && C.modelo_real.nome ? `Última resposta: ${C.modelo_real.nome.replace('claude-', '')} às ${hm(C.modelo_real.em)}.` : 'Sonnet é o equilíbrio entre qualidade e uso da assinatura.';
+  $('aLimite').textContent = `${C.uso_hora} de ${C.limite_hora} na última hora`;
+  // conhecimento
+  const st = C.base_status;
+  $('bStatus').innerHTML = st.estado === 'vetorizando' ? '<span class="st espera">vetorizando…</span>' : st.estado === 'erro' ? '<span class="st off">base com erro</span>' : C.vetor ? `<span class="st on">pronta · ${C.trechos} trechos</span>` : '<span class="st off">busca desligada</span>';
+  desenharBase(); if (!manter) abrirBase(baseSel || Object.keys(C.base)[0] || '');
+}
+$('bPausa').onclick = async () => { await api('/api/pausa', {on: !C.pausado}); carregar(true); };
+$('segModo').onclick = async e => { const b = e.target.closest('button'); if (!b) return; await api('/api/config', {modo_teste: b.dataset.v === 'teste'}); msg('mAjuste', 'salvo'); carregar(true); };
+$('segModelo').onclick = async e => { const b = e.target.closest('button'); if (!b) return; await api('/api/config', {modelo: b.dataset.v}); msg('mAjuste', 'modelo: ' + b.dataset.v); carregar(true); };
+$('segEsforco').onclick = async e => { const b = e.target.closest('button'); if (!b) return; await api('/api/config', {esforco: b.dataset.v}); msg('mAjuste', 'esforço salvo'); carregar(true); };
+
+// ---------------- início
+async function inicioAba() {
+  INI = await api('/api/inicio'); const h = new Date().getHours();
+  $('iData').textContent = new Date().toLocaleDateString('pt-BR', {weekday: 'long', day: 'numeric', month: 'long'});
+  const n = INI.conversas, e = INI.esperando.length, q = INI.quentes.length;
+  $('iTitulo').textContent = `${h < 12 ? 'Bom dia' : h < 18 ? 'Boa tarde' : 'Boa noite'}. ${n ? `O robô atendeu ${n} conversa${n === 1 ? '' : 's'} hoje.` : 'Nenhuma conversa ainda hoje.'}`;
+  $('iSub').textContent = [e ? `${e} ${e === 1 ? 'pessoa está' : 'pessoas estão'} esperando você` : 'Ninguém esperando você', q ? `${q} cliente${q === 1 ? '' : 's'} quente${q === 1 ? '' : 's'}` : ''].filter(Boolean).join(' · ') + '.';
+  $('iConv').textContent = n; $('iRobo').textContent = n ? `${INI.so_robo} só com o robô` : 'conversas com mensagem de cliente';
+  $('iEsp').textContent = e; $('iQuente').textContent = q;
+  $('iTempo').innerHTML = INI.tempo_s == null ? '–' : INI.tempo_s < 90 ? INI.tempo_s + '<span style="font-size:20px;display:inline"> s</span>' : Math.round(INI.tempo_s / 60) + '<span style="font-size:20px;display:inline"> min</span>';
+  $('nConv').textContent = e || '';
+  const vistos = new Set(), itens = [...INI.quentes.map(c => ({c, t: 'quente'})), ...INI.esperando.map(c => ({c, t: 'espera'}))].filter(x => !vistos.has(x.c.chat) && vistos.add(x.c.chat));
+  $('iPrecisa').innerHTML = itens.map(({c, t}) => `<button class="linha-c" data-abre="${esc(c.arquivo)}" type="button"><span class="av ${t === 'quente' ? 'q' : 'e'}">${esc(inicial(nomeDe(c)))}</span><span><b>${esc(nomeDe(c))}</b><em>${esc(t === 'quente' && c.aviso ? c.aviso : c.ultima.texto)}</em></span>${t === 'quente' ? '<span class="st quente">quente</span>' : `<span class="st espera">desde ${hm(c.ultima.t)}</span>`}</button>`).join('') || '<p class="vazio">Ninguém esperando você agora.</p>';
+  $('iUsados').innerHTML = INI.usados.map(u => `<div class="trecho"><b>${esc(u.nome)}</b><small>${esc(arqNome(u.arquivo))}</small><i>${u.vezes}×</i></div>`).join('') || '<p class="vazio">O robô ainda não respondeu ninguém hoje.</p>';
+  const m = C.momento || {};
+  $('iAviso').innerHTML = C.momento_ativo ? `<span><b>Aviso ativo${m.ate ? ' até ' + hm(m.ate) : ''}:</b> "${esc(m.texto)}"</span><button class="chip" data-ir="avisos" type="button">mudar</button>` : `<span>Nenhum aviso do momento.</span><button class="chip" data-ir="avisos" type="button">criar aviso</button>`;
+  desenharBase();
+}
+const ARQ = {'servicos.md': 'Serviços', 'trabalhos-feitos.md': 'Trabalhos', 'perguntas-frequentes.md': 'Perguntas', 'como-este-assistente-funciona.md': 'O assistente', 'como-funciona.md': 'Método', 'quem-e-o-luan.md': 'Quem é o Luan'};
+const arqNome = a => ARQ[a] || String(a).replace(/\.md$/, '').replace(/-/g, ' ');
+$('iPrecisa').onclick = e => { const b = e.target.closest('[data-abre]'); if (b) { ir('conversas'); abrirConv(b.dataset.abre); } };
+
+// ---------------- conversas
+const estadoDe = c => c.quente ? ['quente', 'quente', 'q'] : c.off ? ['voce', 'robô desligado', 'v'] : c.quieto ? ['voce', 'com você', 'v'] : !c.liberado ? ['espera', 'não liberado', 'e'] : c.esperando ? ['espera', 'esperando', 'e'] : ['robo', 'robô', 'r'];
+const passa = c => filtro === 'todas' || (filtro === 'voce' && (c.quieto || c.off || c.esperando)) || (filtro === 'quente' && c.quente) || (filtro === 'robo' && !c.quieto && !c.off && c.liberado && !c.esperando);
+async function conversas() { L = await api('/api/conversas'); lista(); if (atual) abrirConv(atual, true); }
+function lista() {
+  const q = $('busca').value.toLowerCase();
+  $('convs').innerHTML = L.filter(c => passa(c) && (nomeDe(c) + ' ' + c.ultima.texto).toLowerCase().includes(q)).map(c => { const [cl, rot, av] = estadoDe(c);
+    return `<button class="conv ${c.arquivo === atual ? 'on' : ''}" data-f="${esc(c.arquivo)}" type="button"><span class="av ${av}">${esc(inicial(nomeDe(c)))}</span><span style="min-width:0"><b>${esc(nomeDe(c))}</b><em>${c.ultima.quem === 'luan' ? 'Você: ' : c.ultima.quem === 'robo' ? 'Robô: ' : ''}${esc(c.ultima.texto)}</em></span><span class="lado-d">${hora(c.ultima.t).slice(-5)}<span class="st ${cl}">${rot}</span></span></button>`; }).join('') || '<p class="vazio" style="padding:16px">Nenhuma conversa neste filtro.</p>';
+  const esperando = L.filter(c => c.esperando).length; $('nConv').textContent = esperando || '';
+}
+async function abrirConv(f, recarga) {
+  atual = f; const c = L.find(x => x.arquivo === f); if (!c) return; lista();
+  if (!PORID) { const m = await api('/api/mapa'); PORID = Object.fromEntries(m.trechos.map(t => [t.id, t])); }
+  const h = await api('/api/conversa?arquivo=' + encodeURIComponent(f)), [cl, rot, av] = estadoDe(c);
+  $('cAv').textContent = inicial(nomeDe(c)); $('cAv').className = 'av ' + av; $('cNome').textContent = nomeDe(c);
+  $('cInfo').textContent = (c.chat.endsWith('@s.whatsapp.net') ? '+' + c.chat.split('@')[0] : 'WhatsApp') + ` · ${c.total} mensagens`;
+  $('cSt').className = 'st ' + cl; $('cSt').textContent = rot;
+  let dia = '', html = '';
+  h.forEach(m => { const d = new Date(m.t * 1000).toLocaleDateString('pt-BR', {weekday: 'short', day: '2-digit', month: '2-digit'}); if (d !== dia) { dia = d; html += `<span class="dia">${d}</span>`; }
+    const audio = /^\[áudio, transcrito\]\s*/.test(m.texto), txt = m.texto.replace(/^\[áudio, transcrito\]\s*/, '');
+    html += `<div class="b ${m.quem}">${audio ? '<span class="tag">áudio transcrito</span>' : ''}${esc(txt)}<small>${hm(m.t)}${m.quem === 'robo' ? ' · robô' : m.quem === 'luan' ? ' · você' : ''}</small></div>`; });
+  const box = $('cMsgs'), noFim = !recarga || box.scrollHeight - box.scrollTop - box.clientHeight < 80;
+  box.innerHTML = html || '<div class="sem-conv">Sem mensagens.</div>'; if (noFim) box.scrollTop = 1e9;
+  // faixa de estado + compor
+  $('faixa').hidden = false; $('compor').hidden = false;
+  $('faixa').innerHTML = c.off ? `<span class="st voce">robô desligado aqui</span><span>Ele não responde esta conversa até você religar.</span><span class="sp"></span><button class="btn sec" data-acao="devolver" type="button">Religar o robô</button>`
+    : c.quieto ? `<span class="st voce">você está nesta conversa</span><span>O robô fica quieto até ${hora(c.quieto_ate)}.</span><span class="sp"></span><button class="btn sec" data-acao="devolver" type="button">Devolver ao robô</button>`
+    : !c.liberado ? `<span class="st espera">modo teste</span><span>Este número não está liberado: o robô não responde.</span><span class="sp"></span><button class="btn" data-acao="liberar" type="button">Liberar este número</button>`
+    : c.esperando ? `<span class="st espera">esperando você</span><span>A última mensagem é do cliente e o robô não vai responder sozinho.</span><span class="sp"></span><button class="btn" data-acao="assumir" type="button">Assumir conversa</button>`
+    : `<span class="st robo">o robô está respondendo</span><span class="sp"></span><button class="btn sec" data-acao="assumir" type="button">Assumir conversa</button>`;
+  // contexto: resumo do robô, trechos usados, instrução, ações
+  if (!recarga || document.activeElement !== $('cNota')) {
+    const ult = [...h].reverse().find(m => m.quem === 'robo' && m.trechos && m.trechos.length);
+    const trechos = ult ? ult.trechos.map((id, i) => ({t: PORID[id], nota: (ult.base[i] || [])[1]})).filter(x => x.t) : [];
+    const nome = t => { const mm = String(t.texto).match(/^\*\*([^*]+?)\*\*/); return (mm ? mm[1] : t.texto.replace(/\*\*/g, '').split(/\s+/).slice(0, 5).join(' ')).replace(/[:.?!]+$/, ''); };
+    $('ctx').innerHTML = `<div class="card"><h3>${c.quente ? 'Cliente quente' : 'Resumo do robô'}</h3><p>${c.aviso ? esc(c.aviso) : 'O robô ainda não marcou nada importante nesta conversa.'}</p></div>
+      <div class="card"><h3>O que ele usou da base</h3>${trechos.map(x => `<div class="trecho"><b>${esc(nome(x.t))}</b><small>${esc(arqNome(x.t.arquivo))}</small><i>${x.nota != null ? Math.round(x.nota * 100) + '%' : ''}</i></div>`).join('') || '<p>Ainda não há resposta com a busca nova.</p>'}</div>
+      <div class="card"><h3>Instrução só desta conversa</h3><textarea id="cNota" placeholder="Ex.: ela tem pressa, seja bem direto">${esc(c.nota || '')}</textarea>
+        <div class="linha" style="margin-top:8px"><button class="btn sec" data-acao="nota" type="button">Salvar instrução</button><span id="mNota"></span></div></div>
+      <div class="card"><h3>Ações</h3><div style="display:grid;gap:8px"><button class="btn sec" data-acao="responder" type="button">Responder agora com a instrução</button><button class="btn sec" data-acao="${c.off ? 'devolver' : 'desligar'}" type="button">${c.off ? 'Religar o robô nesta conversa' : 'Desligar o robô nesta conversa'}</button></div><span id="mAcao" style="display:block;margin-top:8px"></span></div>`;
+  }
+  $('t-conversas').classList.add('aberta');
+}
+$('convs').onclick = e => { const b = e.target.closest('[data-f]'); if (b) abrirConv(b.dataset.f); };
+$('busca').oninput = lista;
+$('filtros').onclick = e => { const b = e.target.closest('[data-f]'); if (!b) return; filtro = b.dataset.f; $('filtros').querySelectorAll('.chip').forEach(x => x.classList.toggle('on', x === b)); lista(); };
+$('voltar').onclick = () => $('t-conversas').classList.remove('aberta');
+$('t-conversas').addEventListener('click', async e => { const b = e.target.closest('[data-acao]'); if (!b || !atual) return; const c = L.find(x => x.arquivo === atual); const a = b.dataset.acao;
+  b.setAttribute('aria-disabled', 'true');
+  if (a === 'assumir') await api('/api/assumir', {chat: c.chat, on: true});
+  if (a === 'devolver') await api('/api/assumir', {chat: c.chat, on: false});
+  if (a === 'liberar') await api('/api/config', {liberar: c.chat});
+  if (a === 'desligar') await api('/api/conversa-off', {chat: c.chat, off: true});
+  if (a === 'nota') { const r = await api('/api/nota', {chat: c.chat, texto: $('cNota').value}); msg('mNota', r.ok ? 'salva' : 'erro', !!r.ok); }
+  if (a === 'responder') { const r = await api('/api/responder', {chat: c.chat, instrucao: $('cNota').value.trim()}); msg('mAcao', r.ok ? 'o robô vai responder em alguns segundos' : 'erro: ' + r.erro, !!r.ok); }
+  b.removeAttribute('aria-disabled'); if (a !== 'nota' && a !== 'responder') conversas(); });
+$('cEnviar').onclick = async () => { const t = $('cTexto').value.trim(); if (!t || !atual) return; const c = L.find(x => x.arquivo === atual);
+  $('cEnviar').setAttribute('aria-disabled', 'true'); const r = await api('/api/enviar', {chat: c.chat, texto: t}); $('cEnviar').removeAttribute('aria-disabled');
+  if (r.ok) { $('cTexto').value = ''; $('mEnviar').textContent = ''; conversas(); } else msg('mEnviar', 'não enviou: ' + (r.erro || 'erro'), false); };
+$('cTexto').onkeydown = e => { if (e.key === 'Enter') $('cEnviar').click(); };
+
+// ---------------- líder
+function cartaoAcao(a) {
+  if (a.pendente) return `<div data-p="${a.pendente}" style="margin-top:8px;padding:10px 12px;border:1px solid rgba(200,255,46,.3);border-radius:10px;background:rgba(0,0,0,.25)"><b>Aguardando o seu ok:</b> ${esc(a.resumo)}<div class="linha" style="margin-top:8px"><button class="btn" data-ok="${a.pendente}" type="button">Enviar ao cliente</button><button class="btn red" data-no="${a.pendente}" type="button">Descartar</button></div></div>`;
+  return `<span class="tag2" style="${a.erro ? 'color:var(--red);background:rgba(255,107,74,.1)' : ''}">${esc(a.feito || a.erro || a.tipo)}</span>`; }
+const bolhaLider = m => m.quem === 'luan' ? `<div class="b luan">${esc(m.texto)}<small>${hora(m.t)}</small></div>`
+  : `<div class="b lider">${esc(m.texto)}${(m.acoes || []).length ? '<div style="margin-top:6px">' + m.acoes.map(cartaoAcao).join('') + '</div>' : ''}<small>${hora(m.t)} · ${esc(m.modelo || '')}</small></div>`;
+async function historicoLider() { const h = await api('/api/lider-historico'); $('cLider').innerHTML = h.map(bolhaLider).join('') || '<p class="vazio">Comece dizendo o que o atendente deve fazer.</p>'; $('cLider').scrollTop = 1e9; }
+$('bLider').onclick = async () => { const m = $('tLider').value.trim(); if (!m) return;
+  $('cLider').insertAdjacentHTML('beforeend', bolhaLider({quem: 'luan', texto: m, t: Date.now() / 1000})); $('tLider').value = ''; $('cLider').scrollTop = 1e9;
+  $('bLider').setAttribute('aria-disabled', 'true'); msg('mLider', 'o líder está pensando…'); const t0 = Date.now();
+  const r = await api('/api/lider', {mensagem: m}); $('bLider').removeAttribute('aria-disabled');
+  if (r.erro) return msg('mLider', 'erro: ' + r.erro, false); msg('mLider', `respondeu em ${((Date.now() - t0) / 1000).toFixed(0)} s`);
+  $('cLider').insertAdjacentHTML('beforeend', bolhaLider({quem: 'lider', texto: r.resposta, acoes: r.acoes, modelo: r.modelo, t: Date.now() / 1000})); $('cLider').scrollTop = 1e9; carregar(true); };
+$('tLider').onkeydown = e => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) $('bLider').click(); };
+$('sugLider').onclick = e => { const b = e.target.closest('.chip'); if (b) { $('tLider').value = b.textContent; $('tLider').focus(); } };
+$('cLider').onclick = async e => { const ok = e.target.dataset.ok, no = e.target.dataset.no; if (!ok && !no) return;
+  const box = e.target.closest('[data-p]'); box.querySelectorAll('button').forEach(b => b.setAttribute('aria-disabled', 'true'));
+  const r = await api('/api/lider-confirmar', {id: ok || no, descartar: !!no});
+  box.innerHTML = r.erro ? `<span class="err">${esc(r.erro)}</span>` : no ? '<span class="tag2">descartado</span>' : '✅ Enviado ao cliente:' + r.enviados.map(s => `<div class="b robo" style="max-width:100%;margin-top:6px">${esc(s)}</div>`).join(''); };
+
+// ---------------- avisos
+function validade() { const v = validadeSel; if (v === '0') return null; const d = new Date();
+  if (v === 'hoje') { d.setHours(23, 59, 0, 0); return Math.floor(d / 1000); } return Math.floor(Date.now() / 1000) + Number(v) * 3600; }
+$('validade').onclick = e => { const b = e.target.closest('[data-v]'); if (!b) return; validadeSel = b.dataset.v; $('validade').querySelectorAll('[data-v]').forEach(x => x.classList.toggle('on', x === b)); };
+$('modelosAviso').onclick = e => { const b = e.target.closest('[data-txt]'); if (b) { $('tAgora').value = b.dataset.txt; $('tAgora').focus(); } };
+$('bAgora').onclick = async () => { await api('/api/momento', {texto: $('tAgora').value, ate: validade()}); carregar(true); };
+$('bAgoraLimpa').onclick = async () => { $('tAgora').value = ''; await api('/api/momento', {texto: '', ate: null}); carregar(true); };
+
+// ---------------- conhecimento
+function desenharBase() { if (!C.base) return; const uso = (INI && INI.uso_arquivos) || {};
+  $('lBase').innerHTML = Object.keys(C.base).map(n => `<button class="arq ${n === baseSel ? 'on' : ''}" data-n="${esc(n)}" type="button"><b>${esc(arqNome(n))}</b><small>${esc(n)}${uso[n] ? ` · usado ${uso[n]}× na semana` : ''}</small></button>`).join('') + '<button class="arq novo" data-n="" type="button">+ novo assunto</button>'; }
+function abrirBase(n) { baseSel = n; $('iBaseNome').value = n.replace('.md', ''); $('iBaseNome').disabled = !!n;
+  $('tBase').value = n ? C.base[n] : '# Título do assunto\n\n'; $('lBase').querySelectorAll('.arq').forEach(b => b.classList.toggle('on', b.dataset.n === n)); }
+$('lBase').onclick = e => { const b = e.target.closest('[data-n]'); if (b) abrirBase(b.dataset.n); };
+$('bBase').onclick = async () => { const nome = baseSel || $('iBaseNome').value.trim(); if (!nome) return msg('mBase', 'dê um nome ao assunto', false);
+  $('bBase').setAttribute('aria-disabled', 'true'); const r = await api('/api/base-salvar', {nome, texto: $('tBase').value}); $('bBase').removeAttribute('aria-disabled');
+  if (!r.ok) return msg('mBase', 'erro: ' + r.erro, false); baseSel = r.nome; PORID = null; msg('mBase', 'salvo, vetorizando…'); vigiarBase(); };
+$('bBaseApaga').onclick = async () => { if (!baseSel) return; const r = await api('/api/base-salvar', {nome: baseSel, apagar: true});
+  if (r.ok) { baseSel = null; PORID = null; msg('mBase', 'apagado, vetorizando…'); vigiarBase(); } };
+function vigiarBase() { const t = setInterval(async () => { await carregar(true); const st = C.base_status.estado;
+  if (st !== 'vetorizando') { clearInterval(t); msg('mBase', st === 'pronta' ? 'vetorizado ✓ o robô já usa a versão nova' : 'erro ao vetorizar: ' + C.base_status.erro, st === 'pronta'); } }, 1500); }
+$('bBusca').onclick = async () => { const r = await api('/api/buscar?q=' + encodeURIComponent($('iBusca').value));
+  $('rBusca').innerHTML = r.top && r.top.length ? r.top.map(x => `<div class="trecho"><b>${esc((String(x.texto).match(/^\*\*([^*]+?)\*\*/) || [0, x.texto.replace(/\*\*/g, '').split(/\s+/).slice(0, 6).join(' ')])[1])}</b><small>${esc(arqNome(x.arquivo))}</small><i>${Math.round(x.nota * 100)}%</i></div>`).join('') + `<p class="mono" style="margin-top:8px">${r.ms} ms</p>` : `<p class="vazio">${esc(r.erro || 'nada encontrado')}</p>`; };
+$('iBusca').onkeydown = e => { if (e.key === 'Enter') $('bBusca').click(); };
+
+// ---------------- personalidade e regras
+document.querySelectorAll('[data-salva]').forEach(b => b.onclick = async () => {
+  const n = b.dataset.salva; const r = await api('/api/salvar', {nome: n, texto: $('t-' + n).value});
+  msg('m-' + n, r.ok ? 'salvo às ' + new Date().toLocaleTimeString('pt-BR').slice(0, 5) : 'erro: ' + r.erro, r.ok); carregar(true); });
+
+// ---------------- testar
+$('bTeste').onclick = async () => { const ms = $('tTeste').value.split('\n').filter(s => s.trim()); if (!ms.length) return;
+  $('bTeste').setAttribute('aria-disabled', 'true'); msg('mTeste', 'pensando…'); const t0 = Date.now();
+  $('cTeste').innerHTML = ms.map(m => `<div class="b cliente">${esc(m)}</div>`).join('');
+  const r = await api('/api/testar', {mensagens: ms}); $('bTeste').removeAttribute('aria-disabled');
+  if (r.erro) return msg('mTeste', 'erro: ' + r.erro, false); msg('mTeste', `respondeu em ${((Date.now() - t0) / 1000).toFixed(1)} s · ${r.modelo}`);
+  $('cTeste').innerHTML += r.mensagens.map(m => `<div class="b robo">${esc(m)}<small>robô · teste</small></div>`).join('');
+  $('aTeste').innerHTML = r.aviso ? `<div class="aviso-ativo"><span><b>Aviso que iria para você:</b> ${esc(r.aviso)}</span></div>` : ''; };
+
+// ---------------- conexões
+let X = null;
+const novoId = () => String(Date.now()) + Math.floor(Math.random() * 1e3);
+async function conexoesAba(dados) {
+  X = dados || await api('/api/conexoes');
+  const z = X.whatsapp || {}, c = X.claude || {};
+  $('xStatus').innerHTML = `
+    <div class="card"><h3>WhatsApp Business <span class="st ${z.status === 'conectado' ? 'on' : 'off'}">${esc(z.status || '?')}</span></h3><p>Número ${z.numero ? esc(z.numero.replace(/^55(\d\d)(\d{4,5})(\d{4})$/, '($1) $2-$3')) : '—'}. A ponte fica na VM e recebe e manda as mensagens${z.atraso != null ? ' · entrega em ' + String(z.atraso).replace('.', ',') + ' s, em média' : ''}.</p></div>
+    <div class="card"><h3>Claude <span class="st on">assinatura</span></h3><p>Modelo ${esc(c.modelo)}, esforço ${esc(c.esforco)}.${c.ultima && c.ultima.nome ? ' Última resposta: ' + esc(c.ultima.nome.replace('claude-', '')) + '.' : ''} Troque em Ajustes.</p></div>
+    <div class="card"><h3>Autentique <span class="st ${X.autentique.configurado ? 'on' : 'off'}">${X.autentique.configurado ? 'ligado' : 'sem chave'}</span></h3><p>O vigia de contratos avisa no seu WhatsApp quando alguém assina.</p></div>`;
+  $('xNHooks').textContent = X.webhooks.length; $('xNChaves').textContent = X.chaves.length;
+  $('xHooks').innerHTML = X.webhooks.map(w => `<div class="fila" data-id="${esc(w.id)}">
+      <input placeholder="nome (ex.: CRM)" value="${esc(w.nome || '')}" data-k="nome" aria-label="Nome do webhook">
+      <input placeholder="https://..." value="${esc(w.url || '')}" data-k="url" aria-label="Endereço do webhook">
+      <span class="filtros"><button class="chip ${w.ativo ? 'on' : ''}" data-ativo type="button">${w.ativo ? 'ligado' : 'desligado'}</button><button class="mini" data-testar type="button">Testar</button><button class="mini red" data-tira type="button">Remover</button></span>
+      <div class="chips"><span class="mono">eventos:</span>${X.eventos_webhook.map(e => `<button class="chip ${(!w.eventos || !w.eventos.length || w.eventos.includes(e)) ? 'on' : ''}" data-ev="${e}" type="button">${e}</button>`).join('')}
+        <input placeholder="${w.tem_segredo ? 'segredo guardado · deixe vazio para manter' : 'segredo (opcional)'}" data-k="segredo" type="password" style="max-width:260px;margin-left:auto" aria-label="Segredo do webhook">
+        <span class="mono ult" style="color:${w.ultimo && w.ultimo.erro ? 'var(--red)' : 'var(--ink3)'}">${w.ultimo ? (w.ultimo.erro ? 'falhou: ' + esc(w.ultimo.erro) : 'último envio ' + w.ultimo.codigo + ' · ' + hora(w.ultimo.t)) : 'nada enviado ainda'}</span></div></div>`).join('') || '<p class="vazio">Nenhum webhook. Adicione um para mandar as conversas a outro sistema.</p>';
+  $('xChaves').innerHTML = X.chaves.map(k => `<div class="fila ch" data-id="${esc(k.id)}">
+      <input placeholder="nome (ex.: RHiD, Google)" value="${esc(k.nome || '')}" data-k="nome" aria-label="Nome da chave">
+      <input placeholder="${k.final ? 'guardada · termina em ' + esc(k.final) + ' · digite para trocar' : 'cole a chave aqui'}" data-k="valor" type="password" aria-label="Valor da chave">
+      <button class="mini red" data-tira type="button">Remover</button></div>`).join('') || '<p class="vazio">Nenhuma chave guardada.</p>';
+  $('xBase').textContent = location.origin;
+}
+function lerConexoes() {
+  const hooks = [...$('xHooks').querySelectorAll('.fila')].map(f => ({id: f.dataset.id, nome: f.querySelector('[data-k=nome]').value, url: f.querySelector('[data-k=url]').value.trim(),
+    ativo: f.querySelector('[data-ativo]').classList.contains('on'), eventos: [...f.querySelectorAll('[data-ev].on')].map(b => b.dataset.ev),
+    ...(f.querySelector('[data-k=segredo]').value ? {segredo: f.querySelector('[data-k=segredo]').value} : {})}));
+  const chaves = [...$('xChaves').querySelectorAll('.fila')].map(f => ({id: f.dataset.id, nome: f.querySelector('[data-k=nome]').value, ...(f.querySelector('[data-k=valor]').value ? {valor: f.querySelector('[data-k=valor]').value} : {})}));
+  return {webhooks: hooks, chaves};
+}
+function manter() { const d = lerConexoes(), velho = id => X.webhooks.find(w => w.id === id) || {};
+  X.webhooks = d.webhooks.map(w => ({...w, tem_segredo: velho(w.id).tem_segredo, ultimo: velho(w.id).ultimo}));
+  X.chaves = d.chaves.map(c => ({...c, final: (X.chaves.find(k => k.id === c.id) || {}).final})); }
+$('xAddHook').onclick = () => { manter(); X.webhooks.push({id: novoId(), nome: '', url: '', ativo: true, eventos: ['chegou', 'respondeu']}); conexoesAba(X); };
+$('xAddChave').onclick = () => { manter(); X.chaves.push({id: novoId(), nome: ''}); conexoesAba(X); };
+$('xHooks').onclick = async e => { const b = e.target.closest('button'), f = e.target.closest('.fila'); if (!b || !f) return;
+  if (b.dataset.ev || b.hasAttribute('data-ativo')) { b.classList.toggle('on'); if (b.hasAttribute('data-ativo')) b.textContent = b.classList.contains('on') ? 'ligado' : 'desligado'; return; }
+  if (b.hasAttribute('data-tira')) { f.remove(); msg('mX', 'removido · clique em Salvar'); return; }
+  if (b.hasAttribute('data-testar')) { const r = await api('/api/webhook-testar', {id: f.dataset.id});
+    msg('mX', r.erro ? 'falhou: ' + r.erro : 'teste enviado · resposta ' + r.codigo, !r.erro);
+    const u = f.querySelector('.ult'); u.textContent = r.erro ? 'falhou: ' + r.erro : 'último envio ' + r.codigo + ' · ' + hora(r.t); u.style.color = r.erro ? 'var(--red)' : 'var(--acc)'; } };
+$('xChaves').onclick = e => { const b = e.target.closest('[data-tira]'); if (b) { b.closest('.fila').remove(); msg('mX', 'removida · clique em Salvar'); } };
+$('xSalvar').onclick = async () => { const r = await api('/api/conexoes', lerConexoes());
+  if (r.erro) return msg('mX', 'erro: ' + r.erro, false); msg('mX', 'salvo às ' + new Date().toLocaleTimeString('pt-BR').slice(0, 5)); conexoesAba(r); };
+$('xCopia').onclick = async () => { try { await navigator.clipboard.writeText(TOKEN); msg('mCopia', 'copiado'); } catch (e) { msg('mCopia', 'não deu para copiar; o token é o que vem depois de token= no endereço', false); } };
+
+// ---------------- partida
+window.iniciarPainel = () => {
+let ini = location.hash.slice(1); if (!ini) try { ini = localStorage.getItem('aba') || 'inicio'; } catch (e) { ini = 'inicio'; }
+carregar().then(() => { ir(ini); api('/api/inicio').then(r => { INI = r; $('nConv').textContent = r.esperando.length || ''; desenharBase(); }); });
+setInterval(() => { if (document.hidden) return; if ($('t-conversas').classList.contains('on')) conversas(); if ($('t-inicio').classList.contains('on')) inicioAba(); }, 10000);
+setInterval(() => { if (!document.hidden) carregar(true); }, 30000);
+};
+</script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, onAuthStateChanged, signOut, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+import { getFirestore, collection, doc, onSnapshot, addDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+const DONO = "luan@oluan.com.br";
+const fb = initializeApp({ apiKey: "AIzaSyAKym9u1MDwFfqPJfh-RzLYUOaU2AujKUg", authDomain: "caixa-oluan.firebaseapp.com", projectId: "caixa-oluan", appId: "1:807827124097:web:60196678e2a0969a340280" });
+const auth = getAuth(fb), db = getFirestore(fb), el = id => document.getElementById(id);
+
+// espelho: a VM copia estas rotas para atendente/<nome> sempre que mudam; aqui ficam em memória, ao vivo
+const ESP = { "/api/cerebro": "cerebro", "/api/inicio": "inicio", "/api/conversas": "conversas", "/api/mapa": "mapa" };
+const cache = {}, fila = {};
+const espera = nome => cache[nome] != null ? Promise.resolve(cache[nome]) : new Promise(ok => {
+  (fila[nome] ||= []).push(ok); setTimeout(() => ok('{"erro":"sem dados do robô ainda"}'), 15000); });
+function pedir(rota, dados) {                      // o resto: um pedido que a VM atende e responde no mesmo documento
+  return addDoc(collection(db, "atendente_pedidos"), { p: rota, ...(dados ? { b: JSON.stringify(dados) } : {}), t: serverTimestamp() })
+    .then(ref => new Promise(ok => {
+      const fim = () => { clearTimeout(tempo); un(); deleteDoc(ref).catch(() => {}); };
+      const tempo = setTimeout(() => { fim(); ok({ erro: "o robô não respondeu (a VM está ligada?)" }); }, 200000);
+      const un = onSnapshot(ref, s => { const d = s.data(); if (d && d.r != null) { fim(); try { ok(JSON.parse(d.r)); } catch (e) { ok({ erro: "resposta inválida" }); } } });
+    }), e => ({ erro: "sem permissão no banco (" + (e.code || e) + ")" }));
+}
+window.atendenteApi = async (rota, dados) => {
+  if (!dados && ESP[rota]) return JSON.parse(await espera(ESP[rota]));
+  if (!dados && rota.startsWith("/api/eventos")) {
+    const desde = +new URLSearchParams(rota.split("?")[1]).get("desde") || 0, tudo = JSON.parse(await espera("eventos"));
+    if (!Array.isArray(tudo)) return [];
+    const max = tudo.length ? tudo[tudo.length - 1].id : 0;
+    return max < desde ? tudo : tudo.filter(e => e.id > desde);   // max < desde: o robô reiniciou, a tela recomeça a contagem
+  }
+  return pedir(rota, dados);
+};
+
+let vivo = 0;
+function sinal() {
+  const s = el("semSinal"), velho = vivo && Date.now() - vivo > 150000;
+  s.hidden = !velho;
+  if (velho) s.textContent = "Sem sinal da VM desde " + new Date(vivo).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }) + ". O que aparece aqui pode estar desatualizado.";
+}
+setInterval(sinal, 20000);
+
+const provider = new GoogleAuthProvider(); provider.setCustomParameters({ login_hint: DONO, prompt: "select_account" });
+const MSG = { "auth/unauthorized-domain": "Este endereço não está liberado no Firebase.", "auth/popup-blocked": "O navegador bloqueou a janela de login. Libere pop-ups e tente de novo.", "auth/popup-closed-by-user": "", "auth/cancelled-popup-request": "" };
+el("btnLogin").onclick = async () => { el("loginErr").textContent = ""; try { await setPersistence(auth, browserLocalPersistence); await signInWithPopup(auth, provider); }
+  catch (e) { if (e.code === "auth/popup-blocked" || e.code === "auth/operation-not-supported-in-this-environment") { try { await signInWithRedirect(auth, provider); return; } catch (e2) { e = e2; } } el("loginErr").textContent = MSG[e.code] ?? ("Não entrou (" + e.code + ")."); } };
+document.querySelectorAll(".sair").forEach(b => b.onclick = () => signOut(auth).then(() => location.reload()));
+
+let ligado = false;
+onAuthStateChanged(auth, async user => {
+  if (!user) { el("login").hidden = false; return; }
+  if (user.email !== DONO || !user.emailVerified) { await signOut(auth); el("login").hidden = false; el("loginErr").textContent = "A conta " + user.email + " não tem acesso."; return; }
+  if (ligado) return; ligado = true;
+  el("loginTxt").textContent = "Ligando ao robô…"; el("btnLogin").setAttribute("aria-busy", "true");
+  for (const nome of new Set([...Object.values(ESP), "eventos"]))
+    onSnapshot(doc(db, "atendente", nome), s => { if (!s.exists()) return; cache[nome] = s.data().j; (fila[nome] || []).splice(0).forEach(ok => ok(cache[nome])); },
+      e => { el("semSinal").hidden = false; el("semSinal").textContent = "Sem permissão para ler o robô (" + e.code + ")."; });
+  onSnapshot(doc(db, "atendente", "vivo"), s => { const t = s.data()?.t; if (t) { vivo = t.toMillis(); sinal(); } }, () => {});
+  await espera("cerebro");
+  el("login").hidden = true;
+  window.iniciarPainel();
+});
+</script>
+</body></html>
