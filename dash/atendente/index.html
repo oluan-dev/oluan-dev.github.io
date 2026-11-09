@@ -529,7 +529,7 @@ $('cTexto').onkeydown = e => { if (e.key === 'Enter') $('cEnviar').click(); };
 
 // ---------------- líder
 function cartaoAcao(a) {
-  if (a.pendente) return `<div data-p="${a.pendente}" style="margin-top:8px;padding:10px 12px;border:1px solid rgba(200,255,46,.3);border-radius:10px;background:rgba(0,0,0,.25)"><b>Aguardando o seu ok:</b> ${esc(a.resumo)}<div class="linha" style="margin-top:8px"><button class="btn" data-ok="${a.pendente}" type="button">Enviar ao cliente</button><button class="btn red" data-no="${a.pendente}" type="button">Descartar</button></div></div>`;
+  if (a.pendente) return `<div data-p="${esc(a.pendente)}" style="margin-top:8px;padding:10px 12px;border:1px solid rgba(200,255,46,.3);border-radius:10px;background:rgba(0,0,0,.25)"><b>Aguardando o seu ok:</b> ${esc(a.resumo)}<div class="linha" style="margin-top:8px"><button class="btn" data-ok="${esc(a.pendente)}" type="button">Enviar ao cliente</button><button class="btn red" data-no="${esc(a.pendente)}" type="button">Descartar</button></div></div>`;
   return `<span class="tag2" style="${a.erro ? 'color:var(--red);background:rgba(255,107,74,.1)' : ''}">${esc(a.feito || a.erro || a.tipo)}</span>`; }
 const bolhaLider = m => m.quem === 'luan' ? `<div class="b luan">${esc(m.texto)}<small>${hora(m.t)}</small></div>`
   : `<div class="b lider">${esc(m.texto)}${(m.acoes || []).length ? '<div style="margin-top:6px">' + m.acoes.map(cartaoAcao).join('') + '</div>' : ''}<small>${hora(m.t)} · ${esc(m.modelo || '')}</small></div>`;
